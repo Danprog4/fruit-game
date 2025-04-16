@@ -7,8 +7,10 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { init, mockTelegramEnv } from "@telegram-apps/sdk-react";
 import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
+import { AuthProvider } from "~/components/AuthProvider";
 import appCss from "~/lib/styles/app.css?url";
 import { TRPCRouter } from "~/trpc/init/router";
 
@@ -36,9 +38,42 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  useEffect(() => {
+    const themeParams = {
+      accent_text_color: "#6ab2f2",
+      bg_color: "#17212b",
+      button_color: "#5288c1",
+      button_text_color: "#ffffff",
+      destructive_text_color: "#ec3942",
+      header_bg_color: "#17212b",
+      hint_color: "#708499",
+      link_color: "#6ab3f3",
+      secondary_bg_color: "#232e3c",
+      section_bg_color: "#17212b",
+      section_header_text_color: "#6ab3f3",
+      subtitle_text_color: "#708499",
+      text_color: "#f5f5f5",
+    } as const;
+
+    if (import.meta.env.DEV) {
+      mockTelegramEnv({
+        launchParams: {
+          tgWebAppPlatform: "web",
+          tgWebAppVersion: "1.0.0",
+          tgWebAppData: import.meta.env.VITE_MOCK_INIT_DATA,
+          tgWebAppThemeParams: themeParams,
+          tgWebAppStartParam: "ref=3",
+        },
+      });
+    }
+
+    init();
+  }, []);
   return (
     <RootDocument>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+      </AuthProvider>
     </RootDocument>
   );
 }
