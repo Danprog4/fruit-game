@@ -18,7 +18,9 @@ export const authRouter = {
     )
     .mutation(async ({ input }) => {
       try {
-        validate(input.initData, process.env.BOT_TOKEN!);
+        validate(input.initData, process.env.BOT_TOKEN!, {
+          expiresIn: 0,
+        });
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -28,7 +30,7 @@ export const authRouter = {
       const parsedData = parse(input.initData);
 
       const telegramUser = parsedData.user;
-      const referrerId = input.startParam?.split("=")[1];
+      const referrerId = input.startParam?.split("_")[1];
       console.log(referrerId, "startParam");
 
       if (!telegramUser) {

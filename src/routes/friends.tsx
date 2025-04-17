@@ -19,7 +19,7 @@ function RouteComponent() {
   const text = "Приглашаю тебя в игру Fruit Utopia!";
 
   const link = useMemo((): string => {
-    return `https://t.me/FruitUtopia_bot?start=ref=${user?.id || ""}`;
+    return `https://t.me/FruitUtopia_bot?startapp=ref_${user?.id || ""}`;
   }, [user?.id, text]);
   return (
     <div className="mt-[111px] h-screen w-full rounded-lg pr-4 pl-4 text-white">

@@ -16,14 +16,14 @@ export const List = () => {
             className="] flex h-[76px] items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"
             key={friend.id}
           >
-            <div className="flex items-center gap-[21px]">
+            <div className="flex items-center gap-4">
               <UserPhoto />
-              <div className="flex flex-col items-start justify-center gap-[8px] pr-[21px]">
+              <div className="flex flex-col items-start justify-center gap-[8px]">
                 <div className="font-manrope text-xs leading-none font-medium">
                   {friend.name}
                 </div>
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                  Уровень{" "}
+                  Уровень
                   <div className="flex h-[16px] w-[23px] items-center justify-center rounded-full bg-[#B0F72C] text-black">
                     14
                   </div>
