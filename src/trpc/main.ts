@@ -22,6 +22,13 @@ export const router = {
 
     return friends;
   }),
+  getUser: procedure.query(async ({ ctx }) => {
+    const userId = ctx.userId;
+    const user = await db.query.usersTable.findFirst({
+      where: (users) => eq(users.id, userId),
+    });
+    return user;
+  }),
 } satisfies TRPCRouterRecord;
 
 export type Router = typeof router;

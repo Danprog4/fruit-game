@@ -1,15 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { init, mockTelegramEnv } from "@telegram-apps/sdk-react";
 import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
+import { Toaster } from "sonner";
 import { AuthProvider } from "~/components/AuthProvider";
 import appCss from "~/lib/styles/app.css?url";
 import { TRPCRouter } from "~/trpc/init/router";
@@ -98,10 +97,12 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       </head>
       <body>
         {children}
-
-        {isDev && <ReactQueryDevtools buttonPosition="bottom-left" />}
-        {isDev && <TanStackRouterDevtools position="bottom-right" />}
-
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: { backgroundColor: "#85BF1A", color: "#fff" },
+          }}
+        />
         <Scripts />
       </body>
     </html>

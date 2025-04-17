@@ -7,7 +7,6 @@ export default {
   verbose: true,
   strict: true,
   dialect: "postgresql",
-  casing: "snake_case",
   dbCredentials: {
     url: process.env.DATABASE_URL as string,
   },

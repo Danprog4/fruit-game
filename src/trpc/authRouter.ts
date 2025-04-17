@@ -56,6 +56,9 @@ export const authRouter = {
       const existingUser = await db.query.usersTable.findFirst({
         where: eq(usersTable.id, telegramUser.id),
       });
+      const name =
+        telegramUser.first_name +
+        (telegramUser.last_name ? ` ${telegramUser.last_name}` : "");
 
       if (!existingUser) {
         const newUser = await db
@@ -64,6 +67,8 @@ export const authRouter = {
             id: telegramUser.id,
             referrerId: referrerId ? Number(referrerId) : null,
             tokenBalance: 0,
+            name,
+            photoUrl: telegramUser.photo_url || null,
           })
           .returning();
 
