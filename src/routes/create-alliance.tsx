@@ -179,7 +179,7 @@ function RouteComponent() {
           </div>
         </div>
         <button
-          className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[39px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-xs font-medium text-white"
+          className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
           onClick={handleButtonClick}
           disabled={createAlliance.isPending}
         >
