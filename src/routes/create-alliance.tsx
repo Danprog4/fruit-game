@@ -103,7 +103,7 @@ function RouteComponent() {
     showErrors && !allianceName
       ? "border-1 border-red-500 pr-[15px] pl-[12px]"
       : "px-[14px]"
-  } bg-[#F7FFEB0F] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none`;
+  } bg-[#F7FFEB0F] text-base text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none`;
 
   const fileUploadClass = `flex p-3 w-full items-center justify-start gap-4 rounded-full ${
     showErrors && !selectedFile ? "border-1 border-red-500 " : ""
@@ -132,7 +132,7 @@ function RouteComponent() {
             <input
               type="text"
               placeholder="Ссылка на ваш канал"
-              className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] px-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
+              className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] px-[14px] text-base text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
               size={500}
               value={telegramUrl}
               onChange={(e) => setTelegramUrl(e.target.value)}
