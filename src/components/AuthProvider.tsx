@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTRPC } from "~/trpc/init/react";
+import { FullPageSpinner } from "./Spinner";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [initData, startParam]);
 
   if (!loggedIn) {
-    return "loading...";
+    return <FullPageSpinner />;
   }
 
   return <>{children}</>;
