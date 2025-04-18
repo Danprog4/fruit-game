@@ -57,7 +57,7 @@ function RouteComponent() {
           </div>
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium">
             С вами в игре:{" "}
-            <span className="text-[#85BF1A]">{friends?.length || 0} друга</span>
+            <span className="text-[#85BF1A]">{friends?.length || 0} друзей</span>
           </div>
         </div>
         <div
@@ -81,7 +81,7 @@ function RouteComponent() {
         <List />
       ) : (
         <div className="flex h-[100px] w-full items-center justify-center rounded-lg bg-[#F7FFEB0F] text-center">
-          <div className="font-manrope text-base font-medium">У вас пока нету друзей</div>
+          <div className="font-manrope text-base font-medium">У вас пока нет друзей</div>
         </div>
       )}
     </div>
