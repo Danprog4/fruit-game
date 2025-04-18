@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import convert from "heic-convert/browser";
 import { ChangeEvent, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { AllianceGroup } from "~/components/icons/AllianceGroup";
@@ -42,6 +43,25 @@ function RouteComponent() {
     });
   };
 
+  const isHeicFile = (file: File): boolean => {
+    return file.name.toLowerCase().endsWith(".heic");
+  };
+
+  const convertHeicToPng = async (file: File): Promise<File> => {
+    const arrayBuffer = await file.arrayBuffer();
+
+    const outputBuffer = await convert({
+      buffer: arrayBuffer,
+      format: "JPEG",
+      quality: 0.3,
+    });
+
+    const blob = new Blob([outputBuffer], { type: "image/jpeg" });
+    return new File([blob], file.name.replace(/\.heic$/i, ".jpg"), {
+      type: "image/jpeg",
+    });
+  };
+
   const handleCreateAlliance = async () => {
     if (!selectedFile || !allianceName) {
       setShowErrors(true);
@@ -49,7 +69,14 @@ function RouteComponent() {
     }
 
     try {
-      const base64 = await convertToBase64(selectedFile);
+      let fileToProcess = selectedFile;
+
+      // If file is HEIC, convert to PNG first
+      if (isHeicFile(selectedFile)) {
+        fileToProcess = await convertHeicToPng(selectedFile);
+      }
+
+      const base64 = await convertToBase64(fileToProcess);
       console.log(base64);
 
       await createAlliance.mutateAsync({
@@ -74,14 +101,12 @@ function RouteComponent() {
 
   const nameInputClass = `h-[42px] w-full rounded-full ${
     showErrors && !allianceName
-      ? "border-1 border-red-500 pr-[15px] pl-[13px]"
+      ? "border-1 border-red-500 pr-[15px] pl-[12px]"
       : "px-[14px]"
   } bg-[#F7FFEB0F] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none`;
 
-  const fileUploadClass = `flex h-[76px] w-full items-center justify-start gap-4 rounded-full ${
-    showErrors && !selectedFile
-      ? "border-1 border-red-500 pr-[15px] pl-[13px]"
-      : "pr-[14px] pl-[14px]"
+  const fileUploadClass = `flex p-3 w-full items-center justify-start gap-4 rounded-full ${
+    showErrors && !selectedFile ? "border-1 border-red-500 " : ""
   } bg-[#343D24] text-sm font-medium text-white`;
 
   return (
