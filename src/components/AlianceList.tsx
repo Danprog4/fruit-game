@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { ruPeople } from "~/lib/intl";
 import { getImageUrl } from "~/lib/utils/images";
+import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 import { AllianceMini } from "./icons/AlianceMini";
 
@@ -36,7 +38,7 @@ export const AllianceList = ({ searchQuery = "" }) => {
                   {alliance.name}
                 </div>
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                  <div>{alliance.members} человек</div>
+                  <div>{pluralizeRuIntl(alliance.members || 1, ruPeople)}</div>
                 </div>
               </div>
             </div>

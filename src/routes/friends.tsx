@@ -8,6 +8,8 @@ import { Share } from "~/components/icons/Share";
 import { Token } from "~/components/icons/Token";
 import { User } from "~/components/icons/User";
 import { List } from "~/components/List";
+import { ruFriends } from "~/lib/intl";
+import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/friends")({
   component: RouteComponent,
@@ -29,7 +31,7 @@ function RouteComponent() {
       <div className="mt-[111px] mb-[27px] flex h-[76px] w-full items-center justify-between rounded-full bg-[#343d24] pr-[11px] pl-[28px]">
         <div className="flex flex-col gap-[7px]">
           <div className="font-manrope text-base font-semibold">Пригласите друзей</div>
-          <div className="font-manrope text-xs font-medium text-[#93A179]">
+          <div className="font-manrope text-xs font-medium text-[rgb(147,161,121)]">
             И получите <span className="text-[#85BF1A]">5%</span> от дохода друзей
           </div>
         </div>
@@ -57,7 +59,9 @@ function RouteComponent() {
           </div>
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium">
             С вами в игре:{" "}
-            <span className="text-[#85BF1A]">{friends?.length || 0} друзей</span>
+            <span className="text-[#85BF1A]">
+              {pluralizeRuIntl(friends?.length || 0, ruFriends)}
+            </span>
           </div>
         </div>
         <div
