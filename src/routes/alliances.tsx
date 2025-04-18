@@ -19,7 +19,7 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="pr-4 pb-20 pl-4 text-white">
+    <div className="h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <div
         className="absolute top-4 right-4 flex"
         onClick={() => navigate({ to: "/friends" })}
