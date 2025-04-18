@@ -26,7 +26,7 @@ export const AllianceList = ({ searchQuery = "" }) => {
                 <img
                   src={getImageUrl(alliance.avatarId)}
                   alt={alliance.name}
-                  className="h-12 w-12 rounded-full"
+                  className="h-12 w-12 rounded-full object-cover"
                 />
               ) : (
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#3A3A3A]">

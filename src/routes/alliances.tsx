@@ -21,7 +21,7 @@ function RouteComponent() {
   return (
     <div className="h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <div
-        className="absolute top-4 right-4 flex"
+        className="absolute top-4 right-4 z-10 flex"
         onClick={() => navigate({ to: "/friends" })}
       >
         <div className="flex flex-col items-center gap-2">
@@ -47,7 +47,7 @@ function RouteComponent() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center">
+            <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
               <button className="text-white hover:text-white">
                 <div className="flex h-[29px] w-[82px] items-center justify-center rounded-full bg-[#76AD10]">
                   <div className="font-manrope text-xs font-medium">Искать</div>
@@ -61,7 +61,7 @@ function RouteComponent() {
 
       <button
         onClick={() => navigate({ to: "/create-alliance" })}
-        className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[39px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-xs font-medium text-white"
+        className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[52px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
       >
         Создать свой альянс
       </button>

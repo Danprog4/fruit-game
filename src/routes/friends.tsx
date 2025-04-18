@@ -84,8 +84,8 @@ function RouteComponent() {
       {friends && friends.length > 0 ? (
         <List />
       ) : (
-        <div className="flex h-[100px] w-full items-center justify-center rounded-lg bg-[#F7FFEB0F] text-center">
-          <div className="font-manrope text-2xl font-medium">У вас пока нет друзей</div>
+        <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
+          <div className="font-manrope text-sm opacity-50">У вас пока нет друзей</div>
         </div>
       )}
     </div>
