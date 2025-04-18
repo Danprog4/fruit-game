@@ -25,7 +25,7 @@ export const List = () => {
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
                   Уровень
                   <div className="flex h-[16px] w-[23px] items-center justify-center rounded-full bg-[#B0F72C] text-black">
-                    14
+                    1
                   </div>
                 </div>
               </div>
