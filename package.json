@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
-    "db:push": "drizzle-kit push",
+    "db:push": "drizzle-kit push --force",
     "build": "vinxi build && bun db:push",
     "start": "vinxi start",
     "lint": "eslint .",
