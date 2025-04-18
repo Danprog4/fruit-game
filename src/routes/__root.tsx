@@ -79,6 +79,7 @@ function RootComponent() {
       swipeBehavior.mount();
       swipeBehavior.isMounted();
       swipeBehavior.disableVertical();
+      swipeBehavior.isVerticalEnabled();
     }
   }, []);
 
