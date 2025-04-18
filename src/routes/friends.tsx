@@ -75,7 +75,7 @@ function RouteComponent() {
           <div className="font-manrope text-xs leading-none font-medium">Пригласить</div>
         </div>
       </div>
-      <div className="mb-[15px] flex items-center gap-2">
+      <div className="mb-[16px] flex items-center gap-2">
         <Token width={24} height={24} viewBox="0 0 30 30" />
         <div className="font-manrope text-base leading-none font-semibold">
           Прибыль от друзей
