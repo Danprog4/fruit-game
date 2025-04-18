@@ -53,7 +53,8 @@ function RouteComponent() {
             <User />
           </div>
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium">
-            С вами в игре: <span className="text-[#85BF1A]">{friends?.length} друга</span>
+            С вами в игре:{" "}
+            <span className="text-[#85BF1A]">{friends?.length || 0} друга</span>
           </div>
         </div>
         <div
@@ -73,7 +74,13 @@ function RouteComponent() {
           Прибыль от друзей
         </div>
       </div>
-      <List />
+      {friends && friends.length > 0 ? (
+        <List />
+      ) : (
+        <div className="flex h-[100px] w-full items-center justify-center rounded-lg bg-[#F7FFEB0F] text-center">
+          <div className="font-manrope text-base font-medium">У вас пока нету друзей</div>
+        </div>
+      )}
     </div>
   );
 }
