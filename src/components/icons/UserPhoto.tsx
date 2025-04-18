@@ -1,12 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/trpc/init/react";
-
-export const UserPhoto = () => {
-  const trpc = useTRPC();
-  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+export const UserPhoto = ({ friendPhotoUrl }: { friendPhotoUrl?: string }) => {
   return (
     <img
-      src={user?.photoUrl || undefined}
+      src={friendPhotoUrl || undefined}
       alt="user"
       className="h-[54px] w-[54px] rounded-full"
     />

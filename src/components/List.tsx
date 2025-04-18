@@ -17,7 +17,7 @@ export const List = () => {
             key={friend.id}
           >
             <div className="flex items-center gap-4">
-              <UserPhoto />
+              <UserPhoto friendPhotoUrl={friend.photoUrl || ""} />
               <div className="flex flex-col items-start justify-center gap-[8px]">
                 <div className="font-manrope text-xs leading-none font-medium">
                   {friend.name}
