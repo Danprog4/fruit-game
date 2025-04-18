@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { shareURL } from "@telegram-apps/sdk";
 import { useMemo } from "react";
 import { toast } from "sonner";
+import { BackButton } from "~/components/BackButton";
 import { Share } from "~/components/icons/Share";
 import { Token } from "~/components/icons/Token";
 import { User } from "~/components/icons/User";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/friends")({
 
 function RouteComponent() {
   const trpc = useTRPC();
+  const navigate = useNavigate();
   const { data: friends } = useQuery(trpc.main.getFriends.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const text = "Приглашаю тебя в игру Fruit Utopia!";
@@ -22,8 +24,9 @@ function RouteComponent() {
     return `https://t.me/FruitUtopia_bot?startapp=ref_${user?.id || ""}`;
   }, [user?.id, text]);
   return (
-    <div className="mt-[111px] h-screen w-full rounded-lg pr-4 pl-4 text-white">
-      <div className="mb-[27px] flex h-[76px] w-full items-center justify-between rounded-full bg-[#343d24] pr-[11px] pl-[28px]">
+    <div className="h-screen w-full rounded-lg pr-4 pl-4 text-white">
+      <BackButton onClick={() => navigate({ to: "/alliances" })} />
+      <div className="mt-[111px] mb-[27px] flex h-[76px] w-full items-center justify-between rounded-full bg-[#343d24] pr-[11px] pl-[28px]">
         <div className="flex flex-col gap-[7px]">
           <div className="font-manrope text-base font-semibold">Пригласите друзей</div>
           <div className="font-manrope text-xs font-medium text-[#93A179]">

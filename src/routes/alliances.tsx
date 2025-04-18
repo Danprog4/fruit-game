@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AllianceList } from "~/components/AlianceList";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
+import Friends from "~/components/icons/Friends";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/alliances")({
@@ -18,8 +19,14 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="mt-[97px] pr-4 pb-20 pl-4 text-white">
-      <div className="flex flex-col items-center justify-center gap-2">
+    <div className="pr-4 pb-20 pl-4 text-white">
+      <div
+        className="items-center gap-2 pt-4"
+        onClick={() => navigate({ to: "/friends" })}
+      >
+        <Friends />
+      </div>
+      <div className="mt-[97px] flex flex-col items-center justify-center gap-2">
         <Alliance />
         <div className="font-manrope text-2xl leading-none font-semibold">
           Список альянсов

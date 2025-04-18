@@ -5,7 +5,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import { init, mockTelegramEnv } from "@telegram-apps/sdk-react";
+import { backButton, init, mockTelegramEnv } from "@telegram-apps/sdk-react";
 import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
@@ -58,7 +58,7 @@ function RootComponent() {
       mockTelegramEnv({
         launchParams: {
           tgWebAppPlatform: "web",
-          tgWebAppVersion: "1.0.0",
+          tgWebAppVersion: "8.0.0",
           tgWebAppData: import.meta.env.VITE_MOCK_INIT_DATA,
           tgWebAppThemeParams: themeParams,
           tgWebAppStartParam: "ref=3",
@@ -67,7 +67,10 @@ function RootComponent() {
     }
 
     init();
+
+    backButton.mount();
   }, []);
+
   return (
     <RootDocument>
       <AuthProvider>

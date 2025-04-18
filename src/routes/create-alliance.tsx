@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChangeEvent, useRef, useState } from "react";
+import { BackButton } from "~/components/BackButton";
 import { AllianceGroup } from "~/components/icons/AllianceGroup";
 import { PlusIcon } from "~/components/icons/PlusIcon";
 import { Token } from "~/components/icons/Token";
@@ -84,8 +85,9 @@ function RouteComponent() {
   } bg-[#343D24] text-xs font-medium text-white`;
 
   return (
-    <div className="mt-[97px] pr-4 pl-4 text-white">
-      <div className="flex flex-col items-center justify-center">
+    <div className="pr-4 pl-4 text-white">
+      <BackButton onClick={() => navigate({ to: "/alliances" })} />
+      <div className="mt-[97px] flex flex-col items-center justify-center">
         <AllianceGroup />
         <div className="font-manrope mb-[21px] text-2xl leading-none font-semibold">
           Создание альянса
