@@ -19,12 +19,15 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="pr-4 pb-20 pl-4 text-white">
+    <div className="h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <div
-        className="items-center gap-2 pt-4"
+        className="absolute top-4 right-4 flex"
         onClick={() => navigate({ to: "/friends" })}
       >
-        <Friends />
+        <div className="flex flex-col items-center gap-2">
+          <Friends />
+          <div className="font-manrope text-xs font-medium">Друзья</div>
+        </div>
       </div>
       <div className="mt-[97px] flex flex-col items-center justify-center gap-2">
         <Alliance />
