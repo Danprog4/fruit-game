@@ -49,11 +49,11 @@ function RouteComponent() {
 
   const convertHeicToPng = async (file: File): Promise<File> => {
     const arrayBuffer = await file.arrayBuffer();
-
+    const inputBuffer = new Uint8Array(arrayBuffer);
     const outputBuffer = await convert({
-      buffer: arrayBuffer,
+      buffer: inputBuffer as unknown as ArrayBufferLike,
       format: "JPEG",
-      quality: 0.3,
+      quality: 0.2,
     });
 
     const blob = new Blob([outputBuffer], { type: "image/jpeg" });
