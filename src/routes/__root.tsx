@@ -13,6 +13,23 @@ import { AuthProvider } from "~/components/AuthProvider";
 import appCss from "~/lib/styles/app.css?url";
 import { TRPCRouter } from "~/trpc/init/router";
 
+// Define Telegram WebApp types to fix TypeScript errors
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: {
+        expand: () => void;
+        version: string;
+        disableVerticalSwipes: () => void;
+        platform: string;
+        requestFullscreen: () => void;
+        lockOrientation: () => void;
+        enableClosingConfirmation: () => void;
+      };
+    };
+  }
+}
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   trpc: TRPCOptionsProxy<TRPCRouter>;
@@ -70,6 +87,51 @@ function RootComponent() {
 
     backButton.mount();
   }, []);
+
+  // Set up Telegram WebApp mock in development mode or configure for production
+
+  // Configure Telegram WebApp features if it exists
+  if (window.Telegram && window.Telegram.WebApp) {
+    try {
+      window.Telegram.WebApp.expand();
+      const telegramVersion = Number(window.Telegram.WebApp.version);
+
+      if (telegramVersion >= 7.7) {
+        // We're handling scrolling ourselves, so prevent Telegram's swipe gestures
+        window.Telegram.WebApp.disableVerticalSwipes();
+      }
+
+      const isMobile =
+        window.Telegram.WebApp.platform === "ios" ||
+        window.Telegram.WebApp.platform === "android" ||
+        window.Telegram.WebApp.platform === "android_x";
+
+      // Enable proper scrolling for mobile devices
+      if (isMobile) {
+        // Add a class to the body element to indicate we're on mobile
+        document.body.classList.add("telegram-mobile");
+
+        // Set up the app container for scrolling
+        const rootElement = document.getElementById("root");
+        if (rootElement) {
+          rootElement.classList.add("telegram-app-container");
+          rootElement.style.overflowY = "auto";
+          rootElement.style.height = "100%";
+          (rootElement.style as any)["-webkit-overflow-scrolling"] = "touch";
+        }
+      }
+
+      if (telegramVersion >= 8 && isMobile) {
+        window.Telegram.WebApp.requestFullscreen();
+        window.Telegram.WebApp.lockOrientation();
+      }
+
+      // Enable closing confirmation
+      window.Telegram.WebApp.enableClosingConfirmation();
+    } catch (e) {
+      console.warn("Error configuring Telegram WebApp:", e);
+    }
+  }
 
   return (
     <RootDocument>
