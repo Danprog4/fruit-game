@@ -33,8 +33,8 @@ export const NameInput = ({
       </Drawer.Trigger>
       {isOwner && (
         <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 z-[900] bg-black/40" />
-          <Drawer.Content className="fixed right-0 bottom-0 left-0 z-[1000] h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] outline-none">
+          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
+          <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] outline-none">
             <div className="flex flex-col p-6">
               <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-[#575757]" />
 
