@@ -2,9 +2,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AllianceList } from "~/components/AlianceList";
-import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
 import Friends from "~/components/icons/Friends";
+import { Input } from "~/components/Input";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/alliances")({
@@ -29,33 +29,16 @@ function RouteComponent() {
           <div className="font-manrope text-xs font-medium">Друзья</div>
         </div>
       </div>
-      <div className="mt-[97px] flex flex-col items-center justify-center gap-2">
+      <div className="mt-[97px] mb-[43px] flex flex-col items-center justify-center gap-2">
         <Alliance />
         <div className="font-manrope text-2xl leading-none font-semibold">
           Список альянсов
         </div>
-        <div className="relative w-full max-w-md">
-          <div className="relative mt-[21px] mb-[43px] w-full">
-            <div className="absolute top-1/2 left-[15px] flex -translate-y-1/2 items-center">
-              <AllianceMini />
-            </div>
-            <input
-              type="text"
-              placeholder="Поиск альянса..."
-              className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[35px] pl-[50px] text-xs text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
-              size={500}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
-              <button className="text-white hover:text-white">
-                <div className="flex h-[29px] w-[82px] items-center justify-center rounded-full bg-[#76AD10]">
-                  <div className="font-manrope text-xs font-medium">Искать</div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
+        <Input
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          placeholder="Поиск альянса..."
+        />
       </div>
       <AllianceList searchQuery={searchQuery} />
 

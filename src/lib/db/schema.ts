@@ -18,4 +18,8 @@ export const alliancesTable = pgTable("alliances", {
   avatarId: uuid("avatarId"),
   telegramChannelUrl: varchar("telegramChannelUrl", { length: 255 }),
   members: bigint("members", { mode: "number" }).default(1),
+  capacity: bigint("capacity", { mode: "number" }).default(10),
 });
+
+export type Alliance = typeof alliancesTable.$inferSelect;
+export type NewAlliance = typeof alliancesTable.$inferInsert;

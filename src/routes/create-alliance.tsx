@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import convert from "heic-convert/browser";
 import { ChangeEvent, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { AllianceGroup } from "~/components/icons/AllianceGroup";
 import { PlusIcon } from "~/components/icons/PlusIcon";
 import { Token } from "~/components/icons/Token";
+import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
+import { convertToBase64 } from "~/lib/utils/convertToBase64";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/create-alliance")({
@@ -28,38 +29,8 @@ function RouteComponent() {
     }
   };
 
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result);
-        } else {
-          reject(new Error("Failed to convert file to base64"));
-        }
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
   const isHeicFile = (file: File): boolean => {
     return file.name.toLowerCase().endsWith(".heic");
-  };
-
-  const convertHeicToPng = async (file: File): Promise<File> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const inputBuffer = new Uint8Array(arrayBuffer);
-    const outputBuffer = await convert({
-      buffer: inputBuffer as unknown as ArrayBufferLike,
-      format: "JPEG",
-      quality: 0.2,
-    });
-
-    const blob = new Blob([outputBuffer], { type: "image/jpeg" });
-    return new File([blob], file.name.replace(/\.heic$/i, ".jpg"), {
-      type: "image/jpeg",
-    });
   };
 
   const handleCreateAlliance = async () => {
@@ -85,7 +56,7 @@ function RouteComponent() {
         imageBase64: base64,
       });
 
-      navigate({ to: "/alliances" });
+      await navigate({ to: "/alliances" });
     } catch (error) {
       console.error("Error creating alliance:", error);
     }

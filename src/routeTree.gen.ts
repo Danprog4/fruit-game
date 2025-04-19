@@ -15,6 +15,7 @@ import { Route as FriendsImport } from './routes/friends'
 import { Route as CreateAllianceImport } from './routes/create-alliance'
 import { Route as AlliancesImport } from './routes/alliances'
 import { Route as IndexImport } from './routes/index'
+import { Route as AllianceIdImport } from './routes/alliance.$id'
 
 // Create/Update Routes
 
@@ -39,6 +40,12 @@ const AlliancesRoute = AlliancesImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AllianceIdRoute = AllianceIdImport.update({
+  id: '/alliance/$id',
+  path: '/alliance/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsImport
       parentRoute: typeof rootRoute
     }
+    '/alliance/$id': {
+      id: '/alliance/$id'
+      path: '/alliance/$id'
+      fullPath: '/alliance/$id'
+      preLoaderRoute: typeof AllianceIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -84,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/alliance/$id': typeof AllianceIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -91,6 +106,7 @@ export interface FileRoutesByTo {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/alliance/$id': typeof AllianceIdRoute
 }
 
 export interface FileRoutesById {
@@ -99,14 +115,26 @@ export interface FileRoutesById {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/alliance/$id': typeof AllianceIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alliances' | '/create-alliance' | '/friends'
+  fullPaths:
+    | '/'
+    | '/alliances'
+    | '/create-alliance'
+    | '/friends'
+    | '/alliance/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alliances' | '/create-alliance' | '/friends'
-  id: '__root__' | '/' | '/alliances' | '/create-alliance' | '/friends'
+  to: '/' | '/alliances' | '/create-alliance' | '/friends' | '/alliance/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/alliances'
+    | '/create-alliance'
+    | '/friends'
+    | '/alliance/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -115,6 +143,7 @@ export interface RootRouteChildren {
   AlliancesRoute: typeof AlliancesRoute
   CreateAllianceRoute: typeof CreateAllianceRoute
   FriendsRoute: typeof FriendsRoute
+  AllianceIdRoute: typeof AllianceIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -122,6 +151,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlliancesRoute: AlliancesRoute,
   CreateAllianceRoute: CreateAllianceRoute,
   FriendsRoute: FriendsRoute,
+  AllianceIdRoute: AllianceIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -137,7 +167,8 @@ export const routeTree = rootRoute
         "/",
         "/alliances",
         "/create-alliance",
-        "/friends"
+        "/friends",
+        "/alliance/$id"
       ]
     },
     "/": {
@@ -151,6 +182,9 @@ export const routeTree = rootRoute
     },
     "/friends": {
       "filePath": "friends.tsx"
+    },
+    "/alliance/$id": {
+      "filePath": "alliance.$id.tsx"
     }
   }
 }
