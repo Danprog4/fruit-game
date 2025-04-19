@@ -57,13 +57,8 @@ function RouteComponent() {
     return <div>Loading...</div>;
   }
 
-  if (!user?.allianceId) {
-    navigate({ to: "/alliances" });
-    return null;
-  }
-
   const userAlliance = alliances?.find((alliance) => alliance.id === Number(id));
-  const isOwner = userAlliance?.ownerId === user.id;
+  const isOwner = userAlliance?.ownerId === user?.id;
 
   const isHeicFile = (file: File): boolean => {
     return file.name.toLowerCase().endsWith(".heic");
