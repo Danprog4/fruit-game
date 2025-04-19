@@ -55,10 +55,15 @@ export const AllianceList = ({ searchQuery = "" }) => {
                   </div>
                 </div>
               </div>
-              {alliance.ownerId !== user?.id && (
-                <button className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white">
-                  Вступить
-                </button>
+              {alliance.ownerId === user?.id && (
+                <Drawer.Trigger asChild>
+                  <button
+                    className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Вступить
+                  </button>
+                </Drawer.Trigger>
               )}
             </div>
             <Drawer.Portal>
