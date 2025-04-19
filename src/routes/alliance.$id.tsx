@@ -180,11 +180,17 @@ function RouteComponent() {
 
         <div className="absolute flex h-[76px] w-[88vw] items-center justify-between rounded-full bg-[#343D24] pr-[18px] pl-[134px]">
           <div className="flex flex-col gap-2">
-            <NameInput
-              userAlliance={userAlliance}
-              isOwner={isOwner}
-              handleSave={handleNameChange}
-            />
+            {isOwner ? (
+              <NameInput
+                userAlliance={userAlliance}
+                isOwner={isOwner}
+                handleSave={handleNameChange}
+              />
+            ) : (
+              <div className="font-manrope flex cursor-pointer items-center gap-2 text-xs font-medium">
+                {userAlliance?.name}
+              </div>
+            )}
             <div className="font-manrope text-xs font-medium text-[#93A179]">
               {pluralizeRuIntl(userAlliance?.members || 0, {
                 one: "участник",
