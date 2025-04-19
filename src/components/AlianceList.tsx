@@ -55,7 +55,7 @@ export const AllianceList = ({ searchQuery = "" }) => {
                   </div>
                 </div>
               </div>
-              {alliance.ownerId === user?.id && (
+              {alliance.ownerId !== user?.id && (
                 <Drawer.Trigger asChild>
                   <button
                     className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white"
