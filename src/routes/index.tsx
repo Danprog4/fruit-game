@@ -89,11 +89,11 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <img
+      {/* <img
         src="/img/full.svg"
         alt=""
         className="absolute top-5 h-screen w-screen object-cover"
-      />
+      /> */}
 
       <div className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-8 text-sm font-medium text-white">
         <div className="flex flex-col items-center justify-center gap-2">
