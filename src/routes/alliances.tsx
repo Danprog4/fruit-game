@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AllianceList } from "~/components/AlianceList";
 import { Alliance } from "~/components/icons/Alliance";
-import Friends from "~/components/icons/Friends";
 import { Input } from "~/components/Input";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -20,15 +19,6 @@ function RouteComponent() {
 
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
-      <div
-        className="absolute top-4 right-4 z-10 flex"
-        onClick={() => navigate({ to: "/friends" })}
-      >
-        <div className="flex flex-col items-center gap-2">
-          <Friends />
-          <div className="font-manrope text-xs font-medium">Друзья</div>
-        </div>
-      </div>
       <div className="mt-[97px] mb-[43px] flex flex-col items-center justify-center gap-2">
         <Alliance />
         <div className="font-manrope text-2xl leading-none font-semibold">

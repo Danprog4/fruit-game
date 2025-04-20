@@ -1,9 +1,14 @@
-export const AllianceGroupMini = () => {
+export const AllianceGroupMini = ({
+  width = 42,
+  height = 34,
+  viewBox = "0 0 42 34",
+  ...props
+}) => {
   return (
     <svg
-      width="42"
-      height="34"
-      viewBox="0 0 42 34"
+      width={width}
+      height={height}
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
