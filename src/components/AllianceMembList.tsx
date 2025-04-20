@@ -9,6 +9,17 @@ type AllianceMembListProps = {
   isOwner: boolean;
   ownerId: number;
   createdAt: Date;
+  owner:
+    | {
+        id: number;
+        referrerId: number | null;
+        name: string | null;
+        tokenBalance: number | null;
+        photoUrl: string | null;
+        allianceId: number | null;
+        allianceJoinDate: Date | null;
+      }
+    | undefined;
 };
 
 export const AllianceMembList = ({
@@ -17,6 +28,7 @@ export const AllianceMembList = ({
   isOwner,
   ownerId,
   createdAt,
+  owner,
 }: AllianceMembListProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -41,39 +53,37 @@ export const AllianceMembList = ({
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
-        {filteredMembers.length === 0 && (
-          <div
-            className="flex h-[76px] items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"
-            key={ownerId}
-          >
-            <div className="flex items-center gap-4">
-              {currentUser?.photoUrl ? (
-                <img
-                  src={currentUser.photoUrl}
-                  alt={currentUser.name || ""}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-              ) : (
-                <UserPhoto friendPhotoUrl="" />
-              )}
-              <div className="flex flex-col items-start justify-center gap-[8px]">
-                <div className="font-manrope text-xs leading-none font-medium">
-                  {currentUser?.name}
-                </div>
-                {isOwner && (
-                  <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    Создал альянс{" "}
-                    {createdAt.toLocaleDateString("ru-RU", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </div>
-                )}
+        <div
+          className="flex h-[76px] items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"
+          key={ownerId}
+        >
+          <div className="flex items-center gap-4">
+            {owner?.photoUrl ? (
+              <img
+                src={owner.photoUrl}
+                alt={owner.name || ""}
+                className="h-12 w-12 rounded-full object-cover"
+              />
+            ) : (
+              <UserPhoto friendPhotoUrl="" />
+            )}
+            <div className="flex flex-col items-start justify-center gap-[8px]">
+              <div className="font-manrope text-xs leading-none font-medium">
+                {owner?.name}
+              </div>
+
+              <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
+                Создал альянс{" "}
+                {createdAt.toLocaleDateString("ru-RU", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
               </div>
             </div>
           </div>
-        )}
+        </div>
+
         {filteredMembers.map((member) => (
           <div
             className="flex h-[76px] items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"

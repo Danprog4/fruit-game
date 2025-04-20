@@ -25,3 +25,4 @@ export const alliancesTable = pgTable("alliances", {
 
 export type Alliance = typeof alliancesTable.$inferSelect;
 export type NewAlliance = typeof alliancesTable.$inferInsert;
+export type User = typeof usersTable.$inferSelect;

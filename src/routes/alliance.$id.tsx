@@ -27,12 +27,16 @@ function RouteComponent() {
   const { id } = Route.useParams();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [channelUrl, setChannelUrl] = useState("");
   const updateAlliance = useMutation({
     ...trpc.alliances.updateAlliance.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [["alliances", "getAlliances"]] });
     },
   });
+  const { data: users, isLoading: isUsersLoading } = useQuery(
+    trpc.main.getUsers.queryOptions(),
+  );
 
   const addCapacity = useMutation({
     ...trpc.alliances.addCapacity.mutationOptions(),
@@ -62,6 +66,7 @@ function RouteComponent() {
   const userAlliance = alliances?.find((alliance) => alliance.id === Number(id));
   const isOwner = userAlliance?.ownerId === user?.id;
   const ownerId = userAlliance?.ownerId;
+  const owner = users?.find((user) => user.id === Number(userAlliance?.ownerId));
 
   const isHeicFile = (file: File): boolean => {
     return file.name.toLowerCase().endsWith(".heic");
@@ -214,9 +219,12 @@ function RouteComponent() {
               placeholder={userAlliance?.telegramChannelUrl ? "" : "Ссылка на ваш канал"}
               className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
               size={500}
-              value={userAlliance?.telegramChannelUrl || ""}
+              value={channelUrl}
               onChange={(e) => {
-                handleTelegramUrlChange(e.target.value);
+                setChannelUrl(e.target.value);
+              }}
+              onBlur={() => {
+                handleTelegramUrlChange(channelUrl);
               }}
             />
             <div className="absolute top-1/2 right-[15px] flex -translate-y-1/2 items-center">
@@ -269,6 +277,7 @@ function RouteComponent() {
         isOwner={isOwner}
         ownerId={ownerId!}
         createdAt={userAlliance?.createdAt!}
+        owner={owner}
       />
       {isOwner && (
         <div className="fixed bottom-[21px] left-1/2 flex h-[59px] w-[88vw] -translate-x-1/2 items-center justify-between rounded-full bg-[#222221] pr-[10px] pl-[14px]">
