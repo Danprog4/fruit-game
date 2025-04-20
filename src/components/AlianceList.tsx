@@ -55,7 +55,7 @@ export const AllianceList = ({ searchQuery = "" }) => {
                   </div>
                 </div>
               </div>
-              {alliance.ownerId !== user?.id && (
+              {alliance.ownerId !== user?.id && user?.allianceId !== alliance.id && (
                 <Drawer.Trigger asChild>
                   <button
                     className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white"
@@ -111,12 +111,14 @@ export const AllianceList = ({ searchQuery = "" }) => {
                     )}
                   </div>
 
-                  <button
-                    className="font-manrope mt-8 h-[52px] w-full rounded-full bg-[#76AD10] text-base font-medium text-white"
-                    onClick={() => joinAlliance.mutate({ allianceId: alliance.id })}
-                  >
-                    {joinAlliance.isPending ? "Вступаем..." : "Вступить в альянс"}
-                  </button>
+                  {alliance.ownerId !== user?.id && user?.allianceId !== alliance.id && (
+                    <button
+                      className="font-manrope mt-8 h-[52px] w-full rounded-full bg-[#76AD10] text-base font-medium text-white"
+                      onClick={() => joinAlliance.mutate({ allianceId: alliance.id })}
+                    >
+                      {joinAlliance.isPending ? "Вступаем..." : "Вступить в альянс"}
+                    </button>
+                  )}
                 </div>
               </Drawer.Content>
             </Drawer.Portal>
