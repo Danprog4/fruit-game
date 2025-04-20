@@ -6,6 +6,8 @@ import { BackButton } from "~/components/BackButton";
 import { NameInput } from "~/components/DynamicInput";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
+import { ClockIcon } from "~/components/icons/ClockIcon";
+import { Strawberry } from "~/components/icons/fruits/Strawberry";
 import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
 import { ruPeople } from "~/lib/intl";
@@ -59,6 +61,7 @@ function RouteComponent() {
 
   const userAlliance = alliances?.find((alliance) => alliance.id === Number(id));
   const isOwner = userAlliance?.ownerId === user?.id;
+  const ownerId = userAlliance?.ownerId;
 
   const isHeicFile = (file: File): boolean => {
     return file.name.toLowerCase().endsWith(".heic");
@@ -203,23 +206,46 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="relative mt-4 mb-[14px] flex w-full items-center">
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder={userAlliance?.telegramChannelUrl ? "" : "Ссылка на ваш канал"}
-            className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
-            size={500}
-            value={userAlliance?.telegramChannelUrl || ""}
-            onChange={(e) => {
-              handleTelegramUrlChange(e.target.value);
-            }}
-          />
-          <div className="absolute top-1/2 right-[15px] flex -translate-y-1/2 items-center">
-            <PencilIcon />
+      {isOwner ? (
+        <div className="relative mt-4 mb-[14px] flex w-full items-center">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder={userAlliance?.telegramChannelUrl ? "" : "Ссылка на ваш канал"}
+              className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
+              size={500}
+              value={userAlliance?.telegramChannelUrl || ""}
+              onChange={(e) => {
+                handleTelegramUrlChange(e.target.value);
+              }}
+            />
+            <div className="absolute top-1/2 right-[15px] flex -translate-y-1/2 items-center">
+              <PencilIcon />
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div>
+          <div className="mt-4 mb-[17px] flex h-[60px] w-full items-center justify-center rounded-2xl bg-[#222221]">
+            <div className="font-manrope text-[] text-sm font-medium opacity-50">
+              Здесь будет информация о канале
+            </div>
+          </div>
+          <div className="mb-[15px] flex items-center justify-between">
+            <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
+              <Strawberry />
+              Добыча: <span className="text-[#85BF1A]">клубники</span>
+            </div>
+            <div className="font-manrope flex items-center gap-[7px] text-xs leading-none font-medium">
+              <ClockIcon />
+              <div> Осталось 0 д. 0 ч.</div>
+            </div>
+          </div>
+          <div className="flex h-[32px] w-full items-center justify-center rounded-full bg-[#F7FFEB0F]">
+            <div className="font-manrope text-xs font-bold">0%</div>
+          </div>
+        </div>
+      )}
       {isOwner && (
         <Input
           searchQuery={searchQuery}
@@ -237,7 +263,13 @@ function RouteComponent() {
           {isOwner ? "Участники альянса" : "Добытые альянсом фрукты"}
         </div>
       </div>
-      <AllianceMembList allianceId={id} searchQuery={searchQuery} isOwner={isOwner} />
+      <AllianceMembList
+        allianceId={id}
+        searchQuery={searchQuery}
+        isOwner={isOwner}
+        ownerId={ownerId!}
+        createdAt={userAlliance?.createdAt!}
+      />
       {isOwner && (
         <div className="fixed bottom-[21px] left-1/2 flex h-[59px] w-[88vw] -translate-x-1/2 items-center justify-between rounded-full bg-[#222221] pr-[10px] pl-[14px]">
           <AllianceMini />

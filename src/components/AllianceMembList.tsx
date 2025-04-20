@@ -7,12 +7,16 @@ type AllianceMembListProps = {
   allianceId: string;
   searchQuery?: string;
   isOwner: boolean;
+  ownerId: number;
+  createdAt: Date;
 };
 
 export const AllianceMembList = ({
   allianceId,
   searchQuery = "",
   isOwner,
+  ownerId,
+  createdAt,
 }: AllianceMembListProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -38,8 +42,36 @@ export const AllianceMembList = ({
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
         {filteredMembers.length === 0 && (
-          <div className="font-manrope text-xs leading-none font-medium text-[#8F8F8F]">
-            В вашем альянсе пока нет участников
+          <div
+            className="flex h-[76px] items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"
+            key={ownerId}
+          >
+            <div className="flex items-center gap-4">
+              {currentUser?.photoUrl ? (
+                <img
+                  src={currentUser.photoUrl}
+                  alt={currentUser.name || ""}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ) : (
+                <UserPhoto friendPhotoUrl="" />
+              )}
+              <div className="flex flex-col items-start justify-center gap-[8px]">
+                <div className="font-manrope text-xs leading-none font-medium">
+                  {currentUser?.name}
+                </div>
+                {isOwner && (
+                  <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
+                    Создал альянс{" "}
+                    {createdAt.toLocaleDateString("ru-RU", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
         {filteredMembers.map((member) => (
@@ -68,7 +100,12 @@ export const AllianceMembList = ({
                   </div>
                 ) : (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    В альянсе с 19.04.2025
+                    В альянсе с{" "}
+                    {member.allianceJoinDate?.toLocaleDateString("ru-RU", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
                   </div>
                 )}
               </div>

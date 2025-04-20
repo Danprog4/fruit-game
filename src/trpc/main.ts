@@ -54,7 +54,7 @@ export const router = {
       }
       await db
         .update(usersTable)
-        .set({ allianceId: Number(allianceId) })
+        .set({ allianceId: Number(allianceId), allianceJoinDate: new Date() })
         .where(eq(usersTable.id, userId));
     }),
   getUsers: procedure.query(async ({ ctx }) => {
