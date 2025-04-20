@@ -76,6 +76,21 @@ export const authRouter = {
 
         console.log(newUser, "newUser");
 
+        if (referrerId) {
+          const referrer = await db.query.usersTable.findFirst({
+            where: eq(usersTable.id, Number(referrerId)),
+          });
+
+          if (referrer) {
+            await db
+              .update(usersTable)
+              .set({
+                tokenBalance: (referrer.tokenBalance || 0) + 40000,
+              })
+              .where(eq(usersTable.id, Number(referrerId)));
+          }
+        }
+
         return newUser[0];
       }
 

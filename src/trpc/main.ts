@@ -2,7 +2,7 @@ import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { usersTable } from "~/lib/db/schema";
+import { alliancesTable, usersTable } from "~/lib/db/schema";
 import { procedure, publicProcedure } from "./init";
 
 export const router = {
@@ -56,6 +56,11 @@ export const router = {
         .update(usersTable)
         .set({ allianceId: Number(allianceId), allianceJoinDate: new Date() })
         .where(eq(usersTable.id, userId));
+
+      await db
+        .update(alliancesTable)
+        .set({ members: (alliance.members || 0) + 1 })
+        .where(eq(alliancesTable.id, Number(allianceId)));
     }),
   getUsers: procedure.query(async ({ ctx }) => {
     const users = await db.query.usersTable.findMany();

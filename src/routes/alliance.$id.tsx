@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AllianceMembList } from "~/components/AllianceMembList";
 import { BackButton } from "~/components/BackButton";
 import { NameInput } from "~/components/DynamicInput";
@@ -58,6 +58,16 @@ function RouteComponent() {
   const { data: alliances, isLoading: isAlliancesLoading } = useQuery(
     trpc.alliances.getAlliances.queryOptions(),
   );
+
+  // Initialize channelUrl with the alliance's URL when data is loaded
+  useEffect(() => {
+    if (alliances) {
+      const alliance = alliances.find((a) => a.id === Number(id));
+      if (alliance?.telegramChannelUrl) {
+        setChannelUrl(alliance.telegramChannelUrl);
+      }
+    }
+  }, [alliances, id]);
 
   if (isUserLoading || isAlliancesLoading) {
     return <div>Loading...</div>;
@@ -216,7 +226,7 @@ function RouteComponent() {
           <div className="relative w-full">
             <input
               type="text"
-              placeholder={userAlliance?.telegramChannelUrl ? "" : "Ссылка на ваш канал"}
+              placeholder="Ссылка на ваш канал"
               className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
               size={500}
               value={channelUrl}
@@ -224,7 +234,9 @@ function RouteComponent() {
                 setChannelUrl(e.target.value);
               }}
               onBlur={() => {
-                handleTelegramUrlChange(channelUrl);
+                if (channelUrl !== userAlliance?.telegramChannelUrl) {
+                  handleTelegramUrlChange(channelUrl);
+                }
               }}
             />
             <div className="absolute top-1/2 right-[15px] flex -translate-y-1/2 items-center">
