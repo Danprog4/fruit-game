@@ -90,7 +90,7 @@ function RouteComponent() {
         </div>
       </div>
       <img
-        src="src/img/full.svg"
+        src="/img/full.svg"
         alt=""
         className="absolute top-5 h-screen w-screen object-cover"
       />
