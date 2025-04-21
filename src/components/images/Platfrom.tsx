@@ -5,6 +5,7 @@ export const Platform = () => {
       height="146"
       viewBox="0 0 196 146"
       fill="none"
+      className="max-h-[126px] max-w-[156px]"
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect y="29" width="196" height="117" fill="#5A7B1D" />

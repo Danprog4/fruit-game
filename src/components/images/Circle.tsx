@@ -5,6 +5,7 @@ export const Circle = () => {
       height="311"
       viewBox="0 0 311 311"
       fill="none"
+      className="max-h-[211px] max-w-[211px]"
       xmlns="http://www.w3.org/2000/svg"
     >
       <g opacity="0.6">
