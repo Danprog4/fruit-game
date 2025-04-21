@@ -2,10 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
+import { ChampIcon } from "~/components/icons/ChampIcon";
 import Friends from "~/components/icons/Friends";
+import { Apple } from "~/components/icons/fruits/Apple";
+import { Lemon } from "~/components/icons/fruits/Lemon";
+import { Pear } from "~/components/icons/fruits/Pear";
+import { StrawberryMain } from "~/components/icons/fruits/StrawberryMain";
 import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
+import { TasksIcon } from "~/components/icons/Tasks";
 import { Token } from "~/components/icons/Token";
 import { Circle } from "~/components/images/Circle";
 import { Fermer } from "~/components/images/Fermer";
@@ -79,18 +85,18 @@ function RouteComponent() {
             className="absolute right-4 bottom-50 z-10 flex"
             onClick={() => navigate({ to: "/friends" })}
           >
-            <div className="flex flex-col items-center gap-2">
-              <Friends />
-              <div className="font-manrope text-xs font-medium">Друзья</div>
+            <div className="flex flex-col items-center gap-1">
+              <TasksIcon />
+              <div className="font-manrope text-xs font-medium">Задания</div>
             </div>
           </div>
           <div
             className="absolute right-4 bottom-30 z-10 flex"
             onClick={() => navigate({ to: "/friends" })}
           >
-            <div className="flex flex-col items-center gap-2">
-              <Friends />
-              <div className="font-manrope text-xs font-medium">Друзья</div>
+            <div className="flex flex-col items-center">
+              <ChampIcon />
+              <div className="font-manrope text-xs font-medium">Лиги</div>
             </div>
           </div>
         </div>
@@ -99,23 +105,29 @@ function RouteComponent() {
       <div className="absolute bottom-[27vh] left-1/2 -translate-x-1/2 transform">
         <div className="">
           <Circle />
-          {/* White circles on orbit of circle - 2 on left, 2 on right */}
           <div className="absolute top-1/2 left-13 z-10 -translate-x-16 -translate-y-8">
-            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+            <div className="flex h-[31px] w-[31px] items-center justify-center rounded-full bg-white">
+              <Apple />
+            </div>
           </div>
           <div className="absolute bottom-1/3 left-16 -translate-x-16 translate-y-8">
-            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+            <div className="flex h-[31px] w-[31px] items-center justify-center rounded-full bg-white">
+              <Lemon />
+            </div>
           </div>
           <div className="absolute top-1/2 right-13 translate-x-16 -translate-y-8">
-            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+            <div className="flex h-[31px] w-[31px] items-center justify-center rounded-full bg-white pl-1">
+              <Pear />
+            </div>
           </div>
           <div className="absolute right-16 bottom-1/3 translate-x-16 translate-y-8">
-            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+            <div className="flex h-[31px] w-[31px] items-center justify-center rounded-full bg-white">
+              <StrawberryMain />
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="absolute right-0 bottom-0 left-0 w-full">
+      <div className="absolute top-0 right-0 bottom-0 left-0 z-[-10] flex w-full items-center justify-center">
         <Lights />
       </div>
 
