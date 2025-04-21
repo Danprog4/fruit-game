@@ -82,10 +82,6 @@ export const AllianceMembList = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-1">
-            <Token width={26} height={26} viewBox="0 0 30 30" />
-            <div className="font-manrope text-[17px] font-[800]"> 0</div>
-          </div>
         </div>
 
         {filteredMembers.map((member) => (
@@ -107,6 +103,7 @@ export const AllianceMembList = ({
                 <div className="font-manrope text-xs leading-none font-medium">
                   {member.name}
                 </div>
+
                 {isOwner ? (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
                     <Token width={20} height={20} viewBox="0 0 30 30" />
@@ -134,6 +131,10 @@ export const AllianceMembList = ({
                 {kickMember.isPending ? "..." : "Выгнать"}
               </button>
             )}
+            <div className="flex items-center justify-center gap-1">
+              <Token width={26} height={26} viewBox="0 0 30 30" />
+              <div className="font-manrope text-[17px] font-[800]"> 0</div>
+            </div>
           </div>
         ))}
       </div>

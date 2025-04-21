@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AllianceList } from "~/components/AlianceList";
 import { BackButton } from "~/components/BackButton";
+import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
 import { Input } from "~/components/Input";
 import { useTRPC } from "~/trpc/init/react";
@@ -30,6 +31,7 @@ function RouteComponent() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           placeholder="Поиск альянса..."
+          icon={<AllianceMini />}
         />
       </div>
       <AllianceList searchQuery={searchQuery} />

@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TasksImport } from './routes/tasks'
 import { Route as FriendsImport } from './routes/friends'
 import { Route as CreateAllianceImport } from './routes/create-alliance'
 import { Route as AlliancesImport } from './routes/alliances'
@@ -18,6 +19,12 @@ import { Route as IndexImport } from './routes/index'
 import { Route as AllianceIdImport } from './routes/alliance.$id'
 
 // Create/Update Routes
+
+const TasksRoute = TasksImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const FriendsRoute = FriendsImport.update({
   id: '/friends',
@@ -81,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsImport
       parentRoute: typeof rootRoute
     }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksImport
+      parentRoute: typeof rootRoute
+    }
     '/alliance/$id': {
       id: '/alliance/$id'
       path: '/alliance/$id'
@@ -98,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/tasks': typeof TasksRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -106,6 +121,7 @@ export interface FileRoutesByTo {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/tasks': typeof TasksRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -115,6 +131,7 @@ export interface FileRoutesById {
   '/alliances': typeof AlliancesRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
+  '/tasks': typeof TasksRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -125,15 +142,23 @@ export interface FileRouteTypes {
     | '/alliances'
     | '/create-alliance'
     | '/friends'
+    | '/tasks'
     | '/alliance/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alliances' | '/create-alliance' | '/friends' | '/alliance/$id'
+  to:
+    | '/'
+    | '/alliances'
+    | '/create-alliance'
+    | '/friends'
+    | '/tasks'
+    | '/alliance/$id'
   id:
     | '__root__'
     | '/'
     | '/alliances'
     | '/create-alliance'
     | '/friends'
+    | '/tasks'
     | '/alliance/$id'
   fileRoutesById: FileRoutesById
 }
@@ -143,6 +168,7 @@ export interface RootRouteChildren {
   AlliancesRoute: typeof AlliancesRoute
   CreateAllianceRoute: typeof CreateAllianceRoute
   FriendsRoute: typeof FriendsRoute
+  TasksRoute: typeof TasksRoute
   AllianceIdRoute: typeof AllianceIdRoute
 }
 
@@ -151,6 +177,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlliancesRoute: AlliancesRoute,
   CreateAllianceRoute: CreateAllianceRoute,
   FriendsRoute: FriendsRoute,
+  TasksRoute: TasksRoute,
   AllianceIdRoute: AllianceIdRoute,
 }
 
@@ -168,6 +195,7 @@ export const routeTree = rootRoute
         "/alliances",
         "/create-alliance",
         "/friends",
+        "/tasks",
         "/alliance/$id"
       ]
     },
@@ -182,6 +210,9 @@ export const routeTree = rootRoute
     },
     "/friends": {
       "filePath": "friends.tsx"
+    },
+    "/tasks": {
+      "filePath": "tasks.tsx"
     },
     "/alliance/$id": {
       "filePath": "alliance.$id.tsx"

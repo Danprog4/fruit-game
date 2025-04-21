@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ChampIcon } from "~/components/icons/ChampIcon";
@@ -18,7 +19,6 @@ import { Fermer } from "~/components/images/Fermer";
 import { Lights } from "~/components/images/Lights";
 import { Platform } from "~/components/images/Platfrom";
 import { useTRPC } from "~/trpc/init/react";
-
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
@@ -83,7 +83,7 @@ function RouteComponent() {
         <div className="flex flex-col">
           <div
             className="absolute right-4 bottom-50 z-10 flex"
-            onClick={() => navigate({ to: "/friends" })}
+            onClick={() => navigate({ to: "/tasks" })}
           >
             <div className="flex flex-col items-center gap-1">
               <TasksIcon />
@@ -92,7 +92,8 @@ function RouteComponent() {
           </div>
           <div
             className="absolute right-4 bottom-30 z-10 flex"
-            onClick={() => navigate({ to: "/friends" })}
+            // onClick={() => navigate({ to: "/friends" })}
+            onClick={() => toast.error("В разработке")}
           >
             <div className="flex flex-col items-center">
               <ChampIcon />

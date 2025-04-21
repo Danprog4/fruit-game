@@ -271,6 +271,7 @@ function RouteComponent() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           placeholder="Поиск участника"
+          icon={<AllianceMini />}
         />
       )}
       <div className="mt-[24px] mb-[24px] flex items-center gap-[10px]">

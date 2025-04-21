@@ -1,17 +1,16 @@
-import { AllianceMini } from "./icons/AlianceMini";
-
 type InputProps = {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   placeholder: string;
+  icon: React.ReactNode;
 };
 
-export const Input = ({ searchQuery, setSearchQuery, placeholder }: InputProps) => {
+export const Input = ({ searchQuery, setSearchQuery, placeholder, icon }: InputProps) => {
   return (
     <div className="relative w-full max-w-md">
       <div className="relative mt-[21px] w-full">
         <div className="absolute top-1/2 left-[15px] flex -translate-y-1/2 items-center">
-          <AllianceMini />
+          {icon}
         </div>
         <input
           type="text"
