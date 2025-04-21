@@ -107,7 +107,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
   const prefetch = async () => {
     // await queryClient.prefetchQuery(trpc.main.getFriends.queryOptions());
     await queryClient.prefetchQuery(trpc.main.getUser.queryOptions());
-
     await queryClient.prefetchQuery(trpc.alliances.getAlliances.queryOptions());
   };
 
