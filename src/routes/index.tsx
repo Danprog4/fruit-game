@@ -23,35 +23,36 @@ function RouteComponent() {
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
   return (
-    <div className="fixed h-screen w-full overflow-hidden pt-[97px] text-white">
-      <div className="mb-[15px] flex items-center justify-center gap-2">
+    <div className="fixed h-screen w-full overflow-hidden text-white">
+      <div className="z-10 flex flex-col items-center justify-center gap-2 pt-7">
         <Token width={40} height={40} viewBox="0 0 30 30" />
-        <span className="font-manrope text-3xl font-extrabold">
+        <span className="font-manrope z-10 text-3xl font-extrabold">
           {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
         </span>
-      </div>
-      <div className="relative z-[1000] w-full overflow-hidden">
-        <div
-          className="scrollbar-hide flex overflow-x-auto"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          <div className="z-10 mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
-            <span className="font-manrope text-xs leading-none font-medium">
-              Ваша информация
-            </span>
-          </div>
-          <div className="mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
-            <span className="font-manrope text-xs leading-none font-medium">
-              Ваша информация
-            </span>
-          </div>
-          <div className="flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
-            <span className="font-manrope text-xs leading-none font-medium">
-              Ваша информация
-            </span>
+        <div className="z-[1000] w-full overflow-hidden">
+          <div
+            className="scrollbar-hide flex overflow-x-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <div className="z-10 mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+              <span className="font-manrope text-xs leading-none font-medium">
+                Ваша информация
+              </span>
+            </div>
+            <div className="mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+              <span className="font-manrope text-xs leading-none font-medium">
+                Ваша информация
+              </span>
+            </div>
+            <div className="flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+              <span className="font-manrope text-xs leading-none font-medium">
+                Ваша информация
+              </span>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
           <div
