@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import Friends from "~/components/icons/Friends";
 import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { Token } from "~/components/icons/Token";
+import { Circle } from "~/components/images/Circle";
+import { Fermer } from "~/components/images/Fermer";
+import { Lights } from "~/components/images/Lights";
+import { Platform } from "~/components/images/Platfrom";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/")({
@@ -89,11 +94,38 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      {/* <img
-        src="/img/full.svg"
-        alt=""
-        className="absolute top-5 h-screen w-screen object-cover"
-      /> */}
+
+      <div className="absolute bottom-[30vh] left-1/2 -translate-x-1/2 transform">
+        <div className="relative">
+          <Circle />
+          {/* White circles on orbit of circle - 2 on left, 2 on right */}
+          <div className="absolute top-1/2 left-13 -translate-x-16 -translate-y-8">
+            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+          </div>
+          <div className="absolute bottom-1/3 left-16 -translate-x-16 translate-y-8">
+            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+          </div>
+          <div className="absolute top-1/2 right-13 translate-x-16 -translate-y-8">
+            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+          </div>
+          <div className="absolute right-16 bottom-1/3 translate-x-16 translate-y-8">
+            <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute right-0 bottom-0 left-0 w-full">
+        <Lights />
+      </div>
+
+      <div className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 transform">
+        <div className="relative">
+          <Platform />
+          <div className="absolute bottom-[72px] left-1/2 -translate-x-1/2">
+            <Fermer />
+          </div>
+        </div>
+      </div>
 
       <div className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-8 text-sm font-medium text-white">
         <div className="flex flex-col items-center justify-center gap-2">
