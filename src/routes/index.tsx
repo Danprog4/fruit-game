@@ -96,11 +96,11 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="absolute bottom-[30vh] left-1/2 -translate-x-1/2 transform">
-        <div className="relative">
+      <div className="absolute bottom-[27vh] left-1/2 -translate-x-1/2 transform">
+        <div className="">
           <Circle />
           {/* White circles on orbit of circle - 2 on left, 2 on right */}
-          <div className="absolute top-1/2 left-13 -translate-x-16 -translate-y-8">
+          <div className="absolute top-1/2 left-13 z-10 -translate-x-16 -translate-y-8">
             <div className="h-[31px] w-[31px] rounded-full bg-white"></div>
           </div>
           <div className="absolute bottom-1/3 left-16 -translate-x-16 translate-y-8">
@@ -119,7 +119,7 @@ function RouteComponent() {
         <Lights />
       </div>
 
-      <div className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 transform">
+      <div className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 transform">
         <div className="relative">
           <Platform />
           <div className="absolute bottom-[72px] left-1/2 -translate-x-1/2">
