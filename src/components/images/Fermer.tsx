@@ -5,6 +5,7 @@ export const Fermer = () => {
       height="488"
       viewBox="0 0 371 488"
       fill="none"
+      className="max-h-[348px] max-w-[271px]"
       xmlns="http://www.w3.org/2000/svg"
       xlinkHref="http://www.w3.org/1999/xlink"
     >

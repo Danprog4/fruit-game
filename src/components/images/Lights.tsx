@@ -6,7 +6,7 @@ export const Lights = () => {
       viewBox="0 0 375 785"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="h-auto w-full"
+      className="max-h-[600px] w-full"
     >
       <g filter="url(#filter0_f_6_26)">
         <circle cx="179.5" cy="392.5" r="192.5" fill="#87D002" />
