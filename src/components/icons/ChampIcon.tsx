@@ -374,6 +374,23 @@ export const ChampIcon = () => {
         />
       </g>
       <defs>
+        <radialGradient
+          id="paint0_radial_6_155"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(22.7092 22.6152) rotate(-29.7661) scale(16.4383)"
+        >
+          <stop stop-color="#FCEA10" stop-opacity="0" />
+          <stop offset="0.12" stop-color="#CDBE0D" stop-opacity="0" />
+          <stop offset="0.3" stop-color="#8F8509" stop-opacity="0" />
+          <stop offset="0.47" stop-color="#5C5505" stop-opacity="0" />
+          <stop offset="0.63" stop-color="#343003" stop-opacity="0" />
+          <stop offset="0.78" stop-color="#171501" stop-opacity="0" />
+          <stop offset="0.91" stop-color="#060500" stop-opacity="0" />
+          <stop offset="1" stop-opacity="0" />
+        </radialGradient>
         <linearGradient
           id="paint1_linear_6_155"
           x1="8.4425"

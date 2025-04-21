@@ -252,6 +252,23 @@ export const TasksIcon = () => {
       />
       <defs>
         <radialGradient
+          id="paint0_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(26.1055 21.1156) rotate(-30) scale(13.2619)"
+        >
+          <stop stop-color="#FF0B00" stop-opacity="0" />
+          <stop offset="0.13" stop-color="#CD0800" stop-opacity="0" />
+          <stop offset="0.31" stop-color="#8F0600" stop-opacity="0" />
+          <stop offset="0.48" stop-color="#5C0300" stop-opacity="0" />
+          <stop offset="0.64" stop-color="#340200" stop-opacity="0" />
+          <stop offset="0.78" stop-color="#170100" stop-opacity="0" />
+          <stop offset="0.91" stop-color="#060000" stop-opacity="0" />
+          <stop offset="1" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient
           id="paint1_radial_6_110"
           cx="0"
           cy="0"
