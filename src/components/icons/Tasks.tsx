@@ -251,6 +251,108 @@ export const TasksIcon = () => {
         fill="url(#paint35_radial_6_110)"
       />
       <defs>
+        <radialGradient
+          id="paint0_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(26.1055 21.1156) rotate(-30) scale(13.2619)"
+        >
+          <stop stop-color="#FF0B00" />
+          <stop offset="0.13" stop-color="#CD0800" />
+          <stop offset="0.31" stop-color="#8F0600" />
+          <stop offset="0.48" stop-color="#5C0300" />
+          <stop offset="0.64" stop-color="#340200" />
+          <stop offset="0.78" stop-color="#170100" />
+          <stop offset="0.91" stop-color="#060000" />
+          <stop offset="1" />
+        </radialGradient>
+        <radialGradient
+          id="paint1_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(15.4939 13.434) scale(2.63059)"
+        >
+          <stop stop-color="#FCCD10" />
+          <stop offset="0.22" stop-color="#ECAB08" />
+          <stop offset="0.45" stop-color="#DF8D02" />
+          <stop offset="0.58" stop-color="#DB8300" />
+          <stop offset="0.71" stop-color="#D57C00" />
+          <stop offset="0.88" stop-color="#C76B00" />
+          <stop offset="1" stop-color="#BA5B00" />
+        </radialGradient>
+        <radialGradient
+          id="paint2_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(14.8907 12.6046) scale(3.20027)"
+        >
+          <stop stop-color="#FFE58A" />
+          <stop offset="1" />
+        </radialGradient>
+        <radialGradient
+          id="paint3_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(14.2207 11.9428) scale(3.15838)"
+        >
+          <stop stop-color="#FFE58A" />
+          <stop offset="1" />
+        </radialGradient>
+        <radialGradient
+          id="paint4_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(16.2143 13.6351) scale(3.03272)"
+        >
+          <stop stop-color="#FFE58A" />
+          <stop offset="1" />
+        </radialGradient>
+        <linearGradient
+          id="paint5_linear_6_110"
+          x1="14.2535"
+          y1="15.6718"
+          x2="17.9653"
+          y2="15.6667"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0.05" stop-color="#ED9500" />
+          <stop offset="0.4" stop-color="#FFCC00" />
+          <stop offset="0.93" stop-color="#B36600" />
+        </linearGradient>
+        <radialGradient
+          id="paint6_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(17.5146 16.2267) rotate(-30) scale(7.17129)"
+        >
+          <stop stop-color="#E38812" />
+          <stop offset="0.11" stop-color="#E6952C" />
+          <stop offset="0.73" stop-color="#F7E0C2" />
+          <stop offset="1" stop-color="white" />
+        </radialGradient>
+        <radialGradient
+          id="paint7_radial_6_110"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(14.7363 15.0836) rotate(-30) scale(2.55519)"
+        >
+          <stop stop-color="#FFF0B0" />
+          <stop offset="1" />
+        </radialGradient>
         <linearGradient
           id="paint8_linear_6_110"
           x1="24.6101"

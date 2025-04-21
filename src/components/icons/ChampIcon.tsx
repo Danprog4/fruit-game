@@ -374,6 +374,68 @@ export const ChampIcon = () => {
         />
       </g>
       <defs>
+        <radialGradient
+          id="paint0_radial_6_155"
+          cx="0"
+          cy="0"
+          r="1"
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(22.7092 22.6152) rotate(-29.7661) scale(16.4383)"
+        >
+          <stop stop-color="#FCEA10" />
+          <stop offset="0.12" stop-color="#CDBE0D" />
+          <stop offset="0.3" stop-color="#8F8509" />
+          <stop offset="0.47" stop-color="#5C5505" />
+          <stop offset="0.63" stop-color="#343003" />
+          <stop offset="0.78" stop-color="#171501" />
+          <stop offset="0.91" stop-color="#060500" />
+          <stop offset="1" />
+        </radialGradient>
+        <linearGradient
+          id="paint1_linear_6_155"
+          x1="8.4425"
+          y1="19.5988"
+          x2="21.6059"
+          y2="28.1348"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#FFCC00" />
+          <stop offset="1" stop-color="#B36600" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_6_155"
+          x1="13.94"
+          y1="16.8342"
+          x2="16.7949"
+          y2="20.5562"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#DB7D00" />
+          <stop offset="1" stop-color="#914900" />
+        </linearGradient>
+        <linearGradient
+          id="paint3_linear_6_155"
+          x1="10.8732"
+          y1="21.3089"
+          x2="17.3512"
+          y2="29.2999"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#C77000" />
+          <stop offset="0.4" stop-color="#CC8B00" />
+          <stop offset="1" stop-color="#BA5E00" />
+        </linearGradient>
+        <linearGradient
+          id="paint4_linear_6_155"
+          x1="9.99604"
+          y1="19.3391"
+          x2="13.3531"
+          y2="17.4192"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#FFCC00" />
+          <stop offset="1" stop-color="#B36600" />
+        </linearGradient>
         <linearGradient
           id="paint5_linear_6_155"
           x1="29.18"
