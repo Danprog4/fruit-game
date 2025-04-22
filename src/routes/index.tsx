@@ -41,10 +41,12 @@ function RouteComponent() {
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
       <div className="z-10 flex flex-col items-center justify-center gap-2 pt-7">
-        <Token width={40} height={40} viewBox="0 0 30 30" />
-        <span className="font-manrope z-10 text-3xl font-extrabold">
-          {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-        </span>
+        <div className="flex items-center gap-2">
+          <Token width={38} height={38} viewBox="0 0 30 30" />
+          <span className="font-manrope z-10 text-3xl font-extrabold">
+            {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") ?? 0}
+          </span>
+        </div>
         <div className="relative z-[2000] w-full overflow-hidden">
           <InfiniteMovingCards
             direction="right"
