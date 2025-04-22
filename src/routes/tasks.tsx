@@ -1,15 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { BackButton } from "~/components/BackButton";
 import { Flag } from "~/components/icons/Flag";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Input } from "~/components/Input";
-
 export const Route = createFileRoute("/tasks")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   return (
     <div className="flex w-full flex-col px-4 pt-[86px]">
       <BackButton onClick={() => navigate({ to: "/" })} />
