@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
+import { useWindowSize } from "usehooks-ts";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ChampIcon } from "~/components/icons/ChampIcon";
 import Friends from "~/components/icons/Friends";
@@ -29,6 +30,13 @@ function RouteComponent() {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const { height } = useWindowSize();
+
+  const getScale = () => {
+    const baseHeight = 800;
+    const scaleFactor = Math.max(0.6, Math.min(1.2, height / baseHeight));
+    return scaleFactor;
+  };
 
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
@@ -37,7 +45,7 @@ function RouteComponent() {
         <span className="font-manrope z-10 text-3xl font-extrabold">
           {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
         </span>
-        <div className="z-[1000] w-full overflow-hidden">
+        <div className="relative z-[2000] w-full overflow-hidden">
           <InfiniteMovingCards
             direction="right"
             speed="normal"
@@ -120,7 +128,11 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="absolute bottom-[27vh] left-1/2 -translate-x-1/2 transform">
+      <div
+        id="background-circle"
+        className="absolute bottom-[27vh] left-1/2 -translate-x-1/2 transform"
+        style={{ transform: `scale(${getScale()})` }}
+      >
         <div className="">
           <Circle />
           <div className="absolute top-1/2 left-13 z-10 -translate-x-16 -translate-y-8">
@@ -149,7 +161,11 @@ function RouteComponent() {
         <Lights />
       </div>
 
-      <div className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 transform">
+      <div
+        id="farmer"
+        className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 transform"
+        style={{ transform: `scale(${getScale()})` }}
+      >
         <div className="relative">
           <Platform />
           <div className="absolute bottom-[72px] left-1/2 -translate-x-1/2">
