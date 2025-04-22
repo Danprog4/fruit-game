@@ -19,6 +19,8 @@ import { Fermer } from "~/components/images/Fermer";
 import { Lights } from "~/components/images/Lights";
 import { Platform } from "~/components/images/Platfrom";
 import { useTRPC } from "~/trpc/init/react";
+import { InfiniteMovingCards } from "../components/InfiniteMovingCards";
+
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
@@ -36,27 +38,41 @@ function RouteComponent() {
           {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
         </span>
         <div className="z-[1000] w-full overflow-hidden">
-          <div
-            className="scrollbar-hide flex gap-4 overflow-x-auto px-4"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            <div className="z-10 flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
-              <span className="font-manrope text-xs leading-none font-medium">
-                Скидка 10% на пополнение баланса до 22.03
-              </span>
-            </div>
-            <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
-              <span className="font-manrope text-xs leading-none font-medium">
-                Скидка 10% на пополнение баланса до 22.03
-              </span>
-            </div>
-
-            <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
-              <span className="font-manrope text-xs leading-none font-medium">
-                Скидка 10% на пополнение баланса до 22.03
-              </span>
-            </div>
-          </div>
+          <InfiniteMovingCards
+            direction="right"
+            speed="normal"
+            pauseOnHover={false}
+            className="py-2"
+            items={[
+              {
+                content: (
+                  <div className="z-10 flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
+                    <span className="font-manrope text-xs leading-none font-medium">
+                      Скидка 10% на пополнение баланса до 22.03
+                    </span>
+                  </div>
+                ),
+              },
+              {
+                content: (
+                  <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
+                    <span className="font-manrope text-xs leading-none font-medium">
+                      Двойные бонусы за приглашение друзей
+                    </span>
+                  </div>
+                ),
+              },
+              {
+                content: (
+                  <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
+                    <span className="font-manrope text-xs leading-none font-medium">
+                      Новые награды в заданиях
+                    </span>
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
       </div>
 
