@@ -13,7 +13,7 @@ export const AllianceList = ({ searchQuery = "" }) => {
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const joinAlliance = useMutation({
-    ...trpc.main.joinAlliance.mutationOptions(),
+    ...trpc.alliances.joinAlliance.mutationOptions(),
     onSuccess: (_, variables) => {
       navigate({ to: "/alliance/$id", params: { id: String(variables.allianceId) } });
     },

@@ -36,7 +36,7 @@ export const AllianceMembList = ({
   const { data: currentUser } = useQuery(trpc.main.getUser.queryOptions());
 
   const kickMember = useMutation({
-    ...trpc.main.kickFromAlliance.mutationOptions(),
+    ...trpc.alliances.kickFromAlliance.mutationOptions(),
     onSuccess: () => {
       // Refetch users after kicking a member
       queryClient.invalidateQueries({ queryKey: [["main", "getUsers"]] });
