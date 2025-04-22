@@ -37,22 +37,23 @@ function RouteComponent() {
         </span>
         <div className="z-[1000] w-full overflow-hidden">
           <div
-            className="scrollbar-hide flex overflow-x-auto"
+            className="scrollbar-hide flex gap-4 overflow-x-auto px-4"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            <div className="z-10 mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+            <div className="z-10 flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
               <span className="font-manrope text-xs leading-none font-medium">
-                Ваша информация
+                Скидка 10% на пополнение баланса до 22.03
               </span>
             </div>
-            <div className="mr-4 flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+            <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
               <span className="font-manrope text-xs leading-none font-medium">
-                Ваша информация
+                Скидка 10% на пополнение баланса до 22.03
               </span>
             </div>
-            <div className="flex h-[42px] min-w-[110%] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F]">
+
+            <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
               <span className="font-manrope text-xs leading-none font-medium">
-                Ваша информация
+                Скидка 10% на пополнение баланса до 22.03
               </span>
             </div>
           </div>

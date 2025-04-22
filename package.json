@@ -33,6 +33,7 @@
     "heic-convert": "^2.1.0",
     "jose": "^6.0.10",
     "lucide-react": "^0.487.0",
+    "motion": "^12.7.4",
     "postgres": "^3.4.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
