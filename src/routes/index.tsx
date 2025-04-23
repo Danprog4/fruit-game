@@ -9,7 +9,7 @@ import { Apple } from "~/components/icons/fruits/Apple";
 import { Lemon } from "~/components/icons/fruits/Lemon";
 import { Pear } from "~/components/icons/fruits/Pear";
 import { StrawberryMain } from "~/components/icons/fruits/StrawberryMain";
-import Farm from "~/components/icons/navbar/Farm";
+import Ferm from "~/components/icons/navbar/Ferm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { TasksIcon } from "~/components/icons/Tasks";
@@ -174,18 +174,23 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-8 text-sm font-medium text-white">
-        <div className="flex flex-col items-center justify-center gap-1">
-          <Farm />
-          <div className="font-manrope text-xs font-medium">Ферма</div>
+      <div className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
+        <div className="flex w-[105px] flex-col items-center justify-center gap-1">
+          <div
+            onClick={() => navigate({ to: "/ferm" })}
+            className="flex w-[105px] flex-col items-center justify-center gap-1"
+          >
+            <Ferm />
+            <div className="font-manrope text-xs font-medium">Ферма</div>
+          </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-1">
-          <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-[#A2D448]">
+          <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-gradient-to-b from-[#A2D448] to-[#A2D448]">
             <Main />
             <div className="font-manrope text-xs font-medium">Главная</div>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center gap-1">
+        <div className="flex w-[105px] flex-col items-center justify-center gap-1">
           <Wallet />
           <div className="font-manrope text-xs font-medium">Кошелек</div>
         </div>

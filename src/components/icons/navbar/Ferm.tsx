@@ -1,4 +1,4 @@
-export default function Farm() {
+export default function Ferm() {
   return (
     <svg
       width="22"
