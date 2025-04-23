@@ -30,7 +30,7 @@ function RouteComponent() {
             <div className="font-manrope text-xs font-medium text-[#8F8F8F]">40 000</div>
           </div>
         </div>
-        <div className="font-manrope flex h-[36px] items-center justify-center rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white">
+        <div className="font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white">
           Прокачать
         </div>
       </div>
