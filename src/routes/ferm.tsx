@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FermList } from "~/components/FermList";
 import Farm from "~/components/icons/navbar/Ferm";
@@ -54,7 +55,10 @@ function RouteComponent() {
             <div className="font-manrope text-xs font-medium">Главная</div>
           </div>
         </div>
-        <div className="flex w-[105px] flex-col items-center justify-center gap-1">
+        <div
+          className="flex w-[105px] flex-col items-center justify-center gap-1"
+          onClick={() => toast.error("В разработке")}
+        >
           <Wallet />
           <div className="font-manrope text-xs font-medium">Кошелек</div>
         </div>
