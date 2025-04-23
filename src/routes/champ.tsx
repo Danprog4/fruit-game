@@ -12,7 +12,7 @@ export const Route = createFileRoute("/champ")({
 function RouteComponent() {
   const navigate = useNavigate();
   return (
-    <div className="mb-20 flex w-full flex-col px-4 pt-[86px] text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[86px] pb-20 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="ml-1">
