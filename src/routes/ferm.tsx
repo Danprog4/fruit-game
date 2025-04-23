@@ -20,7 +20,7 @@ function RouteComponent() {
       <div className="font-manrope mb-[31px] flex items-center justify-center text-2xl font-semibold text-white">
         Ферма
       </div>
-      <div className="mb-[28px] flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3">
+      <div className="mb-[28px] flex h-[76px] w-full items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px]">
         <div className="mr-3 flex h-[54px] w-[54px] items-center justify-center gap-[6px] rounded-full border border-[#76AD10] bg-[#2A2A2A]">
           <Star />
         </div>

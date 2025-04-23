@@ -5,7 +5,7 @@ export const FermList = () => {
   return (
     <div className="flex flex-col gap-[14px]">
       <div className="flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px]">
-        <div className="mr-3 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
+        <div className="mr-5 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
           <Strawberry width="40" height="40" />
         </div>
         <div className="mr-auto flex w-[116px] flex-col items-start justify-center gap-2">
@@ -16,7 +16,7 @@ export const FermList = () => {
         </div>
       </div>
       <div className="flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px]">
-        <div className="mr-3 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
+        <div className="mr-5 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
           <div className="rotate-[37deg] transform">
             <Lemon width="30" height="30" />
           </div>
