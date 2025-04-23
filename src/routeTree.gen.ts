@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as TasksImport } from './routes/tasks'
 import { Route as FriendsImport } from './routes/friends'
 import { Route as CreateAllianceImport } from './routes/create-alliance'
+import { Route as ChampImport } from './routes/champ'
 import { Route as AlliancesImport } from './routes/alliances'
 import { Route as IndexImport } from './routes/index'
 import { Route as AllianceIdImport } from './routes/alliance.$id'
@@ -35,6 +36,12 @@ const FriendsRoute = FriendsImport.update({
 const CreateAllianceRoute = CreateAllianceImport.update({
   id: '/create-alliance',
   path: '/create-alliance',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChampRoute = ChampImport.update({
+  id: '/champ',
+  path: '/champ',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlliancesImport
       parentRoute: typeof rootRoute
     }
+    '/champ': {
+      id: '/champ'
+      path: '/champ'
+      fullPath: '/champ'
+      preLoaderRoute: typeof ChampImport
+      parentRoute: typeof rootRoute
+    }
     '/create-alliance': {
       id: '/create-alliance'
       path: '/create-alliance'
@@ -110,6 +124,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
+  '/champ': typeof ChampRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
@@ -119,6 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
+  '/champ': typeof ChampRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
@@ -129,6 +145,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
+  '/champ': typeof ChampRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
@@ -140,6 +157,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/alliances'
+    | '/champ'
     | '/create-alliance'
     | '/friends'
     | '/tasks'
@@ -148,6 +166,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/alliances'
+    | '/champ'
     | '/create-alliance'
     | '/friends'
     | '/tasks'
@@ -156,6 +175,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/alliances'
+    | '/champ'
     | '/create-alliance'
     | '/friends'
     | '/tasks'
@@ -166,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlliancesRoute: typeof AlliancesRoute
+  ChampRoute: typeof ChampRoute
   CreateAllianceRoute: typeof CreateAllianceRoute
   FriendsRoute: typeof FriendsRoute
   TasksRoute: typeof TasksRoute
@@ -175,6 +196,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlliancesRoute: AlliancesRoute,
+  ChampRoute: ChampRoute,
   CreateAllianceRoute: CreateAllianceRoute,
   FriendsRoute: FriendsRoute,
   TasksRoute: TasksRoute,
@@ -193,6 +215,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/alliances",
+        "/champ",
         "/create-alliance",
         "/friends",
         "/tasks",
@@ -204,6 +227,9 @@ export const routeTree = rootRoute
     },
     "/alliances": {
       "filePath": "alliances.tsx"
+    },
+    "/champ": {
+      "filePath": "champ.tsx"
     },
     "/create-alliance": {
       "filePath": "create-alliance.tsx"

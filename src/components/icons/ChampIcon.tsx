@@ -1,8 +1,14 @@
-export const ChampIcon = () => {
+export const ChampIcon = ({
+  width = 49,
+  height = 51,
+}: {
+  width?: number;
+  height?: number;
+}) => {
   return (
     <svg
-      width="49"
-      height="51"
+      width={width}
+      height={height}
       viewBox="0 0 49 51"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

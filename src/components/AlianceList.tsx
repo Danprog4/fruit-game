@@ -7,7 +7,13 @@ import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 import { AllianceMini } from "./icons/AlianceMini";
 
-export const AllianceList = ({ searchQuery = "" }) => {
+export const AllianceList = ({
+  searchQuery = "",
+  limit,
+}: {
+  searchQuery?: string;
+  limit?: number;
+}) => {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
@@ -23,10 +29,16 @@ export const AllianceList = ({ searchQuery = "" }) => {
     alliance.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const sortedAlliances = alliances
+    ?.sort((a, b) => (b.members || 1) - (a.members || 1))
+    .slice(0, limit);
+
+  const alliancesToDisplay = limit ? sortedAlliances : filteredAlliances;
+
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
-        {filteredAlliances?.map((alliance) => (
+        {alliancesToDisplay?.map((alliance) => (
           <Drawer.Root key={alliance.id}>
             <div
               className="flex h-[76px] cursor-pointer items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"

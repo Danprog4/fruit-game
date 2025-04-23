@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { useWindowSize } from "usehooks-ts";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
@@ -119,8 +118,7 @@ function RouteComponent() {
           </div>
           <div
             className="absolute right-4 bottom-30 z-10 flex"
-            // onClick={() => navigate({ to: "/friends" })}
-            onClick={() => toast.error("В разработке")}
+            onClick={() => navigate({ to: "/champ" })}
           >
             <div className="flex flex-col items-center">
               <ChampIcon />
