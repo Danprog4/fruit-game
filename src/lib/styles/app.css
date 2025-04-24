@@ -25,3 +25,17 @@ html {
   animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards)
     linear infinite;
 }
+/* TonConnect button styling */
+#ton-connect-button {
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+#ton-connect-button button {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+}
