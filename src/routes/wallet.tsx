@@ -24,23 +24,25 @@ function RouteComponent() {
               <div className="absolute inset-0 opacity-0">
                 <TonConnectButton className="h-[54px] w-[54px]" />
               </div>
-              <div className="absolute right-[1px] -bottom-[1px] flex h-4 w-4 items-center justify-center rounded-sm bg-white shadow-sm">
-                <svg
-                  width="8"
-                  height="8"
-                  viewBox="0 0 8 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4 1V7M1 4H7"
-                    stroke="#85BF1A"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
+              {!wallet && (
+                <div className="absolute right-[1px] -bottom-[1px] flex h-4 w-4 items-center justify-center rounded-sm bg-white shadow-sm">
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 1V7M1 4H7"
+                      stroke="#85BF1A"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-start gap-1">
               <div className="font-manrope text-base font-semibold">
