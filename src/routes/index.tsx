@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { toast } from "sonner";
 import { useWindowSize } from "usehooks-ts";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ChampIcon } from "~/components/icons/ChampIcon";
@@ -193,7 +192,7 @@ function RouteComponent() {
         </div>
         <div
           className="flex w-[105px] flex-col items-center justify-center gap-1"
-          onClick={() => toast.error("В разработке")}
+          onClick={() => navigate({ to: "/wallet" })}
         >
           <Wallet />
           <div className="font-manrope text-xs font-medium">Кошелек</div>

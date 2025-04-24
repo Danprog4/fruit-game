@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as WalletImport } from './routes/wallet'
 import { Route as TasksImport } from './routes/tasks'
 import { Route as FriendsImport } from './routes/friends'
 import { Route as FermImport } from './routes/ferm'
@@ -21,6 +22,12 @@ import { Route as IndexImport } from './routes/index'
 import { Route as AllianceIdImport } from './routes/alliance.$id'
 
 // Create/Update Routes
+
+const WalletRoute = WalletImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const TasksRoute = TasksImport.update({
   id: '/tasks',
@@ -123,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksImport
       parentRoute: typeof rootRoute
     }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletImport
+      parentRoute: typeof rootRoute
+    }
     '/alliance/$id': {
       id: '/alliance/$id'
       path: '/alliance/$id'
@@ -143,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/wallet': typeof WalletRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -154,6 +169,7 @@ export interface FileRoutesByTo {
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/wallet': typeof WalletRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -166,6 +182,7 @@ export interface FileRoutesById {
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/wallet': typeof WalletRoute
   '/alliance/$id': typeof AllianceIdRoute
 }
 
@@ -179,6 +196,7 @@ export interface FileRouteTypes {
     | '/ferm'
     | '/friends'
     | '/tasks'
+    | '/wallet'
     | '/alliance/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -189,6 +207,7 @@ export interface FileRouteTypes {
     | '/ferm'
     | '/friends'
     | '/tasks'
+    | '/wallet'
     | '/alliance/$id'
   id:
     | '__root__'
@@ -199,6 +218,7 @@ export interface FileRouteTypes {
     | '/ferm'
     | '/friends'
     | '/tasks'
+    | '/wallet'
     | '/alliance/$id'
   fileRoutesById: FileRoutesById
 }
@@ -211,6 +231,7 @@ export interface RootRouteChildren {
   FermRoute: typeof FermRoute
   FriendsRoute: typeof FriendsRoute
   TasksRoute: typeof TasksRoute
+  WalletRoute: typeof WalletRoute
   AllianceIdRoute: typeof AllianceIdRoute
 }
 
@@ -222,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   FermRoute: FermRoute,
   FriendsRoute: FriendsRoute,
   TasksRoute: TasksRoute,
+  WalletRoute: WalletRoute,
   AllianceIdRoute: AllianceIdRoute,
 }
 
@@ -242,6 +264,7 @@ export const routeTree = rootRoute
         "/ferm",
         "/friends",
         "/tasks",
+        "/wallet",
         "/alliance/$id"
       ]
     },
@@ -265,6 +288,9 @@ export const routeTree = rootRoute
     },
     "/tasks": {
       "filePath": "tasks.tsx"
+    },
+    "/wallet": {
+      "filePath": "wallet.tsx"
     },
     "/alliance/$id": {
       "filePath": "alliance.$id.tsx"

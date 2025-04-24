@@ -13,6 +13,7 @@ import {
   swipeBehavior,
   viewport,
 } from "@telegram-apps/sdk-react";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
@@ -92,7 +93,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <AuthProvider>
-        <Outlet />
+        <TonConnectUIProvider manifestUrl="https://fruit-game-eight.vercel.app/tonconnect-manifest.json">
+          <Outlet />
+        </TonConnectUIProvider>
       </AuthProvider>
     </RootDocument>
   );
