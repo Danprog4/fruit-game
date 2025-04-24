@@ -32,10 +32,22 @@ html {
   border-radius: 50% !important;
   padding: 0 !important;
   overflow: hidden !important;
+  float: right !important;
 }
 
 #ton-connect-button button {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50% !important;
+}
+
+/* Position the wallet connection carousel to the right side */
+.tc-connect-wallet__wallets-list {
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+.tc-connect-wallet__wallets-list-container {
+  justify-content: flex-end !important;
 }
