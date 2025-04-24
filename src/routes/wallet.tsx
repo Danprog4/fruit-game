@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
+import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { useEffect } from "react";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
@@ -13,6 +14,15 @@ export const Route = createFileRoute("/wallet")({
 
 function RouteComponent() {
   const wallet = useTonWallet();
+  const [tonConnectUI, setOptions] = useTonConnectUI();
+
+  useEffect(() => {
+    if (tonConnectUI) {
+      console.log("Setting TonConnect UI language to Russian");
+      setOptions({ language: "ru" });
+    }
+  }, [tonConnectUI, setOptions]);
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[100px] pb-20 text-white">
       <BackButton onClick={() => window.history.back()} />
