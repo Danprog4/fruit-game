@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Swap } from "~/components/icons/Swap";
 import { Token } from "~/components/icons/Token";
@@ -25,6 +25,13 @@ function RouteComponent() {
   useEffect(() => {
     setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
   }, [fromAmount, fromToken, toToken]);
+  const scrollPositionRef = useRef<number>(0);
+  const handleInputFocus = () => {
+    scrollPositionRef.current = window.scrollY;
+  };
+  const handleInputBlur = () => {
+    window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
+  };
 
   const handleSwap = () => {
     setSwapped(!swapped);
@@ -151,6 +158,8 @@ function RouteComponent() {
               }}
               className="font-manrope w-[120px] bg-transparent text-right text-[18px] font-medium text-[#8F8F8F] outline-none"
               placeholder="0.13 - 100000"
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
             <div
               className="font-manrope absolute right-4 bottom-4 cursor-pointer text-[12px] font-medium text-[#85BF1A]"
