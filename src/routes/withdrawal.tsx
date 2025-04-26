@@ -21,7 +21,7 @@ function RouteComponent() {
     scrollPositionRef.current = window.scrollY;
   };
   const handleInputBlur = () => {
-    window.scrollTo({ top: scrollPositionRef.current, behavior: "smooth" });
+    window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
   };
 
   const handleLongPress = () => {
