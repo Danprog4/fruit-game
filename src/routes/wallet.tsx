@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import { useEffect } from "react";
 import { BackButton } from "~/components/BackButton";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/wallet")({
 function RouteComponent() {
   const wallet = useTonWallet();
   const [tonConnectUI, setOptions] = useTonConnectUI();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (tonConnectUI) {
@@ -82,7 +83,10 @@ function RouteComponent() {
           <div className="mb-[35px] flex items-center justify-center gap-[23px]">
             <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
               <div className="flex items-center gap-4">
-                <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#404040]">
+                <div
+                  onClick={() => navigate({ to: "/change" })}
+                  className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
+                >
                   <Dollar />
                 </div>
                 <div>Обмен</div>

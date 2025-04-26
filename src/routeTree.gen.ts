@@ -16,6 +16,7 @@ import { Route as TasksImport } from './routes/tasks'
 import { Route as FriendsImport } from './routes/friends'
 import { Route as FermImport } from './routes/ferm'
 import { Route as CreateAllianceImport } from './routes/create-alliance'
+import { Route as ChangeImport } from './routes/change'
 import { Route as ChampImport } from './routes/champ'
 import { Route as AlliancesImport } from './routes/alliances'
 import { Route as IndexImport } from './routes/index'
@@ -50,6 +51,12 @@ const FermRoute = FermImport.update({
 const CreateAllianceRoute = CreateAllianceImport.update({
   id: '/create-alliance',
   path: '/create-alliance',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChangeRoute = ChangeImport.update({
+  id: '/change',
+  path: '/change',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -100,6 +107,13 @@ declare module '@tanstack/react-router' {
       path: '/champ'
       fullPath: '/champ'
       preLoaderRoute: typeof ChampImport
+      parentRoute: typeof rootRoute
+    }
+    '/change': {
+      id: '/change'
+      path: '/change'
+      fullPath: '/change'
+      preLoaderRoute: typeof ChangeImport
       parentRoute: typeof rootRoute
     }
     '/create-alliance': {
@@ -153,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
   '/champ': typeof ChampRoute
+  '/change': typeof ChangeRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
@@ -165,6 +180,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
   '/champ': typeof ChampRoute
+  '/change': typeof ChangeRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
@@ -178,6 +194,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/alliances': typeof AlliancesRoute
   '/champ': typeof ChampRoute
+  '/change': typeof ChangeRoute
   '/create-alliance': typeof CreateAllianceRoute
   '/ferm': typeof FermRoute
   '/friends': typeof FriendsRoute
@@ -192,6 +209,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alliances'
     | '/champ'
+    | '/change'
     | '/create-alliance'
     | '/ferm'
     | '/friends'
@@ -203,6 +221,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alliances'
     | '/champ'
+    | '/change'
     | '/create-alliance'
     | '/ferm'
     | '/friends'
@@ -214,6 +233,7 @@ export interface FileRouteTypes {
     | '/'
     | '/alliances'
     | '/champ'
+    | '/change'
     | '/create-alliance'
     | '/ferm'
     | '/friends'
@@ -227,6 +247,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlliancesRoute: typeof AlliancesRoute
   ChampRoute: typeof ChampRoute
+  ChangeRoute: typeof ChangeRoute
   CreateAllianceRoute: typeof CreateAllianceRoute
   FermRoute: typeof FermRoute
   FriendsRoute: typeof FriendsRoute
@@ -239,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlliancesRoute: AlliancesRoute,
   ChampRoute: ChampRoute,
+  ChangeRoute: ChangeRoute,
   CreateAllianceRoute: CreateAllianceRoute,
   FermRoute: FermRoute,
   FriendsRoute: FriendsRoute,
@@ -260,6 +282,7 @@ export const routeTree = rootRoute
         "/",
         "/alliances",
         "/champ",
+        "/change",
         "/create-alliance",
         "/ferm",
         "/friends",
@@ -276,6 +299,9 @@ export const routeTree = rootRoute
     },
     "/champ": {
       "filePath": "champ.tsx"
+    },
+    "/change": {
+      "filePath": "change.tsx"
     },
     "/create-alliance": {
       "filePath": "create-alliance.tsx"
