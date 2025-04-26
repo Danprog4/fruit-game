@@ -101,6 +101,11 @@ function RouteComponent() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.currentTarget.blur();
+              }
+            }}
             placeholder="Удерживайте чтобы вставить"
             className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[19px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
             size={500}
@@ -122,6 +127,11 @@ function RouteComponent() {
             type="text"
             value={amount}
             onChange={handleAmountChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.currentTarget.blur();
+              }
+            }}
             placeholder={`Минимум ${MIN_AMOUNT}`}
             className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[19px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
             size={500}
