@@ -187,11 +187,11 @@ html {
 }
 
 /* ensure inputs don't cause page to rotate or zoom */
-/* input,
+input,
 textarea {
   touch-action: manipulation;
   -webkit-user-select: auto;
   -ms-user-select: auto;
   user-select: auto;
   transform: translateZ(0);
-} */
+}
