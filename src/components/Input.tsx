@@ -2,7 +2,7 @@ type InputProps = {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   placeholder: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 export const Input = ({ searchQuery, setSearchQuery, placeholder, icon }: InputProps) => {
