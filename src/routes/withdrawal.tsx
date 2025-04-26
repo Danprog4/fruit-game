@@ -79,7 +79,7 @@ function RouteComponent() {
           </Drawer.Root>
         </div>
       </div>
-
+      <div className="relative z-10"></div>
       <div className="font-manrope text-xs font-medium">Адрес</div>
       <div className="relative mt-4 mb-[22px] flex w-full items-center">
         <div className="relative w-full">

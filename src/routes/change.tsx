@@ -1,5 +1,6 @@
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Swap } from "~/components/icons/Swap";
 import { Token } from "~/components/icons/Token";
@@ -10,10 +11,94 @@ export const Route = createFileRoute("/change")({
 
 function RouteComponent() {
   const [swapped, setSwapped] = useState(false);
+  const [fromToken, setFromToken] = useState("FRU");
+  const [toToken, setToToken] = useState("STR");
+  const [fromAmount, setFromAmount] = useState("");
+  const [toAmount, setToAmount] = useState("0");
+
+  // Token prices in USD
+  const tokenPrices = {
+    FRU: 0.85,
+    STR: 2.35,
+    APL: 1.27,
+  };
+
+  // Exchange rate calculation based on token prices
+  const calculateExchangeAmount = (amount: string, from: string, to: string) => {
+    if (!amount || isNaN(parseFloat(amount))) {
+      return "0";
+    }
+
+    // Calculate based on relative token prices
+    const fromPrice = tokenPrices[from as keyof typeof tokenPrices];
+    const toPrice = tokenPrices[to as keyof typeof tokenPrices];
+    const exchangeRate = fromPrice / toPrice;
+
+    return (parseFloat(amount) * exchangeRate).toFixed(6);
+  };
+
+  // Update toAmount whenever fromAmount or tokens change
+  useEffect(() => {
+    setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
+  }, [fromAmount, fromToken, toToken]);
 
   const handleSwap = () => {
     setSwapped(!swapped);
+
+    // Keep the input value in the first field
+    const newFromAmount = fromAmount;
+
+    // Swap token values
+    const tempToken = fromToken;
+    setFromToken(toToken);
+    setToToken(tempToken);
+
+    // Calculate new toAmount based on the swapped tokens
+    setToAmount(calculateExchangeAmount(newFromAmount, toToken, tempToken));
   };
+
+  const handleFromTokenChange = (value: string) => {
+    setFromToken(value);
+    // Recalculate toAmount when fromToken changes
+    setToAmount(calculateExchangeAmount(fromAmount, value, toToken));
+  };
+
+  const handleToTokenChange = (value: string) => {
+    setToToken(value);
+    // Recalculate toAmount when toToken changes
+    setToAmount(calculateExchangeAmount(fromAmount, fromToken, value));
+  };
+
+  const handleFromAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow numbers and decimal point
+    if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+      setFromAmount(value);
+      // Update toAmount based on new fromAmount
+      setToAmount(calculateExchangeAmount(value, fromToken, toToken));
+    }
+  };
+
+  // Calculate exchange rate display
+  const getExchangeRateDisplay = () => {
+    const fromPrice = tokenPrices[fromToken as keyof typeof tokenPrices];
+    const toPrice = tokenPrices[toToken as keyof typeof tokenPrices];
+    const rate = (fromPrice / toPrice).toFixed(6);
+    return `1 ${fromToken} = ${rate} ${toToken}`;
+  };
+
+  // Fake percentage change
+  const getPercentageChange = () => {
+    // Generate random percentage between -10% and +50%
+    const randomChange = (Math.random() * 60 - 10).toFixed(2);
+    const isPositive = parseFloat(randomChange) >= 0;
+    return {
+      value: randomChange,
+      isPositive,
+    };
+  };
+
+  const percentChange = getPercentageChange();
 
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[110px] text-white">
@@ -24,10 +109,22 @@ function RouteComponent() {
       <div className="mb-[21px] flex items-center justify-between">
         <div>
           <div className="font-manrope text-[10px] font-medium">
-            1 TST = 0.361928 HYPER <span className="text-[#A2D448]"> +49.10%</span>
+            {getExchangeRateDisplay()}{" "}
+            <span
+              className={percentChange.isPositive ? "text-[#A2D448]" : "text-red-500"}
+            >
+              {" "}
+              {percentChange.isPositive ? "+" : ""}
+              {percentChange.value}%
+            </span>
           </div>
         </div>
-        <div className="font-manrope text-[10px] font-medium">0,407407</div>
+        <div className="font-manrope text-[10px] font-medium">
+          {(
+            tokenPrices[fromToken as keyof typeof tokenPrices] /
+            tokenPrices[toToken as keyof typeof tokenPrices]
+          ).toFixed(6)}
+        </div>
       </div>
       <div className="relative mb-[21px] flex h-[173px] w-full items-end justify-end rounded-4xl bg-[#252A1B]">
         <Graphic />
@@ -41,25 +138,53 @@ function RouteComponent() {
       <div className="relative flex flex-col gap-6">
         <div className="relative h-[124px] w-full rounded-3xl bg-[#222221] p-4">
           <div className="mb-4 flex items-center justify-between text-[#8F8F8F]">
-            <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-              {swapped ? "В" : "Из"}
-            </div>
+            <div className="font-manrope text-xs font-medium text-[#8F8F8F]">Из</div>
             <div className="flex h-[25px] w-[150px] items-center justify-center rounded-xl border border-[#3B3B3B]">
               <div className="font-manrope text-[10px] font-medium">
-                Доступно 52,2160 FRU
+                Доступно 52,2160 {fromToken}
               </div>
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-center gap-1">
               <Token width={28} height={28} viewBox="0 0 34 34" />
-              <div className="font-manrope text-[24px] font-medium">FRU</div>
+              <div className="font-manrope text-[24px] font-medium">{fromToken}</div>
+              <Select onValueChange={handleFromTokenChange} value={fromToken}>
+                <SelectTrigger className="bg-[#333333]"></SelectTrigger>
+                <SelectContent className="z-50 bg-[#333333]">
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="FRU"
+                  >
+                    FRU
+                  </SelectItem>
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="STR"
+                  >
+                    STR
+                  </SelectItem>
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="APL"
+                  >
+                    APL
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="font-manrope text-[18px] font-medium text-[#8F8F8F]">
-              0.13 - 100000
-            </div>
-            <div className="font-manrope absolute right-4 bottom-4 text-[12px] font-medium text-[#85BF1A]">
+            <input
+              type="text"
+              value={fromAmount}
+              onChange={handleFromAmountChange}
+              className="font-manrope w-[120px] bg-transparent text-right text-[18px] font-medium text-[#8F8F8F] outline-none"
+              placeholder="0.13 - 100000"
+            />
+            <div
+              className="font-manrope absolute right-4 bottom-4 cursor-pointer text-[12px] font-medium text-[#85BF1A]"
+              onClick={() => setFromAmount("52.2160")}
+            >
               Макс.
             </div>
           </div>
@@ -74,17 +199,38 @@ function RouteComponent() {
 
         <div className="h-[124px] w-full rounded-3xl bg-[#222221] p-4">
           <div className="mb-4 flex items-center justify-between text-[#8F8F8F]">
-            <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-              {swapped ? "Из" : "В"}
-            </div>
+            <div className="font-manrope text-xs font-medium text-[#8F8F8F]">В</div>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-center gap-1">
               <Token width={28} height={28} viewBox="0 0 34 34" />
-              <div className="font-manrope text-[24px] font-medium">FRU</div>
+              <div className="font-manrope text-[24px] font-medium">{toToken}</div>
+              <Select onValueChange={handleToTokenChange} value={toToken}>
+                <SelectTrigger className="bg-[#333333]"></SelectTrigger>
+                <SelectContent className="z-50 bg-[#333333]">
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="FRU"
+                  >
+                    FRU
+                  </SelectItem>
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="STR"
+                  >
+                    STR
+                  </SelectItem>
+                  <SelectItem
+                    className="flex w-[100px] items-center justify-start"
+                    value="APL"
+                  >
+                    APL
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="font-manrope text-[18px] font-medium text-[#8F8F8F]">
-              0.13 - 100000
+            <div className="font-manrope w-[120px] overflow-hidden text-right text-[18px] font-medium text-ellipsis text-[#8F8F8F]">
+              {toAmount}
             </div>
           </div>
         </div>
