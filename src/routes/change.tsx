@@ -5,6 +5,11 @@ import { BackButton } from "~/components/BackButton";
 import { Swap } from "~/components/icons/Swap";
 import { Token } from "~/components/icons/Token";
 import { Graphic } from "~/components/images/Graphic";
+import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
+import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay";
+import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
+
+import tokenPrices from "~/tokenPrices";
 export const Route = createFileRoute("/change")({
   component: RouteComponent,
 });
@@ -15,27 +20,6 @@ function RouteComponent() {
   const [toToken, setToToken] = useState("STR");
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("0");
-
-  // Token prices in USD
-  const tokenPrices = {
-    FRU: 0.85,
-    STR: 2.35,
-    APL: 1.27,
-  };
-
-  // Exchange rate calculation based on token prices
-  const calculateExchangeAmount = (amount: string, from: string, to: string) => {
-    if (!amount || isNaN(parseFloat(amount))) {
-      return "0";
-    }
-
-    // Calculate based on relative token prices
-    const fromPrice = tokenPrices[from as keyof typeof tokenPrices];
-    const toPrice = tokenPrices[to as keyof typeof tokenPrices];
-    const exchangeRate = fromPrice / toPrice;
-
-    return (parseFloat(amount) * exchangeRate).toFixed(6);
-  };
 
   // Update toAmount whenever fromAmount or tokens change
   useEffect(() => {
@@ -79,25 +63,6 @@ function RouteComponent() {
     }
   };
 
-  // Calculate exchange rate display
-  const getExchangeRateDisplay = () => {
-    const fromPrice = tokenPrices[fromToken as keyof typeof tokenPrices];
-    const toPrice = tokenPrices[toToken as keyof typeof tokenPrices];
-    const rate = (fromPrice / toPrice).toFixed(6);
-    return `1 ${fromToken} = ${rate} ${toToken}`;
-  };
-
-  // Fake percentage change
-  const getPercentageChange = () => {
-    // Generate random percentage between -10% and +50%
-    const randomChange = (Math.random() * 60 - 10).toFixed(2);
-    const isPositive = parseFloat(randomChange) >= 0;
-    return {
-      value: randomChange,
-      isPositive,
-    };
-  };
-
   const percentChange = getPercentageChange();
 
   return (
@@ -109,7 +74,7 @@ function RouteComponent() {
       <div className="mb-[21px] flex items-center justify-between">
         <div>
           <div className="font-manrope text-[10px] font-medium">
-            {getExchangeRateDisplay()}{" "}
+            {getExchangeRateDisplay(fromToken, toToken)}{" "}
             <span
               className={percentChange.isPositive ? "text-[#A2D448]" : "text-red-500"}
             >
