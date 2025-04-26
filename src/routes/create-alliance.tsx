@@ -28,9 +28,7 @@ function RouteComponent() {
       setSelectedFile(e.target.files[0]);
     }
   };
-  const handleInputFocus = () => {
-    scrollPositionRef.current = window.scrollY;
-  };
+  const handleInputFocus = () => {};
   const handleInputBlur = () => {
     window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
   };
