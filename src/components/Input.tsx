@@ -19,6 +19,12 @@ export const Input = ({ searchQuery, setSearchQuery, placeholder, icon }: InputP
           size={500}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }
+          }}
         />
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
           <button className="text-white hover:text-white">

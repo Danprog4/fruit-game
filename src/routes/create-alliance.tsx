@@ -97,6 +97,12 @@ function RouteComponent() {
               size={500}
               value={allianceName}
               onChange={(e) => setAllianceName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                }
+              }}
             />
           </div>
           <div className="relative mb-[18px] w-full">
@@ -107,6 +113,12 @@ function RouteComponent() {
               size={500}
               value={telegramUrl}
               onChange={(e) => setTelegramUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                }
+              }}
             />
           </div>
         </div>
