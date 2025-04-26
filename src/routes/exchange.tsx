@@ -26,10 +26,10 @@ function RouteComponent() {
     setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
   }, [fromAmount, fromToken, toToken]);
   const handleInputFocus = () => {
-    scrollPositionRef.current = 0;
+    scrollPositionRef.current = window.scrollY;
   };
   const handleInputBlur = () => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
   };
 
   const handleSwap = () => {
