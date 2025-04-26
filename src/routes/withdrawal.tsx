@@ -103,6 +103,7 @@ function RouteComponent() {
             onChange={(e) => setAddress(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                e.preventDefault();
                 e.currentTarget.blur();
               }
             }}
@@ -129,6 +130,7 @@ function RouteComponent() {
             onChange={handleAmountChange}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                e.preventDefault();
                 e.currentTarget.blur();
               }
             }}
