@@ -84,7 +84,7 @@ function RouteComponent() {
             <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
               <div className="flex items-center gap-4">
                 <div
-                  onClick={() => navigate({ to: "/change" })}
+                  onClick={() => navigate({ to: "/exchange" })}
                   className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
                 >
                   <Dollar />

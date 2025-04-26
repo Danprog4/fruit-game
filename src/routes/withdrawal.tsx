@@ -13,6 +13,7 @@ function RouteComponent() {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const MIN_AMOUNT = 14;
 
   const handleLongPress = () => {
     navigator.clipboard
@@ -23,6 +24,18 @@ function RouteComponent() {
       .catch((err) => {
         console.error("Failed to read clipboard contents: ", err);
       });
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow numbers and decimal point
+    if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+      setAmount(value);
+    }
+  };
+
+  const handleMaxAmount = () => {
+    setAmount("59.2110");
   };
 
   return (
@@ -108,14 +121,19 @@ function RouteComponent() {
           <input
             type="text"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Минимум 14"
+            onChange={handleAmountChange}
+            placeholder={`Минимум ${MIN_AMOUNT}`}
             className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[19px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
             size={500}
           />
           <div className="absolute top-1/2 right-4 flex -translate-y-1/2 items-center justify-center gap-3 text-sm">
             <div className="font-manrope text-xs font-medium">FRU</div>
-            <span className="font-manrope text-xs font-medium text-[#73A517]">Макс</span>
+            <span
+              className="font-manrope cursor-pointer text-xs font-medium text-[#73A517]"
+              onClick={handleMaxAmount}
+            >
+              Макс
+            </span>
           </div>
         </div>
       </div>
@@ -142,7 +160,14 @@ function RouteComponent() {
             Комиссия сети <span className="text-white">7,37 FRU</span>
           </div>
         </div>
-        <button className="font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white">
+        <button
+          className={`font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full ${
+            !amount || parseFloat(amount) < MIN_AMOUNT
+              ? "cursor-not-allowed bg-[#76AD10]/50"
+              : "cursor-pointer bg-[#76AD10]"
+          } px-6 text-sm font-medium text-white`}
+          disabled={!amount || parseFloat(amount) < MIN_AMOUNT}
+        >
           Вывод
         </button>
       </div>

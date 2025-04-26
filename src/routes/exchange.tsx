@@ -10,7 +10,7 @@ import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay
 import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
 
 import tokenPrices from "~/tokenPrices";
-export const Route = createFileRoute("/change")({
+export const Route = createFileRoute("/exchange")({
   component: RouteComponent,
 });
 
@@ -66,7 +66,7 @@ function RouteComponent() {
   const percentChange = getPercentageChange();
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[110px] pb-20 text-white">
+    <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[110px] pb-20 text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="font-manrope mx-auto mb-[33px] text-center text-2xl font-semibold">
         Обмен
