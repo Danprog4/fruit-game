@@ -49,7 +49,7 @@ function RouteComponent() {
 
   return (
     <div
-      className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[110px] text-white"
+      className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] text-white"
       style={{ height: window.innerHeight }}
     >
       <BackButton onClick={() => window.history.back()} />
