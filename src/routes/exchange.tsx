@@ -25,9 +25,7 @@ function RouteComponent() {
   useEffect(() => {
     setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
   }, [fromAmount, fromToken, toToken]);
-  const handleInputFocus = () => {
-    scrollPositionRef.current = window.scrollY;
-  };
+  const handleInputFocus = () => {};
   const handleInputBlur = () => {
     window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
   };
