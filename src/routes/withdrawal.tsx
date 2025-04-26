@@ -39,7 +39,10 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[50px] text-white">
+    <div
+      className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] text-white"
+      style={{ height: window.innerHeight }}
+    >
       <BackButton onClick={() => window.history.back()} />
       <div className="mb-9 flex items-center justify-between">
         <div className="invisible flex items-center justify-center gap-2">
