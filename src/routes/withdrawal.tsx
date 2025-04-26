@@ -15,6 +15,15 @@ function RouteComponent() {
   const inputRef = useRef<HTMLInputElement>(null);
   const MIN_AMOUNT = 14;
 
+  // add scroll save/restore logic
+  const scrollPositionRef = useRef<number>(0);
+  const handleInputFocus = () => {
+    scrollPositionRef.current = window.scrollY;
+  };
+  const handleInputBlur = () => {
+    window.scrollTo({ top: scrollPositionRef.current, behavior: "smooth" });
+  };
+
   const handleLongPress = () => {
     navigator.clipboard
       .readText()
@@ -104,6 +113,8 @@ function RouteComponent() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -131,6 +142,8 @@ function RouteComponent() {
             type="text"
             value={amount}
             onChange={handleAmountChange}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
