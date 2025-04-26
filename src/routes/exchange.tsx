@@ -98,8 +98,9 @@ function RouteComponent() {
           ).toFixed(6)}
         </div>
       </div>
-      <div className="relative mb-[21px] flex h-[173px] w-full items-end justify-end rounded-4xl bg-[#252A1B]">
+      <div className="relative mb-[21px] flex h-[173px] w-full items-end justify-end rounded-4xl bg-[#252A1B] pt-8 pb-2">
         <Graphic />
+
         <div className="font-manrope absolute bottom-[30px] left-[48px] text-[10px] font-medium text-[#6A7B49]">
           0,20140
         </div>
