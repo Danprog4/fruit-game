@@ -22,11 +22,17 @@ function RouteComponent() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showErrors, setShowErrors] = useState(false);
-
+  const scrollPositionRef = useRef<number>(0);
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
     }
+  };
+  const handleInputFocus = () => {
+    scrollPositionRef.current = window.scrollY;
+  };
+  const handleInputBlur = () => {
+    window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
   };
 
   const isHeicFile = (file: File): boolean => {
@@ -103,6 +109,8 @@ function RouteComponent() {
                   e.currentTarget.blur();
                 }
               }}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
           </div>
           <div className="relative mb-[18px] w-full">
@@ -119,6 +127,8 @@ function RouteComponent() {
                   e.currentTarget.blur();
                 }
               }}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
           </div>
         </div>
