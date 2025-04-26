@@ -116,21 +116,21 @@ function RouteComponent() {
               <div className="font-manrope text-[24px] font-medium">{fromToken}</div>
               <Select onValueChange={handleFromTokenChange} value={fromToken}>
                 <SelectTrigger className="bg-[#333333]"></SelectTrigger>
-                <SelectContent className="z-50 bg-[#333333]">
+                <SelectContent className="z-50 bg-[#333333] p-3">
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="FRU"
                   >
                     FRU
                   </SelectItem>
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="STR"
                   >
                     STR
                   </SelectItem>
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="APL"
                   >
                     APL
@@ -178,21 +178,21 @@ function RouteComponent() {
               <div className="font-manrope text-[24px] font-medium">{toToken}</div>
               <Select onValueChange={handleToTokenChange} value={toToken}>
                 <SelectTrigger className="bg-[#333333]"></SelectTrigger>
-                <SelectContent className="z-50 bg-[#333333]">
+                <SelectContent className="z-50 bg-[#333333] p-3">
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="FRU"
                   >
                     FRU
                   </SelectItem>
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="STR"
                   >
                     STR
                   </SelectItem>
                   <SelectItem
-                    className="flex w-[100px] items-center justify-start"
+                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
                     value="APL"
                   >
                     APL
