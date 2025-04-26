@@ -25,6 +25,12 @@ function RouteComponent() {
   useEffect(() => {
     setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
   }, [fromAmount, fromToken, toToken]);
+  const handleInputFocus = () => {
+    scrollPositionRef.current = 0;
+  };
+  const handleInputBlur = () => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
 
   const handleSwap = () => {
     setSwapped(!swapped);
@@ -66,7 +72,7 @@ function RouteComponent() {
   const percentChange = getPercentageChange();
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[40px] pb-[300px] text-white">
+    <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] pb-[300px] text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="font-manrope mx-auto mb-[33px] text-center text-2xl font-semibold">
         Обмен
@@ -152,6 +158,8 @@ function RouteComponent() {
               }}
               className="font-manrope w-[120px] bg-transparent text-right text-[18px] font-medium text-[#8F8F8F] outline-none"
               placeholder="0.13 - 100000"
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
             />
             <div
               className="font-manrope absolute right-4 bottom-4 cursor-pointer text-[12px] font-medium text-[#85BF1A]"
