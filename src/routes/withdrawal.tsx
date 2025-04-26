@@ -39,7 +39,7 @@ function RouteComponent() {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[110px] text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[50px] text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="mb-9 flex items-center justify-between">
         <div className="invisible flex items-center justify-center gap-2">
