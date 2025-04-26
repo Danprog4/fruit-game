@@ -88,20 +88,6 @@ function RootComponent() {
     if (viewport.expand.isAvailable()) {
       viewport.expand();
     }
-
-    // scroll to top when any input or textarea receives focus
-    const inputs = Array.from(document.querySelectorAll("input, textarea"));
-    const handleFocus = () => {
-      window.scrollTo(0, 0);
-    };
-    inputs.forEach((input) => {
-      input.addEventListener("focus", handleFocus);
-    });
-    return () => {
-      inputs.forEach((input) => {
-        input.removeEventListener("focus", handleFocus);
-      });
-    };
   }, []);
 
   return (

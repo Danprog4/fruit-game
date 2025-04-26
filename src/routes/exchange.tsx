@@ -143,6 +143,12 @@ function RouteComponent() {
               type="text"
               value={fromAmount}
               onChange={handleFromAmountChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                }
+              }}
               className="font-manrope w-[120px] bg-transparent text-right text-[18px] font-medium text-[#8F8F8F] outline-none"
               placeholder="0.13 - 100000"
             />
