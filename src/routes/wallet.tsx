@@ -7,6 +7,7 @@ import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
 import { GreenDollar } from "~/components/icons/GreenDollar";
+import { Refresh } from "~/components/icons/Refresh";
 import { Token } from "~/components/icons/Token";
 import { Wallet } from "~/components/icons/Wallet";
 import { useTRPC } from "~/trpc/init/react";
@@ -28,14 +29,23 @@ function RouteComponent() {
     trpc.main.invalidateBalances.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["main.getUser"] });
+        console.log("Balances invalidated");
+        console.log(user?.balances);
+        console.log(user?.lastUpdatedBalanceAt);
+      },
+      onError: (error) => {
+        console.error("Error invalidating balances:", error);
       },
     }),
   );
 
   useEffect(() => {
     invalidateBalances.mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const refreshBalances = () => {
+    invalidateBalances.mutate();
+  };
 
   useEffect(() => {
     if (tonConnectUI) {
@@ -132,6 +142,9 @@ function RouteComponent() {
               <GreenDollar />
             </div>
             <div>Баланс фруктов</div>
+            <div onClick={refreshBalances}>
+              <Refresh />
+            </div>
           </div>
         </div>
       </div>
