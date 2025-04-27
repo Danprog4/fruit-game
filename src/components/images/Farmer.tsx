@@ -1,4 +1,4 @@
-export const Fermer = () => {
+export const Farmer = () => {
   return (
     <svg
       width="371"

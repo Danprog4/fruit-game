@@ -1,8 +1,8 @@
-import { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { db } from "~/lib/db";
+import { updateBalances } from "~/lib/utils/updateBalances";
 import { procedure, publicProcedure } from "./init";
-
 export const router = {
   getHello: publicProcedure.query(() => {
     return {
@@ -33,6 +33,18 @@ export const router = {
   getUsers: procedure.query(async ({ ctx }) => {
     const users = await db.query.usersTable.findMany();
     return users;
+  }),
+
+  invalidateBalances: procedure.query(async ({ ctx }) => {
+    const userId = ctx.userId;
+    const user = await db.query.usersTable.findFirst({
+      where: (users) => eq(users.id, userId),
+    });
+    if (!user) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    }
+    await updateBalances(userId);
+    return user.balances;
   }),
 } satisfies TRPCRouterRecord;
 

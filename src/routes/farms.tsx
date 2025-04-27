@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BackButton } from "~/components/BackButton";
-import { FermList } from "~/components/FermList";
-import Farm from "~/components/icons/navbar/Ferm";
+import { FarmList } from "~/components/FarmList";
+import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { Star } from "~/components/icons/Star";
 
-export const Route = createFileRoute("/ferm")({
+export const Route = createFileRoute("/farms")({
   component: RouteComponent,
 });
 
@@ -37,7 +37,7 @@ function RouteComponent() {
       <div className="font-manrope mb-[20px] text-base font-semibold">
         Покупай фермы и получай токены
       </div>
-      <FermList />
+      <FarmList />
       <div className="font-manrope px fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
         <div className="flex flex-col items-center justify-center gap-1">
           <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-gradient-to-b from-[#A2D448] to-[#A2D448]">

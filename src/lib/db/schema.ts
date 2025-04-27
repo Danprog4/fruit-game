@@ -1,13 +1,24 @@
-import { bigint, pgTable, serial, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  jsonb,
+  pgTable,
+  serial,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: bigint("id", { mode: "number" }).primaryKey(),
   referrerId: bigint("referrerId", { mode: "number" }),
-  tokenBalance: bigint("tokenBalance", { mode: "number" }).default(0),
+  tokenBalance: bigint("tokenBalance", { mode: "number" }).default(0).notNull(),
   photoUrl: varchar({ length: 255 }),
-  name: varchar({ length: 255 }),
+  name: varchar("name", { length: 255 }),
   allianceId: bigint("allianceId", { mode: "number" }),
   allianceJoinDate: timestamp("allianceJoinDate", { withTimezone: true }),
+  farms: jsonb("farms").default({}).notNull(),
+  lastUpdatedBalanceAt: timestamp("lastUpdatedBalance", { withTimezone: true }),
+  balances: jsonb("balances").default({}).notNull(),
 });
 
 export const alliancesTable = pgTable("alliances", {

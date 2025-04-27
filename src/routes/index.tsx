@@ -9,13 +9,13 @@ import { Apple } from "~/components/icons/fruits/Apple";
 import { Lemon } from "~/components/icons/fruits/Lemon";
 import { Pear } from "~/components/icons/fruits/Pear";
 import { StrawberryMain } from "~/components/icons/fruits/StrawberryMain";
-import Ferm from "~/components/icons/navbar/Ferm";
+import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Token } from "~/components/icons/Token";
 import { Circle } from "~/components/images/Circle";
-import { Fermer } from "~/components/images/Fermer";
+import { Farmer } from "~/components/images/Farmer";
 import { Lights } from "~/components/images/Lights";
 import { Platform } from "~/components/images/Platfrom";
 import { useTRPC } from "~/trpc/init/react";
@@ -169,7 +169,7 @@ function RouteComponent() {
         <div className="relative">
           <Platform />
           <div className="absolute bottom-[72px] left-1/2 -translate-x-1/2">
-            <Fermer />
+            <Farmer />
           </div>
         </div>
       </div>
@@ -177,10 +177,10 @@ function RouteComponent() {
       <div className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
         <div className="flex w-[105px] flex-col items-center justify-center gap-1">
           <div
-            onClick={() => navigate({ to: "/ferm" })}
+            onClick={() => navigate({ to: "/farms" })}
             className="flex w-[105px] flex-col items-center justify-center gap-1"
           >
-            <Ferm />
+            <Farm />
             <div className="font-manrope text-xs font-medium">Ферма</div>
           </div>
         </div>

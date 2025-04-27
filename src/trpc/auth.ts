@@ -6,6 +6,7 @@ import { SignJWT } from "jose";
 import { z } from "zod";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
+import { updateBalances } from "~/lib/utils/updateBalances";
 import { publicProcedure } from "./init";
 
 export const authRouter = {
@@ -93,6 +94,8 @@ export const authRouter = {
 
         return newUser[0];
       }
+
+      await updateBalances(existingUser.id);
 
       return existingUser;
     }),
