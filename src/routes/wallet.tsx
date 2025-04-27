@@ -28,7 +28,7 @@ function RouteComponent() {
   const invalidateBalances = useMutation(
     trpc.main.invalidateBalances.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["main.getUser"] });
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
         console.log("Balances invalidated");
         console.log(user?.balances);
         console.log(user?.lastUpdatedBalanceAt);

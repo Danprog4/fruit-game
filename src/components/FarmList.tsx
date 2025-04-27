@@ -47,11 +47,7 @@ export const FarmList = () => {
             onClick={() => buyFarm.mutate({ farmId: farm.id })}
             className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
-            {buyFarm.isPending
-              ? "Покупка..."
-              : farm.enabled
-                ? `${farm.priceInFRU.toLocaleString()} FRU`
-                : "Недоступно"}
+            {farm.enabled ? `${farm.priceInFRU.toLocaleString()} FRU` : "Недоступно"}
           </div>
         </div>
       ))}
