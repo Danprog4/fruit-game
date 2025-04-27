@@ -31,7 +31,7 @@ function RouteComponent() {
   const updateAlliance = useMutation({
     ...trpc.alliances.updateAlliance.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [["alliances", "getAlliances"]] });
+      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
     },
   });
   const { data: users, isLoading: isUsersLoading } = useQuery(
@@ -41,14 +41,14 @@ function RouteComponent() {
   const addCapacity = useMutation({
     ...trpc.alliances.addCapacity.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [["alliances", "getAlliances"]] });
+      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
     },
   });
 
   const removeCapacity = useMutation({
     ...trpc.alliances.removeCapacity.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [["alliances", "getAlliances"]] });
+      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
     },
   });
 

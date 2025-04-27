@@ -9,7 +9,7 @@ export const FarmList = () => {
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["farms"] });
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
         console.log("success");
       },
       onError: () => {
