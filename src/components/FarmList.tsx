@@ -11,10 +11,11 @@ export const FarmList = () => {
     trpc.farms.buyFarm.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
-        toast.success("Вы успешнокупили ферму");
+        toast.success("Вы успешно купили ферму");
         console.log("success");
       },
       onError: () => {
+        toast.error("К сожалению, у вас недостаточно FRU для покупки фермы");
         console.log("error");
       },
     }),
