@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FARMS_CONFIG } from "farms.config";
+import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
 export const FarmList = () => {
@@ -10,6 +11,7 @@ export const FarmList = () => {
     trpc.farms.buyFarm.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+        toast.success("Вы успешнокупили ферму");
         console.log("success");
       },
       onError: () => {
@@ -44,7 +46,11 @@ export const FarmList = () => {
             </div>
           </div>
           <div
-            onClick={() => buyFarm.mutate({ farmId: farm.id })}
+            onClick={
+              farm.enabled
+                ? () => buyFarm.mutate({ farmId: farm.id })
+                : () => toast.error("К сожалению, ферма пока недоступна")
+            }
             className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
             {farm.enabled ? `${farm.priceInFRU.toLocaleString()} FRU` : "Недоступно"}

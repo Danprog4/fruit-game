@@ -31,8 +31,8 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <div className="mt-6 mb-[27px] flex flex-col gap-4">
-        <div className="flex gap-4">
+      <div className="mt-6 mb-[27px] flex flex-col justify-center gap-4">
+        <div className="flex justify-center gap-4">
           <div className="flex h-[42px] w-[167px] items-center justify-between rounded-full bg-[#F7FFEB0F] px-4">
             <div className="font-manrope text-xs font-medium">1 место</div>
             <div className="font-manrope flex items-center gap-1 text-xs font-medium">
@@ -46,7 +46,7 @@ function RouteComponent() {
             </div>
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex justify-center gap-4">
           <div className="flex h-[42px] w-[167px] items-center justify-between rounded-full bg-[#F7FFEB0F] px-4">
             <div className="font-manrope text-xs font-medium">3 место</div>
             <div className="font-manrope flex items-center gap-1 text-xs font-medium">

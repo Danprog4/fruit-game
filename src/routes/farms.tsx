@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
 import Farm from "~/components/icons/navbar/Farm";
@@ -20,17 +21,24 @@ function RouteComponent() {
         Ферма
       </div>
       <div className="mb-[28px] flex h-[76px] w-full items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px]">
-        <div className="mr-3 flex h-[54px] w-[54px] items-center justify-center gap-[6px] rounded-full border border-[#76AD10] bg-[#2A2A2A]">
-          <Star />
-        </div>
-        <div className="mr-[50px] flex flex-col items-start justify-center gap-2">
-          <div className="font-manrope text-xs font-medium">Звездная ферма</div>
-          <div className="flex items-center gap-1">
-            <Star width={16} height={16} />
-            <div className="font-manrope text-xs font-medium text-[#8F8F8F]">40 000</div>
+        <div className="flex items-center justify-center gap-5">
+          <div className="flex h-[54px] w-[54px] items-center justify-center gap-[6px] rounded-full border border-[#76AD10] bg-[#2A2A2A]">
+            <Star />
+          </div>
+          <div className="flex flex-col items-start justify-center gap-2">
+            <div className="font-manrope text-xs font-medium">Звездная ферма</div>
+            <div className="flex items-center gap-1">
+              <Star width={16} height={16} />
+              <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
+                40 000
+              </div>
+            </div>
           </div>
         </div>
-        <div className="font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white">
+        <div
+          onClick={() => toast.error("К сожалению, прокачка пока недоступна")}
+          className="font-manrope flex h-[36px] w-[92px] cursor-pointer items-center justify-center rounded-full bg-[#4A4A4A] px-4 text-xs font-medium text-white"
+        >
           Прокачать
         </div>
       </div>
