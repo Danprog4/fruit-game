@@ -1,24 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FARMS_CONFIG } from "farms.config";
 import { useTRPC } from "~/trpc/init/react";
-import { Lemon } from "./icons/fruits/Lemon";
-import { Strawberry } from "./icons/fruits/Strawberry";
 
 export const FarmList = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
-  const getFarmIcon = (id: string) => {
-    switch (id) {
-      case "strawberry":
-        return <Strawberry width="40" height="40" />;
-      case "cherry":
-        return <Strawberry width="40" height="40" />;
-      case "coconut":
-        return <Strawberry width="40" height="40" />;
-      default:
-        return <Lemon width="30" height="30" />;
-    }
-  };
+
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
       onSuccess: () => {
@@ -41,7 +28,7 @@ export const FarmList = () => {
           className={`flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px] ${!farm.enabled ? "" : ""}`}
         >
           <div className="relative mr-5 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
-            {getFarmIcon(farm.id)}
+            <div className="text-2xl">{farm.icon}</div>
             {userFarms && userFarms[farm.id] && (
               <div className="absolute -right-1 -bottom-1 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-[#76AD10] text-xs font-bold text-white">
                 {userFarms[farm.id]}
@@ -52,7 +39,7 @@ export const FarmList = () => {
             <div className="font-manrope text-xs font-medium">{farm.name} ферма</div>
             <div className="font-manrope text-xs font-medium text-nowrap text-[#8F8F8F]">
               {userFarms && userFarms[farm.id]
-                ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2)} FRU/час`
+                ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2)} ${farm.tokenName}/час`
                 : "Купите первую ферму!"}{" "}
             </div>
           </div>

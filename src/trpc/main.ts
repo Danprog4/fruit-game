@@ -34,8 +34,7 @@ export const router = {
     const users = await db.query.usersTable.findMany();
     return users;
   }),
-
-  invalidateBalances: procedure.query(async ({ ctx }) => {
+  invalidateBalances: procedure.mutation(async ({ ctx }) => {
     const userId = ctx.userId;
     const user = await db.query.usersTable.findFirst({
       where: (users) => eq(users.id, userId),

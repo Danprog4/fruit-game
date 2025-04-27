@@ -1,5 +1,7 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { FARMS_CONFIG } from "farms.config";
 import { useEffect } from "react";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
@@ -7,6 +9,7 @@ import { Dollar } from "~/components/icons/Dollar";
 import { GreenDollar } from "~/components/icons/GreenDollar";
 import { Token } from "~/components/icons/Token";
 import { Wallet } from "~/components/icons/Wallet";
+import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/wallet")({
   component: RouteComponent,
@@ -16,6 +19,23 @@ function RouteComponent() {
   const wallet = useTonWallet();
   const [tonConnectUI, setOptions] = useTonConnectUI();
   const navigate = useNavigate();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+
+  const invalidateBalances = useMutation(
+    trpc.main.invalidateBalances.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["main.getUser"] });
+      },
+    }),
+  );
+
+  useEffect(() => {
+    invalidateBalances.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (tonConnectUI) {
@@ -23,6 +43,9 @@ function RouteComponent() {
       setOptions({ language: "ru" });
     }
   }, [tonConnectUI, setOptions]);
+
+  // Get user balances from the user data
+  const balances = user?.balances as Record<string, number> | undefined;
 
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[100px] pb-20 text-white">
@@ -73,7 +96,7 @@ function RouteComponent() {
               <div className="flex flex-col items-start gap-1">
                 <div className="font-manrope text-base font-semibold">FRU</div>
                 <div className="font-manrope text-xs font-medium text-[#93A179]">
-                  8.00000.00 SPR
+                  {user?.tokenBalance?.toLocaleString() || "0"} FRU
                 </div>
               </div>
             </div>
@@ -113,48 +136,35 @@ function RouteComponent() {
         </div>
       </div>
       <div className="flex flex-col gap-[15px]">
-        <div className="flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#575757] bg-[#2A2A2A] p-[14px]">
-          <div className="flex items-center gap-[20px]">
-            <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
-              <Token width={30} height={34} viewBox="0 0 30 30" />
-            </div>
-            <div className="flex flex-col items-start gap-1">
-              <div className="font-manrope text-base font-semibold">FRU</div>
-              <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-                8.00000.00 SPR
+        {balances && Object.keys(balances).length > 0 ? (
+          FARMS_CONFIG.filter((farm) => balances[farm.id] !== undefined).map((farm) => (
+            <div
+              key={farm.id}
+              className="flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#575757] bg-[#2A2A2A] p-[14px]"
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
+                  <div className="text-2xl">{farm.icon}</div>
+                </div>
+                <div className="flex flex-col items-start gap-1">
+                  <div className="font-manrope text-base font-semibold">
+                    {farm.id.charAt(0).toUpperCase() + farm.id.slice(1)}
+                  </div>
+                  <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
+                    {balances[farm.id]?.toFixed(2) || "0"} {farm.tokenName}
+                  </div>
+                </div>
+              </div>
+              <div className="font-manrope pr-4 text-lg font-semibold">
+                {farm.rateFru
+                  ? `${(balances[farm.id] / farm.rateFru / 1).toFixed(2)}$`
+                  : "0$"}
               </div>
             </div>
-          </div>
-          <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
-        </div>
-        <div className="flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#575757] bg-[#2A2A2A] p-[14px]">
-          <div className="flex items-center gap-[20px]">
-            <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
-              <Token width={30} height={34} viewBox="0 0 30 30" />
-            </div>
-            <div className="flex flex-col items-start gap-1">
-              <div className="font-manrope text-base font-semibold">FRU</div>
-              <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-                8.00000.00 SPR
-              </div>
-            </div>
-          </div>
-          <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
-        </div>
-        <div className="flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#575757] bg-[#2A2A2A] p-[14px]">
-          <div className="flex items-center gap-[20px]">
-            <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
-              <Token width={30} height={34} viewBox="0 0 30 30" />
-            </div>
-            <div className="flex flex-col items-start gap-1">
-              <div className="font-manrope text-base font-semibold">FRU</div>
-              <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-                8.00000.00 SPR
-              </div>
-            </div>
-          </div>
-          <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
-        </div>
+          ))
+        ) : (
+          <div className="text-center text-gray-400">Нет доступных фруктов</div>
+        )}
       </div>
     </div>
   );
