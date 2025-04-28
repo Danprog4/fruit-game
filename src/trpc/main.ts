@@ -67,9 +67,11 @@ export const router = {
       }
 
       const { fromToken, toToken, amount } = input;
+      const amountNum = parseFloat(amount);
 
       // Calculate exchange amount
       const exchangeAmount = calculateExchangeAmount(amount, fromToken, toToken);
+      const exchangeAmountNum = parseFloat(exchangeAmount);
 
       // Get current balances
       const balances = { ...(user.balances as Record<string, number>) };
@@ -78,32 +80,67 @@ export const router = {
       const fromFarmId = FARMS_CONFIG.find((farm) => farm.tokenName === fromToken)?.id;
       const toFarmId = FARMS_CONFIG.find((farm) => farm.tokenName === toToken)?.id;
 
+      // Helper function to compare numbers with precision
+      const compareWithPrecision = (a: number, b: number, precision = 3) => {
+        const roundedA =
+          Math.round(a * Math.pow(10, precision)) / Math.pow(10, precision);
+        const roundedB =
+          Math.round(b * Math.pow(10, precision)) / Math.pow(10, precision);
+        const result = roundedA >= roundedB;
+
+        console.log("Precision comparison:", {
+          originalA: a,
+          originalB: b,
+          roundedA,
+          roundedB,
+          result,
+        });
+
+        return result;
+      };
+
       // Check if user has enough balance
       if (fromToken === "FRU") {
         // For FRU, check tokenBalance
-        if (Number(user.tokenBalance) < parseFloat(amount)) {
+        const tokenBalanceNum = Number(user.tokenBalance);
+        console.log("FRU Balance Check:", {
+          tokenBalance: tokenBalanceNum,
+          amount: amountNum,
+          difference: tokenBalanceNum - amountNum,
+          isEqual: compareWithPrecision(tokenBalanceNum, amountNum),
+        });
+
+        if (!compareWithPrecision(tokenBalanceNum, amountNum)) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "Insufficient FRU balance",
+            message: `Insufficient FRU balance. You have ${tokenBalanceNum} but need ${amountNum}`,
           });
         }
       } else {
         // For other tokens, check balances using farm ID
-        if (
-          !fromFarmId ||
-          !balances[fromFarmId] ||
-          balances[fromFarmId] < parseFloat(amount)
-        ) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+        const currentBalance = balances[fromFarmId!] || 0;
+        console.log("Token Balance Check:", {
+          token: fromToken,
+          currentBalance,
+          amount: amountNum,
+          difference: currentBalance - amountNum,
+          isEqual: compareWithPrecision(currentBalance, amountNum),
+        });
+
+        if (!fromFarmId || !compareWithPrecision(currentBalance, amountNum)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Insufficient ${fromToken} balance. You have ${currentBalance} but need ${amountNum}`,
+          });
         }
       }
 
       // Update balances
       if (fromToken === "FRU") {
         // For FRU, update tokenBalance
-        const newTokenBalance = Number(user.tokenBalance) - parseFloat(amount);
+        const newTokenBalance = Number(user.tokenBalance) - amountNum;
         if (toFarmId) {
-          balances[toFarmId] = (balances[toFarmId] || 0) + parseFloat(exchangeAmount);
+          balances[toFarmId] = (balances[toFarmId] || 0) + exchangeAmountNum;
         }
         await db
           .update(usersTable)
@@ -114,8 +151,8 @@ export const router = {
           .where(eq(usersTable.id, userId));
       } else if (toToken === "FRU") {
         // When converting to FRU
-        balances[fromFarmId!] -= parseFloat(amount);
-        const newTokenBalance = Number(user.tokenBalance) + parseFloat(exchangeAmount);
+        balances[fromFarmId!] -= amountNum;
+        const newTokenBalance = Number(user.tokenBalance) + exchangeAmountNum;
         await db
           .update(usersTable)
           .set({
@@ -125,8 +162,8 @@ export const router = {
           .where(eq(usersTable.id, userId));
       } else {
         // For other token exchanges
-        balances[fromFarmId!] -= parseFloat(amount);
-        balances[toFarmId!] = (balances[toFarmId!] || 0) + parseFloat(exchangeAmount);
+        balances[fromFarmId!] -= amountNum;
+        balances[toFarmId!] = (balances[toFarmId!] || 0) + exchangeAmountNum;
         await db
           .update(usersTable)
           .set({
@@ -139,16 +176,16 @@ export const router = {
         success: true,
         fromBalance:
           fromToken === "FRU"
-            ? Number(user.tokenBalance) - parseFloat(amount)
+            ? Number(user.tokenBalance) - amountNum
             : balances[fromFarmId!],
         toBalance:
           toToken === "FRU"
-            ? Number(user.tokenBalance) + parseFloat(exchangeAmount)
+            ? Number(user.tokenBalance) + exchangeAmountNum
             : balances[toFarmId!],
         exchangeAmount,
         tokenBalance:
           toToken === "FRU"
-            ? Number(user.tokenBalance) + parseFloat(exchangeAmount)
+            ? Number(user.tokenBalance) + exchangeAmountNum
             : Number(user.tokenBalance),
       };
     }),

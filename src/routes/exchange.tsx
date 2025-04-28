@@ -40,7 +40,11 @@ function RouteComponent() {
       },
       onError: (error) => {
         console.log(error);
-        toast.error("Обмен не выполнен, недостаточно средств");
+        if (error.message === "Insufficient balance") {
+          toast.error("Обмен не выполнен, недостаточно средств");
+        } else {
+          toast.error("Введите сумму для обмена");
+        }
       },
     }),
   );
@@ -199,7 +203,13 @@ function RouteComponent() {
             />
             <div
               className="font-manrope absolute right-4 bottom-4 cursor-pointer text-[12px] font-medium text-[#85BF1A]"
-              onClick={() => setFromAmount(getTokenBalance(fromToken).toString())}
+              onClick={() => {
+                if (fromToken === "FRU") {
+                  setFromAmount(user?.tokenBalance.toString() || "0");
+                } else {
+                  setFromAmount(getTokenBalance(fromToken).toString());
+                }
+              }}
             >
               Макс.
             </div>
