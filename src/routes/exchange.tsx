@@ -9,9 +9,10 @@ import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay
 import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FARMS_CONFIG } from "farms.config";
 import { toast } from "sonner";
 import { Token } from "~/components/icons/Token";
+import { getTokenBalance } from "~/lib/utils/getTokenBalance";
+import { getTokenIcon } from "~/lib/utils/getTokenIcon";
 import tokenPrices from "~/tokenPrices";
 import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/exchange")({
@@ -98,20 +99,6 @@ function RouteComponent() {
 
   const percentChange = getPercentageChange();
 
-  const getTokenIcon = (tokenName: string) => {
-    const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);
-    return farm ? farm.icon : <Token width={28} height={28} viewBox="0 0 34 34" />; // Default icon if token not found in farms
-  };
-
-  const getTokenBalance = (tokenName: string) => {
-    const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);
-
-    const balanceKey = farm?.id!;
-    // Format the balance to show only 3 decimal places
-    const balance = balances?.[balanceKey] || 0;
-    return Number(balance.toFixed(3)) || 0;
-  };
-
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] pb-[300px] text-white">
       <BackButton onClick={() => window.history.back()} />
@@ -155,7 +142,9 @@ function RouteComponent() {
             <div className="flex h-[25px] w-[150px] items-center justify-center rounded-xl border border-[#3B3B3B]">
               <div className="font-manrope text-[10px] font-medium">
                 Доступно{" "}
-                {fromToken === "FRU" ? user?.tokenBalance : getTokenBalance(fromToken)}{" "}
+                {fromToken === "FRU"
+                  ? user?.tokenBalance
+                  : getTokenBalance(fromToken, balances || {})}{" "}
                 {fromToken}
               </div>
             </div>
@@ -207,7 +196,7 @@ function RouteComponent() {
                 if (fromToken === "FRU") {
                   setFromAmount(user?.tokenBalance.toString() || "0");
                 } else {
-                  setFromAmount(getTokenBalance(fromToken).toString());
+                  setFromAmount(getTokenBalance(fromToken, balances || {}).toString());
                 }
               }}
             >

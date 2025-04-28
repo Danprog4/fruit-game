@@ -68,7 +68,6 @@ export const router = {
 
       const { fromToken, toToken, amount } = input;
       const amountNum = parseFloat(amount);
-
       // Calculate exchange amount
       const exchangeAmount = calculateExchangeAmount(amount, fromToken, toToken);
       const exchangeAmountNum = parseFloat(exchangeAmount);
