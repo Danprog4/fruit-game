@@ -3,13 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Swap } from "~/components/icons/Swap";
-import { Token } from "~/components/icons/Token";
 import { Graphic } from "~/components/images/Graphic";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay";
 import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FARMS_CONFIG } from "farms.config";
+import { toast } from "sonner";
+import { Token } from "~/components/icons/Token";
 import tokenPrices from "~/tokenPrices";
+import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/exchange")({
   component: RouteComponent,
 });
@@ -20,7 +24,26 @@ function RouteComponent() {
   const [toToken, setToToken] = useState("STR");
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("0");
+
   const scrollPositionRef = useRef<number>(0);
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const balances = user?.balances as Record<string, number> | undefined;
+  const exchangeBalance = useMutation(
+    trpc.main.exchange.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+        toast.success("Обмен успешно выполнен");
+        setFromAmount("");
+        setToAmount("");
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error("Обмен не выполнен, недостаточно средств");
+      },
+    }),
+  );
   // Update toAmount whenever fromAmount or tokens change
   useEffect(() => {
     setToAmount(calculateExchangeAmount(fromAmount, fromToken, toToken));
@@ -71,6 +94,20 @@ function RouteComponent() {
 
   const percentChange = getPercentageChange();
 
+  const getTokenIcon = (tokenName: string) => {
+    const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);
+    return farm ? farm.icon : <Token width={28} height={28} viewBox="0 0 34 34" />; // Default icon if token not found in farms
+  };
+
+  const getTokenBalance = (tokenName: string) => {
+    const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);
+
+    const balanceKey = farm?.id!;
+    // Format the balance to show only 3 decimal places
+    const balance = balances?.[balanceKey] || 0;
+    return Number(balance.toFixed(3)) || 0;
+  };
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] pb-[300px] text-white">
       <BackButton onClick={() => window.history.back()} />
@@ -113,35 +150,32 @@ function RouteComponent() {
             <div className="font-manrope text-xs font-medium text-[#8F8F8F]">Из</div>
             <div className="flex h-[25px] w-[150px] items-center justify-center rounded-xl border border-[#3B3B3B]">
               <div className="font-manrope text-[10px] font-medium">
-                Доступно 52,2160 {fromToken}
+                Доступно {getTokenBalance(fromToken)} {fromToken}
               </div>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center justify-center gap-1">
-              <Token width={28} height={28} viewBox="0 0 34 34" />
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-2xl">
+                {fromToken === "FRU" ? (
+                  <Token width={28} height={28} viewBox="0 0 34 34" />
+                ) : (
+                  getTokenIcon(fromToken)
+                )}
+              </span>
               <div className="font-manrope text-[24px] font-medium">{fromToken}</div>
               <Select onValueChange={handleFromTokenChange} value={fromToken}>
                 <SelectTrigger className="bg-[#333333]"></SelectTrigger>
                 <SelectContent className="z-50 bg-[#333333] p-3">
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="FRU"
-                  >
-                    FRU
-                  </SelectItem>
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="STR"
-                  >
-                    STR
-                  </SelectItem>
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="APL"
-                  >
-                    APL
-                  </SelectItem>
+                  {Object.keys(tokenPrices).map((token) => (
+                    <SelectItem
+                      key={token}
+                      className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
+                      value={token}
+                    >
+                      {token}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -163,7 +197,7 @@ function RouteComponent() {
             />
             <div
               className="font-manrope absolute right-4 bottom-4 cursor-pointer text-[12px] font-medium text-[#85BF1A]"
-              onClick={() => setFromAmount("52.2160")}
+              onClick={() => setFromAmount(getTokenBalance(fromToken).toString())}
             >
               Макс.
             </div>
@@ -182,30 +216,27 @@ function RouteComponent() {
             <div className="font-manrope text-xs font-medium text-[#8F8F8F]">В</div>
           </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center justify-center gap-1">
-              <Token width={28} height={28} viewBox="0 0 34 34" />
+            <div className="flex items-center justify-center gap-2">
+              <div className="text-2xl">
+                {toToken === "FRU" ? (
+                  <Token width={28} height={28} viewBox="0 0 34 34" />
+                ) : (
+                  getTokenIcon(toToken)
+                )}
+              </div>
               <div className="font-manrope text-[24px] font-medium">{toToken}</div>
               <Select onValueChange={handleToTokenChange} value={toToken}>
                 <SelectTrigger className="bg-[#333333]"></SelectTrigger>
                 <SelectContent className="z-50 bg-[#333333] p-3">
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="FRU"
-                  >
-                    FRU
-                  </SelectItem>
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="STR"
-                  >
-                    STR
-                  </SelectItem>
-                  <SelectItem
-                    className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                    value="APL"
-                  >
-                    APL
-                  </SelectItem>
+                  {Object.keys(tokenPrices).map((token) => (
+                    <SelectItem
+                      key={token}
+                      className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
+                      value={token}
+                    >
+                      {token}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -215,8 +246,17 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <button className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white">
-        Предпросмотр
+      <button
+        onClick={() =>
+          exchangeBalance.mutate({
+            fromToken,
+            toToken,
+            amount: fromAmount,
+          })
+        }
+        className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+      >
+        {exchangeBalance.isPending ? "Обмен..." : "Обменять"}
       </button>
     </div>
   );
