@@ -78,42 +78,78 @@ export const router = {
       const fromFarmId = FARMS_CONFIG.find((farm) => farm.tokenName === fromToken)?.id;
       const toFarmId = FARMS_CONFIG.find((farm) => farm.tokenName === toToken)?.id;
 
-      if (!fromFarmId || !toFarmId) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid token" });
-      }
-
       // Check if user has enough balance
-      if (!balances[fromFarmId] || balances[fromFarmId] < parseFloat(amount)) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+      if (fromToken === "FRU") {
+        // For FRU, check tokenBalance
+        if (Number(user.tokenBalance) < parseFloat(amount)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Insufficient FRU balance",
+          });
+        }
+      } else {
+        // For other tokens, check balances using farm ID
+        if (
+          !fromFarmId ||
+          !balances[fromFarmId] ||
+          balances[fromFarmId] < parseFloat(amount)
+        ) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+        }
       }
 
       // Update balances
-      balances[fromFarmId] -= parseFloat(amount);
-      balances[toFarmId] = (balances[toFarmId] || 0) + parseFloat(exchangeAmount);
-
-      // Update tokenBalance if the token is FRU
-      let tokenBalance = Number(user.tokenBalance);
       if (fromToken === "FRU") {
-        tokenBalance -= parseFloat(amount);
+        // For FRU, update tokenBalance
+        const newTokenBalance = Number(user.tokenBalance) - parseFloat(amount);
+        if (toFarmId) {
+          balances[toFarmId] = (balances[toFarmId] || 0) + parseFloat(exchangeAmount);
+        }
+        await db
+          .update(usersTable)
+          .set({
+            tokenBalance: Math.floor(newTokenBalance),
+            balances,
+          })
+          .where(eq(usersTable.id, userId));
       } else if (toToken === "FRU") {
-        tokenBalance += parseFloat(exchangeAmount);
+        // When converting to FRU
+        balances[fromFarmId!] -= parseFloat(amount);
+        const newTokenBalance = Number(user.tokenBalance) + parseFloat(exchangeAmount);
+        await db
+          .update(usersTable)
+          .set({
+            tokenBalance: Math.floor(newTokenBalance),
+            balances,
+          })
+          .where(eq(usersTable.id, userId));
+      } else {
+        // For other token exchanges
+        balances[fromFarmId!] -= parseFloat(amount);
+        balances[toFarmId!] = (balances[toFarmId!] || 0) + parseFloat(exchangeAmount);
+        await db
+          .update(usersTable)
+          .set({
+            balances,
+          })
+          .where(eq(usersTable.id, userId));
       }
-
-      // Save updated balances to database
-      await db
-        .update(usersTable)
-        .set({
-          balances,
-          tokenBalance: Math.floor(tokenBalance), // Fix: Use number instead of BigInt
-        })
-        .where(eq(usersTable.id, userId));
 
       return {
         success: true,
-        fromBalance: balances[fromFarmId],
-        toBalance: balances[toFarmId],
+        fromBalance:
+          fromToken === "FRU"
+            ? Number(user.tokenBalance) - parseFloat(amount)
+            : balances[fromFarmId!],
+        toBalance:
+          toToken === "FRU"
+            ? Number(user.tokenBalance) + parseFloat(exchangeAmount)
+            : balances[toFarmId!],
         exchangeAmount,
-        tokenBalance,
+        tokenBalance:
+          toToken === "FRU"
+            ? Number(user.tokenBalance) + parseFloat(exchangeAmount)
+            : Number(user.tokenBalance),
       };
     }),
 } satisfies TRPCRouterRecord;

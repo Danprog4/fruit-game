@@ -150,7 +150,9 @@ function RouteComponent() {
             <div className="font-manrope text-xs font-medium text-[#8F8F8F]">Из</div>
             <div className="flex h-[25px] w-[150px] items-center justify-center rounded-xl border border-[#3B3B3B]">
               <div className="font-manrope text-[10px] font-medium">
-                Доступно {getTokenBalance(fromToken)} {fromToken}
+                Доступно{" "}
+                {fromToken === "FRU" ? user?.tokenBalance : getTokenBalance(fromToken)}{" "}
+                {fromToken}
               </div>
             </div>
           </div>
