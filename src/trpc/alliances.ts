@@ -2,7 +2,7 @@ import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { allianceSeasonsTable, alliancesTable, usersTable } from "~/lib/db/schema";
+import { allianceSessionTable, alliancesTable, usersTable } from "~/lib/db/schema";
 import { uploadBase64Image } from "~/lib/s3/upload";
 import { procedure } from "./init";
 
@@ -161,7 +161,7 @@ export const alliancesRouter = {
   getSeason: procedure.query(async () => {
     try {
       // Check if the table exists and has data
-      const season = await db.query.allianceSeasonsTable.findFirst();
+      const season = await db.query.allianceSessionTable.findFirst();
       console.log(season, "first season");
 
       if (!season) {
@@ -173,7 +173,7 @@ export const alliancesRouter = {
         };
 
         // Insert the new season into the database
-        await db.insert(allianceSeasonsTable).values(newSeason);
+        await db.insert(allianceSessionTable).values(newSeason);
 
         return newSeason;
       }
