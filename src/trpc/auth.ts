@@ -83,10 +83,11 @@ export const authRouter = {
           });
 
           if (referrer) {
+            // Give 10 stars to referrer
             await db
               .update(usersTable)
               .set({
-                tokenBalance: (referrer.tokenBalance || 0) + 40000,
+                starBalance: (referrer.starBalance || 0) + 10,
               })
               .where(eq(usersTable.id, Number(referrerId)));
           }
@@ -96,6 +97,43 @@ export const authRouter = {
       }
 
       await updateBalances(existingUser.id);
+
+      // If user has a referrer, give 5% of all balances to the referrer
+      if (existingUser.referrerId) {
+        const referrer = await db.query.usersTable.findFirst({
+          where: eq(usersTable.id, existingUser.referrerId),
+        });
+
+        if (referrer) {
+          // Calculate 5% of user's token balance
+          const referralBonus = Math.floor(existingUser.tokenBalance * 0.05);
+
+          // Calculate 5% of each fruit in balances
+          const userBalances = existingUser.balances as Record<string, number>;
+          const referrerBalances = referrer.balances as Record<string, number>;
+
+          const updatedReferrerBalances = { ...referrerBalances };
+
+          // Add 5% of each fruit balance to referrer
+          for (const [fruit, amount] of Object.entries(userBalances)) {
+            const bonus = Math.floor(amount * 0.05);
+            if (bonus > 0) {
+              updatedReferrerBalances[fruit] =
+                (updatedReferrerBalances[fruit] || 0) + bonus;
+            }
+          }
+
+          // Update referrer with bonuses
+          await db
+            .update(usersTable)
+            .set({
+              tokenBalance: referrer.tokenBalance + referralBonus,
+              balances: updatedReferrerBalances,
+              starBalance: (referrer.starBalance || 0) + 10,
+            })
+            .where(eq(usersTable.id, existingUser.referrerId));
+        }
+      }
 
       return existingUser;
     }),

@@ -20,6 +20,7 @@ export const usersTable = pgTable("users", {
   farms: jsonb("farms").default({}).notNull(),
   lastUpdatedBalanceAt: timestamp("lastUpdatedBalance", { withTimezone: true }),
   balances: jsonb("balances").default({}).notNull(),
+  starBalance: bigint("starBalance", { mode: "number" }).default(0).notNull(),
 });
 
 export const alliancesTable = pgTable("alliances", {
