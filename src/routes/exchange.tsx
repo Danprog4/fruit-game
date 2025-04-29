@@ -2,7 +2,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
-import { Swap } from "~/components/icons/Swap";
 import { Graphic } from "~/components/images/Graphic";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay";
@@ -21,8 +20,8 @@ export const Route = createFileRoute("/exchange")({
 
 function RouteComponent() {
   const [swapped, setSwapped] = useState(false);
-  const [fromToken, setFromToken] = useState("FRU");
-  const [toToken, setToToken] = useState("STR");
+  const [fromToken, setFromToken] = useState("STR");
+  const [toToken, setToToken] = useState("FRU");
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("0");
 
@@ -43,8 +42,8 @@ function RouteComponent() {
         console.log(error);
         if (error.message === "Insufficient balance") {
           toast.error("Обмен не выполнен, недостаточно средств");
-        } else {
-          toast.error("Введите сумму для обмена");
+        } else if (error.message) {
+          toast.error("Упс, что-то пошло не так");
         }
       },
     }),
@@ -100,7 +99,7 @@ function RouteComponent() {
   const percentChange = getPercentageChange();
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden px-4 pt-[50px] pb-[300px] text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[50px] pb-[300px] text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="font-manrope mx-auto mb-[33px] text-center text-2xl font-semibold">
         Обмен
@@ -162,15 +161,17 @@ function RouteComponent() {
               <Select onValueChange={handleFromTokenChange} value={fromToken}>
                 <SelectTrigger className="bg-[#333333]"></SelectTrigger>
                 <SelectContent className="z-50 bg-[#333333] p-3">
-                  {Object.keys(tokenPrices).map((token) => (
-                    <SelectItem
-                      key={token}
-                      className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                      value={token}
-                    >
-                      {token}
-                    </SelectItem>
-                  ))}
+                  {Object.keys(tokenPrices)
+                    .filter((token) => token !== "FRU")
+                    .map((token) => (
+                      <SelectItem
+                        key={token}
+                        className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
+                        value={token}
+                      >
+                        {token}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -204,13 +205,13 @@ function RouteComponent() {
             </div>
           </div>
         </div>
-
+        {/* 
         <button
           onClick={handleSwap}
           className="absolute top-1/2 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#141414] shadow-lg"
         >
           <Swap />
-        </button>
+        </button> */}
 
         <div className="h-[124px] w-full rounded-3xl bg-[#222221] p-4">
           <div className="mb-4 flex items-center justify-between text-[#8F8F8F]">
@@ -219,27 +220,9 @@ function RouteComponent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-center gap-2">
               <div className="text-2xl">
-                {toToken === "FRU" ? (
-                  <Token width={28} height={28} viewBox="0 0 34 34" />
-                ) : (
-                  getTokenIcon(toToken)
-                )}
+                <Token width={28} height={28} viewBox="0 0 34 34" />
               </div>
-              <div className="font-manrope text-[24px] font-medium">{toToken}</div>
-              <Select onValueChange={handleToTokenChange} value={toToken}>
-                <SelectTrigger className="bg-[#333333]"></SelectTrigger>
-                <SelectContent className="z-50 bg-[#333333] p-3">
-                  {Object.keys(tokenPrices).map((token) => (
-                    <SelectItem
-                      key={token}
-                      className="mb-2 flex w-[100px] items-center justify-start rounded-none border-b border-white"
-                      value={token}
-                    >
-                      {token}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="font-manrope text-[24px] font-medium">FRU</div>
             </div>
             <div className="font-manrope w-[120px] overflow-hidden text-right text-[18px] font-medium text-ellipsis text-[#8F8F8F]">
               {toAmount}
