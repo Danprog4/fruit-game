@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { FARMS_CONFIG } from "farms.config";
 import { useEffect, useState } from "react";
 import { AllianceMembList } from "~/components/AllianceMembList";
 import { BackButton } from "~/components/BackButton";
@@ -7,7 +8,6 @@ import { NameInput } from "~/components/DynamicInput";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ClockIcon } from "~/components/icons/ClockIcon";
-import { Strawberry } from "~/components/icons/fruits/Strawberry";
 import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
 import { ruPeople } from "~/lib/intl";
@@ -37,6 +37,12 @@ function RouteComponent() {
   const { data: users, isLoading: isUsersLoading } = useQuery(
     trpc.main.getUsers.queryOptions(),
   );
+
+  const { data: season, isLoading: isSeasonLoading } = useQuery(
+    trpc.alliances.getSeason.queryOptions(),
+  );
+
+  console.log(season, "season");
 
   const addCapacity = useMutation({
     ...trpc.alliances.addCapacity.mutationOptions(),
@@ -140,7 +146,25 @@ function RouteComponent() {
     });
   };
 
-  console.log(userAlliance);
+  const timeRemaining =
+    (season && season?.seasonEnd.getTime() - Date.now()) || 30 * 24 * 60 * 60 * 1000;
+  const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+  const hoursRemaining = Math.floor(
+    (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+  );
+  const seasonCurr = season?.seasonCurr || "strawberry";
+
+  const allianceMembers = users?.filter((user) => user.allianceId === Number(id)) || [];
+
+  let countOfFruits = 0;
+  allianceMembers.forEach((member) => {
+    countOfFruits += (member.balances as any)[seasonCurr] || 0;
+  });
+
+  const fruitIcon = FARMS_CONFIG.find((farm) => farm.id === seasonCurr)?.icon;
+  const fruitRussianName = FARMS_CONFIG.find(
+    (farm) => farm.id === seasonCurr,
+  )?.allianceName;
 
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
@@ -253,16 +277,21 @@ function RouteComponent() {
           </div>
           <div className="mb-[15px] flex items-center justify-between">
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
-              <Strawberry />
-              Добыча: <span className="text-[#85BF1A]">клубники</span>
+              <div className="text-lg">{fruitIcon}</div>
+              Добыча: <span className="text-[#85BF1A]">{fruitRussianName}</span>
             </div>
             <div className="font-manrope flex items-center gap-[7px] text-xs leading-none font-medium">
               <ClockIcon />
-              <div> Осталось 0 д. 0 ч.</div>
+              <div>
+                {" "}
+                Осталось {daysRemaining} д. {hoursRemaining} ч.
+              </div>
             </div>
           </div>
           <div className="flex h-[32px] w-full items-center justify-center rounded-full bg-[#F7FFEB0F]">
-            <div className="font-manrope text-xs font-bold">0%</div>
+            <div className="font-manrope text-xs font-bold">
+              {countOfFruits.toLocaleString()} собрано
+            </div>
           </div>
         </div>
       )}

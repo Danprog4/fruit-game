@@ -158,4 +158,10 @@ export const alliancesRouter = {
         .set({ allianceId: null })
         .where(eq(usersTable.id, targetUserId));
     }),
+
+  getSeason: procedure.query(async () => {
+    const season = await db.query.allianceSessionTable.findFirst();
+
+    return season;
+  }),
 } satisfies TRPCRouterRecord;

@@ -35,6 +35,8 @@ export const AllianceList = ({
 
   const alliancesToDisplay = limit ? sortedAlliances : filteredAlliances;
 
+  const isOwner = alliancesToDisplay?.some((alliance) => alliance.ownerId === user?.id);
+
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
@@ -67,7 +69,7 @@ export const AllianceList = ({
                   </div>
                 </div>
               </div>
-              {alliance.ownerId !== user?.id && user?.allianceId !== alliance.id && (
+              {user?.allianceId !== alliance.id && !isOwner && (
                 <Drawer.Trigger asChild>
                   <button
                     className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white"
@@ -123,7 +125,7 @@ export const AllianceList = ({
                     )}
                   </div>
 
-                  {alliance.ownerId !== user?.id && user?.allianceId !== alliance.id && (
+                  {user?.allianceId !== alliance.id && !isOwner && (
                     <button
                       className="font-manrope mt-8 h-[52px] w-full rounded-full bg-[#76AD10] text-base font-medium text-white"
                       onClick={() => joinAlliance.mutate({ allianceId: alliance.id })}
