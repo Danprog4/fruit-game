@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import { FARMS_CONFIG } from "farms.config";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
@@ -25,6 +25,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
@@ -36,9 +37,15 @@ function RouteComponent() {
         console.log("Balances invalidated");
         console.log(user?.balances);
         console.log(user?.lastUpdatedBalanceAt);
+
+        // Stop the refresh animation after a short delay
+        setTimeout(() => {
+          setIsRefreshing(false);
+        }, 500);
       },
       onError: (error) => {
         console.error("Error invalidating balances:", error);
+        setIsRefreshing(false);
       },
     }),
   );
@@ -48,6 +55,7 @@ function RouteComponent() {
   }, []);
 
   const refreshBalances = () => {
+    setIsRefreshing(true);
     invalidateBalances.mutate();
   };
 
@@ -146,7 +154,11 @@ function RouteComponent() {
               <GreenDollar />
             </div>
             <div>Баланс фруктов</div>
-            <div onClick={refreshBalances}>
+            <div
+              onClick={refreshBalances}
+              className={`cursor-pointer ${isRefreshing ? "animate-spin" : ""}`}
+              style={{ animationDuration: isRefreshing ? "0.5s" : "0s" }}
+            >
               <Refresh />
             </div>
           </div>
