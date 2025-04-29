@@ -2,7 +2,7 @@ import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { allianceSessionTable, alliancesTable, usersTable } from "~/lib/db/schema";
+import { alliancesTable, usersTable } from "~/lib/db/schema";
 import { uploadBase64Image } from "~/lib/s3/upload";
 import { procedure } from "./init";
 
@@ -159,27 +159,7 @@ export const alliancesRouter = {
         .where(eq(usersTable.id, targetUserId));
     }),
   getSeason: procedure.query(async () => {
-    const season = await db.query.allianceSessionTable.findFirst();
-
-    if (!season) {
-      const defaultSeason = {
-        seasonCurr: "strawberry",
-        seasonEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      };
-
-      await db.insert(allianceSessionTable).values(defaultSeason);
-
-      return {
-        season: defaultSeason,
-        isDefault: true,
-      };
-    }
-
-    return {
-      season,
-      isDefault: false,
-      currentTime: new Date(),
-      timeRemaining: season.seasonEnd.getTime() - Date.now(),
-    };
+    const season = await db.query.allianceSeasonsTable.findFirst();
+    return season;
   }),
 } satisfies TRPCRouterRecord;

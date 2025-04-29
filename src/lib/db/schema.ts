@@ -36,8 +36,9 @@ export const alliancesTable = pgTable("alliances", {
   createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const allianceSessionTable = pgTable("allianceSession", {
-  seasonCurr: varchar("seasonCurr", { length: 255 }).notNull(),
+export const allianceSeasonsTable = pgTable("allianceSeasons", {
+  seasonCurr: varchar("seasonCurr", { length: 255 }).notNull().default("strawberry"),
+  seasonStart: timestamp("seasonStart", { withTimezone: true }).notNull().defaultNow(),
   seasonEnd: timestamp("seasonEnd", { withTimezone: true })
     .notNull()
     .default(sql`NOW() + INTERVAL '30 days'`),
