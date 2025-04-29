@@ -1,9 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AllianceList } from "~/components/AlianceList";
 import { BackButton } from "~/components/BackButton";
 import { ChampIcon } from "~/components/icons/ChampIcon";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Token } from "~/components/icons/Token";
+import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/champ")({
   component: RouteComponent,
@@ -11,6 +13,16 @@ export const Route = createFileRoute("/champ")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const trpc = useTRPC();
+  const { data: season } = useQuery(trpc.alliances.getSeason.queryOptions());
+
+  const timeRemaining =
+    (season && season?.seasonEnd.getTime() - Date.now()) || 30 * 24 * 60 * 60 * 1000;
+  const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+  const hoursRemaining = Math.floor(
+    (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+  );
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[86px] pb-20 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
@@ -61,12 +73,18 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <div className="mb-[20px] flex items-center gap-2">
-        <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#76AD10] pb-1">
-          <TasksIcon width={24} height={24} />
+      <div className="mb-[20px] flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#76AD10] pb-1">
+            <TasksIcon width={24} height={24} />
+          </div>
+          <div className="font-manrope text-base font-semibold">Топ 10 альясов</div>
         </div>
-        <div className="font-manrope text-base font-semibold">Топ 10 альясов</div>
+        <div className="font-manrope text-xs font-medium">
+          Осталось {daysRemaining} д. {hoursRemaining} ч.
+        </div>
       </div>
+
       <AllianceList limit={10} />
     </div>
   );
