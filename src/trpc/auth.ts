@@ -129,7 +129,6 @@ export const authRouter = {
             .set({
               tokenBalance: referrer.tokenBalance + referralBonus,
               balances: updatedReferrerBalances,
-              starBalance: (referrer.starBalance || 0) + 10,
             })
             .where(eq(usersTable.id, existingUser.referrerId));
         }
