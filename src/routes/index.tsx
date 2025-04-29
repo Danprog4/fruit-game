@@ -163,7 +163,7 @@ function RouteComponent() {
 
       <div
         id="farmer"
-        className="absolute bottom-[3vh] left-1/2 -translate-x-1/2 transform"
+        className="absolute bottom-[4vh] left-1/2 -translate-x-1/2 transform"
         style={{ transform: `scale(${getScale()})` }}
       >
         <div className="relative">

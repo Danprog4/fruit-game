@@ -7,9 +7,12 @@ import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
 import { GreenDollar } from "~/components/icons/GreenDollar";
+import Farm from "~/components/icons/navbar/Farm";
+import Main from "~/components/icons/navbar/Main";
+import Wallet from "~/components/icons/navbar/Wallet";
 import { Refresh } from "~/components/icons/Refresh";
 import { Token } from "~/components/icons/Token";
-import { Wallet } from "~/components/icons/Wallet";
+import { Wallet as WalletIcon } from "~/components/icons/Wallet";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/wallet")({
@@ -65,7 +68,7 @@ function RouteComponent() {
         <div className="w-full">
           <div className="flex h-[76px] w-full items-center justify-start gap-[20px] rounded-full bg-[#343D24] p-[14px]">
             <div className="relative flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#85BF1A]">
-              <Wallet />
+              <WalletIcon />
               <div className="absolute inset-0 opacity-0">
                 <TonConnectButton className="h-[54px] w-[54px]" />
               </div>
@@ -179,6 +182,30 @@ function RouteComponent() {
         ) : (
           <div className="text-center text-gray-400">Нет доступных фруктов</div>
         )}
+      </div>
+      <div className="font-manrope px fixed right-4 bottom-[21px] left-4 flex h-[76px] w-auto items-center justify-between rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
+        <div className="flex flex-col items-center justify-center gap-1">
+          <div
+            className="flex w-[105px] flex-col items-center justify-center gap-1"
+            onClick={() => navigate({ to: "/farms" })}
+          >
+            <Farm />
+            <div className="font-manrope text-xs font-medium">Ферма</div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-1">
+          <div
+            className="flex w-[105px] flex-col items-center justify-center gap-1"
+            onClick={() => navigate({ to: "/" })}
+          >
+            <Main />
+            <div className="font-manrope text-xs font-medium">Главная</div>
+          </div>
+        </div>
+        <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-gradient-to-b from-[#A2D448] to-[#A2D448]">
+          <Wallet />
+          <div className="font-manrope text-xs font-medium">Кошелек</div>
+        </div>
       </div>
     </div>
   );
