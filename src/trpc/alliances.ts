@@ -2,7 +2,7 @@ import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { allianceSessionTable, alliancesTable, usersTable } from "~/lib/db/schema";
+import { alliancesTable, usersTable } from "~/lib/db/schema";
 import { uploadBase64Image } from "~/lib/s3/upload";
 import { procedure } from "./init";
 
@@ -164,19 +164,19 @@ export const alliancesRouter = {
       const season = await db.query.allianceSessionTable.findFirst();
       console.log(season, "first season");
 
-      if (!season) {
-        // Create a new season if none exists
-        const newSeason = {
-          seasonCurr: "strawberry",
-          seasonStart: new Date(),
-          seasonEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        };
+      // if (!season) {
+      //   // Create a new season if none exists
+      //   const newSeason = {
+      //     seasonCurr: "strawberry",
+      //     seasonStart: new Date(),
+      //     seasonEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      //   };
 
-        // Insert the new season into the database
-        await db.insert(allianceSessionTable).values(newSeason);
+      //   // Insert the new season into the database
+      //   await db.insert(allianceSessionTable).values(newSeason);
 
-        return newSeason;
-      }
+      //   return newSeason;
+      // }
 
       return season;
     } catch (error) {
