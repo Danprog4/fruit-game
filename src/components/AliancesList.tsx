@@ -7,7 +7,7 @@ import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 import { AllianceMini } from "./icons/AlianceMini";
 
-export const AllianceList = ({
+export const AlliancesList = ({
   searchQuery = "",
   limit,
 }: {
@@ -18,6 +18,8 @@ export const AllianceList = ({
   const navigate = useNavigate();
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
+  const { data: season } = useQuery(trpc.alliances.getSeason.queryOptions());
   const joinAlliance = useMutation({
     ...trpc.alliances.joinAlliance.mutationOptions(),
     onSuccess: (_, variables) => {
@@ -29,8 +31,23 @@ export const AllianceList = ({
     alliance.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const seasonCurr = season?.seasonCurr || "strawberry";
+
   const sortedAlliances = alliances
-    ?.sort((a, b) => (b.members || 1) - (a.members || 1))
+    ?.map((alliance) => {
+      const allianceMembers =
+        users?.filter((user) => user.allianceId === alliance.id) || [];
+      let totalFruits = 0;
+      allianceMembers.forEach((member) => {
+        totalFruits += (member.balances as any)[seasonCurr] || 0;
+      });
+
+      return {
+        ...alliance,
+        totalFruits,
+      };
+    })
+    .sort((a, b) => b.totalFruits - a.totalFruits)
     .slice(0, limit);
 
   const alliancesToDisplay = limit ? sortedAlliances : filteredAlliances;

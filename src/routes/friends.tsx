@@ -28,7 +28,7 @@ function RouteComponent() {
   return (
     <div className="h-screen w-full rounded-lg pr-4 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
-      <div className="mt-[111px] mb-[27px] flex h-[76px] w-full items-center justify-between rounded-full bg-[#343d24] pr-[11px] pl-[28px]">
+      <div className="mt-12 mb-[27px] flex h-[76px] w-full items-center justify-between rounded-full bg-[#343d24] pr-[11px] pl-[28px]">
         <div className="flex flex-col gap-[7px]">
           <div className="font-manrope text-base font-semibold">Пригласите друзей</div>
           <div className="font-manrope text-xs font-medium text-[rgb(147,161,121)]">

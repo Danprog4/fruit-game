@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { AllianceList } from "~/components/AlianceList";
+import { AlliancesList } from "~/components/AliancesList";
 import { BackButton } from "~/components/BackButton";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
@@ -22,7 +22,7 @@ function RouteComponent() {
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
-      <div className="mt-[97px] mb-[43px] flex flex-col items-center justify-center gap-2">
+      <div className="mt-12 mb-[43px] flex flex-col items-center justify-center gap-2">
         <Alliance />
         <div className="font-manrope text-2xl leading-none font-semibold">
           Список альянсов
@@ -34,7 +34,7 @@ function RouteComponent() {
           icon={<AllianceMini />}
         />
       </div>
-      <AllianceList searchQuery={searchQuery} />
+      <AlliancesList searchQuery={searchQuery} />
 
       <button
         onClick={() => navigate({ to: "/create-alliance" })}

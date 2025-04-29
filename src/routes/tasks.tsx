@@ -12,7 +12,7 @@ function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   return (
-    <div className="flex w-full flex-col px-4 pt-[86px]">
+    <div className="flex w-full flex-col px-4 pt-12">
       <BackButton onClick={() => navigate({ to: "/" })} />
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="ml-1">

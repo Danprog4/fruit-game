@@ -14,7 +14,7 @@ export const Route = createFileRoute("/farms")({
 function RouteComponent() {
   const navigate = useNavigate();
   return (
-    <div className="flex w-full flex-col px-4 pt-[109px] text-white">
+    <div className="flex w-full flex-col px-4 pt-12 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
 
       <div className="font-manrope mb-[31px] flex items-center justify-center text-2xl font-semibold text-white">

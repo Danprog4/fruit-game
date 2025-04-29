@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AllianceList } from "~/components/AlianceList";
+import { AlliancesList } from "~/components/AliancesList";
 import { BackButton } from "~/components/BackButton";
 import { ChampIcon } from "~/components/icons/ChampIcon";
 import { TasksIcon } from "~/components/icons/Tasks";
@@ -24,7 +24,7 @@ function RouteComponent() {
   );
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-[86px] pb-20 text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-20 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="ml-1">
@@ -85,7 +85,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <AllianceList limit={10} />
+      <AlliancesList limit={10} />
     </div>
   );
 }
