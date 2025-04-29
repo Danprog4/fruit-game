@@ -99,7 +99,7 @@ function RouteComponent() {
   const percentChange = getPercentageChange();
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-[300px] text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-20 text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="font-manrope mx-auto mb-[33px] text-center text-2xl font-semibold">
         Обмен

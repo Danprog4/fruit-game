@@ -62,7 +62,7 @@ function RouteComponent() {
   const balances = user?.balances as Record<string, number> | undefined;
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-20 text-white">
+    <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
       <div className="flex w-full items-center justify-between">
         <div className="w-full">
