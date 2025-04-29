@@ -34,6 +34,7 @@ export const alliancesTable = pgTable("alliances", {
   capacity: bigint("capacity", { mode: "number" }).default(10),
   createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
 });
+
 export const allianceSeasonsTable = pgTable("allianceSeasons", {
   seasonCurr: varchar("seasonCurr", { length: 255 }).notNull(),
   seasonStart: timestamp("seasonStart", { withTimezone: true }).notNull(),

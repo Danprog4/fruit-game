@@ -116,6 +116,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
     // await queryClient.prefetchQuery(trpc.main.getFriends.queryOptions());
     await queryClient.prefetchQuery(trpc.main.getUser.queryOptions());
     await queryClient.prefetchQuery(trpc.alliances.getAlliances.queryOptions());
+    await queryClient.prefetchQuery(trpc.alliances.getSeason.queryOptions());
   };
 
   useEffect(() => {
