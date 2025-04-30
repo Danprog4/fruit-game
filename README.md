@@ -8,7 +8,7 @@ bun dev
 bun ngrok # if needed
 ```
 
-## Environment Variablezzz
+## Environment Variabless
 
 ```bash
 cp .env.example .env
