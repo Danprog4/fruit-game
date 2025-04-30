@@ -25,7 +25,7 @@ A Telegram mini-app game built with Tanstack, TRPC, and TON blockchain integrati
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/)  installed
+- [Bun](https://bun.sh/) installed
 - PostgreSQL database
 - Telegram Bot (for authentication)
 - Node.js 18+
