@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useTonConnectUI } from "@tonconnect/ui-react";
+import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
 import { toast } from "sonner";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
@@ -8,6 +8,7 @@ import { useTRPC } from "~/trpc/init/react";
 export const FarmList = () => {
   const trpc = useTRPC();
 
+  const address = useTonAddress();
   const [tonConnectUI] = useTonConnectUI();
   const { getJettonTx } = usePrepareJettonTx();
 
@@ -41,6 +42,11 @@ export const FarmList = () => {
   const userFarms = user?.farms as Record<string, number> | undefined;
 
   const handleBuyFarm = (farm: Farm) => {
+    if (!address) {
+      toast.error("Подключите ваш TON-кошелек");
+      return;
+    }
+
     if (!farm.enabled) {
       toast.error("К сожалению, ферма пока недоступна");
       return;
