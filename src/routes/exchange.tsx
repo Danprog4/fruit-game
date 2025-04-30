@@ -1,8 +1,8 @@
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Graphic } from "~/components/images/Graphic";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "~/components/ui/select";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay";
 import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
