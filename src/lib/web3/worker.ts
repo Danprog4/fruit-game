@@ -1,4 +1,4 @@
-import { startTonProcessor } from "./ton-payment";
+// import { startTonProcessor } from "./ton-payment";
 
-startTonProcessor();
-setInterval(startTonProcessor, 10000);
+// startTonProcessor();
+// setInterval(startTonProcessor, 10000);
