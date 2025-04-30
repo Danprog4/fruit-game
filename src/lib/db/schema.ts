@@ -20,7 +20,7 @@ export const usersTable = pgTable("users", {
   lastUpdatedBalanceAt: timestamp("lastUpdatedBalance", { withTimezone: true }),
   balances: jsonb("balances").default({}).$type<Record<string, number>>().notNull(),
   starBalance: bigint("starBalance", { mode: "number" }).default(0).notNull(),
-  walletAddress: varchar("walletAddress", { length: 255 }).notNull(),
+  walletAddress: varchar("walletAddress", { length: 255 }),
 });
 
 export const alliancesTable = pgTable("alliances", {

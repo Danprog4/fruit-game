@@ -96,7 +96,7 @@ function RootComponent() {
         <TonConnectUIProvider
           manifestUrl="https://fruit-game-eight.vercel.app/tonconnect-manifest.json"
           actionsConfiguration={{
-            twaReturnUrl: "https://t.me/fruit-game-eight.vercel.app/wallet",
+            twaReturnUrl: "https://t.me/FruitUtopia_bot",
           }}
         >
           <Outlet />

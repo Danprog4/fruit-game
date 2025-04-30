@@ -11,11 +11,13 @@ export const incrementUserFarm = async (userId: number, farmId: string) => {
     return;
   }
 
-  const allFarms = user.farms || {};
+  const currentFarms = user.farms || {};
+
+  const farmCount = currentFarms[farmId] || 0;
 
   const updatedFarms = {
-    ...allFarms,
-    [farmId]: allFarms[farmId] || 0,
+    ...currentFarms,
+    [farmId]: farmCount + 1,
   };
 
   await db

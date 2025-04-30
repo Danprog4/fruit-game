@@ -36,3 +36,5 @@ export const FARMS_CONFIG = [
     txType: "Coconut Farm",
   },
 ];
+
+export type Farm = (typeof FARMS_CONFIG)[number];

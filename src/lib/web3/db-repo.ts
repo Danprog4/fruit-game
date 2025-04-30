@@ -47,15 +47,29 @@ export const deleteAllTonPayments = async () => {
 
 // --- REDIS TO STORE LAST PROCESSED TX lt bigint ---
 
-// TODO: redis here
-let lastTxLt: bigint | null = null;
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 export const setLastTxRecord = async (lt: bigint) => {
-  lastTxLt = lt;
+  await redis.set("lastTxLt", lt.toString());
 };
 
 export const getLastTxRecord = async (): Promise<bigint> => {
-  return lastTxLt ?? 0n;
+  const lastTxLt = await redis.get<string>("lastTxLt");
+  return lastTxLt ? BigInt(lastTxLt) : 0n;
+};
+
+export const getIsProcessing = async (): Promise<boolean> => {
+  const isProcessing = await redis.get<string>("isProcessing");
+  return isProcessing === "true";
+};
+
+export const setIsProcessing = async (isProcessing: boolean) => {
+  await redis.set("isProcessing", isProcessing.toString());
 };
 
 export const getOrCreateBlockchainPayment = async ({

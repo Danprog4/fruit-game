@@ -1,27 +1,53 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTonConnectUI } from "@tonconnect/ui-react";
 import { toast } from "sonner";
-import { FARMS_CONFIG } from "~/lib/farms.config";
+import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
+import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
 
 export const FarmList = () => {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+
+  const [tonConnectUI] = useTonConnectUI();
+  const { getJettonTx } = usePrepareJettonTx();
 
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
-        toast.success("Вы успешно купили ферму");
-        console.log("success");
+      onSuccess: async (memo, variables) => {
+        const farm = FARMS_CONFIG.find((f) => f.id === variables.farmId);
+
+        if (!farm) {
+          throw new Error("Farm not found");
+        }
+
+        const jettonTx = await getJettonTx(farm.priceInFRU, memo);
+
+        if (!jettonTx) {
+          throw new Error("Jetton transaction not found");
+        }
+
+        await tonConnectUI.sendTransaction(jettonTx);
+
+        toast.success(`Транзакция отправлена, ждите бро`);
       },
-      onError: () => {
+      onError: (error) => {
+        console.log("error", error);
         toast.error("К сожалению, у вас недостаточно FRU для покупки фермы");
-        console.log("error");
       },
     }),
   );
+
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const userFarms = user?.farms as Record<string, number> | undefined;
+
+  const handleBuyFarm = (farm: Farm) => {
+    if (!farm.enabled) {
+      toast.error("К сожалению, ферма пока недоступна");
+      return;
+    }
+
+    buyFarm.mutate({ farmId: farm.id });
+  };
 
   return (
     <div className="flex flex-col gap-[14px]">
@@ -46,16 +72,14 @@ export const FarmList = () => {
                 : "Купите первую ферму!"}{" "}
             </div>
           </div>
-          <div
-            onClick={
-              farm.enabled
-                ? () => buyFarm.mutate({ farmId: farm.id })
-                : () => toast.error("К сожалению, ферма пока недоступна")
-            }
-            className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
+          <button
+            type="button"
+            onClick={() => handleBuyFarm(farm)}
+            disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
+            className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
             {farm.enabled ? `${farm.priceInFRU.toLocaleString()} FRU` : "Недоступно"}
-          </div>
+          </button>
         </div>
       ))}
     </div>

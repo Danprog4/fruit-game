@@ -1,3 +1,4 @@
+import { Address } from "@ton/core";
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -49,6 +50,24 @@ export const router = {
     await updateBalances(userId);
     return user.balances;
   }),
+
+  connectWallet: procedure
+    .input(
+      z.object({
+        walletAddress: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await db
+        .update(usersTable)
+        .set({
+          walletAddress: Address.parse(input.walletAddress).toString({
+            bounceable: false,
+          }),
+        })
+        .where(eq(usersTable.id, ctx.userId));
+    }),
+
   exchange: procedure
     .input(
       z.object({

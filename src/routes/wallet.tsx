@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import {
+  TonConnectButton,
+  useTonAddress,
+  useTonConnectUI,
+  useTonWallet,
+} from "@tonconnect/ui-react";
 import { useEffect, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
@@ -28,6 +33,7 @@ function RouteComponent() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletPage, setIsWalletPage] = useState(true);
+  const address = useTonAddress(true);
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
@@ -52,9 +58,25 @@ function RouteComponent() {
     }),
   );
 
-  useEffect(() => {
-    invalidateBalances.mutate();
-  }, []);
+  const connectWallet = useMutation(
+    trpc.main.connectWallet.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+      },
+    }),
+  );
+
+  useEffect(
+    () =>
+      tonConnectUI.onStatusChange((wallet) => {
+        if (!wallet) return;
+
+        connectWallet.mutate({ walletAddress: wallet.account.address });
+      }),
+
+    // eslint-disable-next-line @tanstack/query/no-unstable-deps
+    [tonConnectUI, connectWallet],
+  );
 
   const refreshBalances = () => {
     setIsRefreshing(true);

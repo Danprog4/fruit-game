@@ -1,25 +1,19 @@
+import {
+  getIsProcessing,
+  getLastTxRecord,
+  setIsProcessing,
+  setLastTxRecord,
+} from "./db-repo";
 import { fetchTransactionsUpToLt } from "./fetch-transactions";
 import { handlePayment } from "./handle-payment";
 import { processTonTransaction } from "./tx-processor";
 
-let lastTxLt = BigInt(0);
-
-const getLastTxRecord = async () => {
-  return lastTxLt;
-};
-
-const setLastTxRecord = async (lt: bigint) => {
-  lastTxLt = lt;
-};
-
-let processing = false;
-
 export const startTonProcessor = async () => {
-  if (processing) {
+  if (await getIsProcessing()) {
     return;
   }
 
-  processing = true;
+  await setIsProcessing(true);
 
   const lastTxLt = await getLastTxRecord();
 
@@ -28,7 +22,7 @@ export const startTonProcessor = async () => {
   console.log(`[ton payments] fetched ${transactions.length} transactions`);
 
   if (transactions.length === 0) {
-    processing = false;
+    await setIsProcessing(false);
     return;
   }
 
@@ -39,6 +33,5 @@ export const startTonProcessor = async () => {
   const firstTxLt = transactions[0].lt;
 
   await setLastTxRecord(firstTxLt);
-
-  processing = false;
+  await setIsProcessing(false);
 };
