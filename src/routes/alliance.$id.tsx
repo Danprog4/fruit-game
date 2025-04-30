@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { FARMS_CONFIG } from "farms.config";
 import { useEffect, useState } from "react";
 import { AllianceMembList } from "~/components/AllianceMembList";
 import { BackButton } from "~/components/BackButton";
@@ -10,6 +9,7 @@ import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ClockIcon } from "~/components/icons/ClockIcon";
 import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import { ruPeople } from "~/lib/intl";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";

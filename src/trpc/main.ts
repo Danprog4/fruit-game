@@ -1,9 +1,9 @@
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { FARMS_CONFIG } from "farms.config";
 import { z } from "zod";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import { updateBalances } from "~/lib/utils/updateBalances";
 import { procedure, publicProcedure } from "./init";

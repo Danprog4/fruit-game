@@ -1,4 +1,4 @@
-import { FARMS_CONFIG } from "farms.config";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 
 // Exchange rate calculation based on farm config rates
 const calculateExchangeAmount = (amount: string, from: string, to: string) => {

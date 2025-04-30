@@ -16,10 +16,11 @@ export const usersTable = pgTable("users", {
   name: varchar("name", { length: 255 }),
   allianceId: bigint("allianceId", { mode: "number" }),
   allianceJoinDate: timestamp("allianceJoinDate", { withTimezone: true }),
-  farms: jsonb("farms").default({}).notNull(),
+  farms: jsonb("farms").default({}).$type<Record<string, number>>().notNull(),
   lastUpdatedBalanceAt: timestamp("lastUpdatedBalance", { withTimezone: true }),
-  balances: jsonb("balances").default({}).notNull(),
+  balances: jsonb("balances").default({}).$type<Record<string, number>>().notNull(),
   starBalance: bigint("starBalance", { mode: "number" }).default(0).notNull(),
+  walletAddress: varchar("walletAddress", { length: 255 }).notNull(),
 });
 
 export const alliancesTable = pgTable("alliances", {
@@ -41,6 +42,24 @@ export const allianceSessionTable = pgTable("allianceSession", {
   seasonStart: timestamp("seasonStart", { withTimezone: true }).notNull(),
   seasonEnd: timestamp("seasonEnd", { withTimezone: true }).notNull(),
 });
+
+export const blockchainPaymentsTable = pgTable("blockchain_payments", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: bigint("user_id", { mode: "number" })
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
+  status: varchar("status", { length: 255 })
+    .$type<"pending" | "completed" | "failed">()
+    .notNull(),
+  txType: varchar("tx_type", { length: 255 }).notNull(),
+  fruAmount: bigint("fru_amount", { mode: "bigint" }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  txId: varchar("tx_id", { length: 255 }),
+});
+
+export type BlockchainPayment = typeof blockchainPaymentsTable.$inferSelect;
+export type NewBlockchainPayment = typeof blockchainPaymentsTable.$inferInsert;
 
 export type Alliance = typeof alliancesTable.$inferSelect;
 export type NewAlliance = typeof alliancesTable.$inferInsert;

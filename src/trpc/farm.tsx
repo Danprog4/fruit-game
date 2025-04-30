@@ -1,10 +1,13 @@
+import { toNano } from "@ton/core";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { FARMS_CONFIG } from "farms.config";
+import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { usersTable } from "~/lib/db/schema";
+import { blockchainPaymentsTable, NewBlockchainPayment } from "~/lib/db/schema";
+import { FARMS_CONFIG } from "~/lib/farms.config";
+import { createMemo } from "~/lib/web3/memo";
 import { procedure } from "./init";
+
 export const farmRouter = {
   buyFarm: procedure
     .input(
@@ -14,41 +17,30 @@ export const farmRouter = {
     )
     .mutation(async ({ ctx, input }) => {
       const { farmId } = input;
+
       const farm = FARMS_CONFIG.find((f) => f.id === farmId);
+
       if (!farm) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Farm not found" });
       }
-      const userId = ctx.userId;
-      const user = await db.query.usersTable.findFirst({
-        where: (users) => eq(users.id, userId),
-      });
-      if (!user) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-      }
 
-      if (user.tokenBalance < farm.priceInFRU) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Not enough FRU tokens",
-        });
-      }
+      const txType = farm.txType;
+      const priceInFRU = farm.priceInFRU;
 
-      const currentFarms = (user.farms as Record<string, number>) || {};
+      const id = nanoid();
 
-      const farmCount = currentFarms[farmId] || 0;
-      const updatedFarms = {
-        ...currentFarms,
-        [farmId]: farmCount + 1,
+      const newTransaction: NewBlockchainPayment = {
+        id,
+        userId: ctx.userId,
+        status: "pending",
+        txType,
+        fruAmount: toNano(priceInFRU),
       };
 
-      await db
-        .update(usersTable)
-        .set({
-          farms: updatedFarms,
-          tokenBalance: user.tokenBalance - farm.priceInFRU,
-        })
-        .where(eq(usersTable.id, userId));
+      await db.insert(blockchainPaymentsTable).values(newTransaction);
 
-      return { success: true, farms: updatedFarms };
+      const memo = createMemo(txType, id);
+
+      return memo;
     }),
 };

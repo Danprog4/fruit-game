@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
-import { FARMS_CONFIG } from "farms.config";
 import { useEffect, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
@@ -13,6 +12,8 @@ import Wallet from "~/components/icons/navbar/Wallet";
 import { Refresh } from "~/components/icons/Refresh";
 import { Token } from "~/components/icons/Token";
 import { Wallet as WalletIcon } from "~/components/icons/Wallet";
+import { FARMS_CONFIG } from "~/lib/farms.config";
+import { getShortAddress } from "~/lib/utils/address";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/wallet")({
@@ -132,7 +133,7 @@ function RouteComponent() {
                     {wallet ? "Подключено" : "Подключить кошелек"}
                   </div>
                   <div className="font-manrope text-xs font-medium text-[#93A179]">
-                    {wallet ? wallet.account.address.slice(0, 12) + "..." : "TON Connect"}
+                    {wallet ? getShortAddress(wallet.account.address) : "TON Connect"}
                   </div>
                 </div>
               </div>

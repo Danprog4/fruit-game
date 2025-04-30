@@ -1,5 +1,5 @@
-import { FARMS_CONFIG } from "farms.config";
 import { Token } from "~/components/icons/Token";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 
 export const getTokenIcon = (tokenName: string) => {
   const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);

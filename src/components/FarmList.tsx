@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FARMS_CONFIG } from "farms.config";
 import { toast } from "sonner";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import { useTRPC } from "~/trpc/init/react";
 
 export const FarmList = () => {

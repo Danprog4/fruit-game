@@ -1,4 +1,4 @@
-import { FARMS_CONFIG } from "farms.config";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 
 export const getTokenBalance = (tokenName: string, balances: Record<string, number>) => {
   const farm = FARMS_CONFIG.find((farm) => farm.tokenName === tokenName);

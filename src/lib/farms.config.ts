@@ -9,6 +9,7 @@ export const FARMS_CONFIG = [
     rateFru: 1.68,
     enabled: true,
     icon: "🍓",
+    txType: "Straberry Farm",
   },
   {
     id: "cherry",
@@ -20,6 +21,7 @@ export const FARMS_CONFIG = [
     rateFru: 86.4,
     enabled: true,
     icon: "🍒",
+    txType: "Cherry Farm",
   },
   {
     id: "coconut",
@@ -31,5 +33,6 @@ export const FARMS_CONFIG = [
     rateFru: 0.7584,
     enabled: false,
     icon: "🥥",
+    txType: "Coconut Farm",
   },
 ];

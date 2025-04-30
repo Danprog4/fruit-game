@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
-import { FARMS_CONFIG } from "../../../farms.config";
+import { FARMS_CONFIG } from "../farms.config";
 
 /**
  * Updates all farms' balances for the given user based on the time elapsed

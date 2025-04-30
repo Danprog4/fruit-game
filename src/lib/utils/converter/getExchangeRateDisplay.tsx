@@ -1,4 +1,4 @@
-import { FARMS_CONFIG } from "farms.config";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 
 // Calculate exchange rate display based on farm config rates
 const getExchangeRateDisplay = (fromToken: string, toToken: string) => {
