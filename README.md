@@ -16,4 +16,4 @@ cp .env.example .env
 
 ## Configuration
 
-app.config.ts - add your ngrok domain to the allowedHosts array
+app.config.ts - add your ngrok domain to the allowedHostsss array
