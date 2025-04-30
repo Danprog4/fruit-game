@@ -1,9 +1,3 @@
-import { Buffer as BufferRaw } from "buffer";
-
-if (typeof window !== "undefined") {
-  window.Buffer = BufferRaw;
-}
-
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";

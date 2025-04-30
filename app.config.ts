@@ -1,6 +1,6 @@
+import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
-// import { nodePolyfills } from "vite-plugin-node-polyfills";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
@@ -10,9 +10,9 @@ export default defineConfig({
         projects: ["./tsconfig.json"],
       }),
       tailwindcss(),
-      // nodePolyfills({
-      //   include: ["buffer"],
-      // }),
+      NodeGlobalsPolyfillPlugin({
+        buffer: true,
+      }),
     ],
   },
 

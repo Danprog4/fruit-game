@@ -21,6 +21,19 @@ import { AuthProvider } from "~/components/AuthProvider";
 import appCss from "~/lib/styles/app.css?url";
 import { useTRPC } from "~/trpc/init/react";
 import { TRPCRouter } from "~/trpc/init/router";
+
+import { Buffer } from "buffer";
+
+// @ts-expect-error
+if (typeof window !== "undefined" && !window.Buffer) {
+  // @ts-expect-error
+  window.Buffer = Buffer;
+}
+
+// now anywhere in your client code you can:
+const buf = Buffer.from("hello world");
+console.log(buf.toString("hex"));
+
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   trpc: TRPCOptionsProxy<TRPCRouter>;
