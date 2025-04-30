@@ -29,11 +29,11 @@ export const FarmList = () => {
 
         await tonConnectUI.sendTransaction(jettonTx);
 
-        toast.success(`Транзакция отправлена, ждите бро`);
+        toast.success(`Транзакция отправлена, ожидайте`);
       },
       onError: (error) => {
         console.log("error", error);
-        toast.error("К сожалению, у вас недостаточно FRU для покупки фермы");
+        toast.error("Упс, что-то пошло не так. ");
       },
     }),
   );
