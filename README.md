@@ -10,7 +10,7 @@ bun ngrok # if needed
 
 ## Environment Variable
 
-```bash
+``bash
 cp .env.example .env
 ```
 
