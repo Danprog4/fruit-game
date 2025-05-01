@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -18,6 +18,21 @@ declare global {
 export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const [isTelegramReady, setIsTelegramReady] = useState(false);
+
+  // Убедимся, что Telegram SDK полностью загружен
+  useEffect(() => {
+    const checkTelegramReady = () => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        setIsTelegramReady(true);
+      } else {
+        // Если Telegram SDK еще не загружен, повторим проверку через небольшой интервал
+        setTimeout(checkTelegramReady, 100);
+      }
+    };
+
+    checkTelegramReady();
+  }, []);
 
   // Мутация для обновления статуса после оплаты
   const upgradeForStars = useMutation(
@@ -73,12 +88,18 @@ export const useUpgradeForStars = () => {
 
   // Функция для покупки звезды
   const handleUpgradeForStars = useCallback(() => {
-    if (window.Telegram?.WebApp) {
+    // Проверяем, что Telegram SDK точно готов
+    if (isTelegramReady) {
       createInvoice.mutate();
     } else {
-      toast.error("Вы не можете оплатить звезду в браузере");
+      // Проверим еще раз наличие Telegram SDK перед выдачей ошибки
+      if (window.Telegram?.WebApp) {
+        createInvoice.mutate();
+      } else {
+        toast.error("Не удалось получить доступ к Telegram WebApp");
+      }
     }
-  }, [createInvoice]);
+  }, [createInvoice, isTelegramReady]);
 
   return {
     upgradeForStars: {
