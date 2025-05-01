@@ -96,9 +96,13 @@ export const FarmList = () => {
             }
             className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
-            {farm.enabled ? `${farm.priceInFRU.toLocaleString()} FRU` : "Недоступно"}
-            {isTXPending && buyFarm.variables?.farmId === farm.id && (
+            {(buyFarm.isPending && buyFarm.variables?.farmId === farm.id) ||
+            (isTXPending && buyFarm.variables?.farmId === farm.id) ? (
               <span className="text-xs text-white">Ожидайте...</span>
+            ) : farm.enabled ? (
+              `${farm.priceInFRU.toLocaleString()} FRU`
+            ) : (
+              "Недоступно"
             )}
           </button>
         </div>
