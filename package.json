@@ -41,6 +41,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.42.0",
     "eruda": "^3.4.1",
+    "grammy": "^1.36.1",
     "heic-convert": "^2.1.0",
     "jose": "^6.0.10",
     "lucide-react": "^0.503.0",
