@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -19,6 +19,9 @@ export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  // Function to be called when payment is successful
+  let onPaymentSuccess: (() => void) | null = null;
+
   // Мутация для обновления статуса после оплаты
   const upgradeForStars = useMutation(
     trpc.tgTx.upgradeForStars.mutationOptions({
@@ -35,18 +38,6 @@ export const useUpgradeForStars = () => {
   // Мутация для создания инвойса
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
-      onSuccess: (data) => {
-        try {
-          if (window.Telegram?.WebApp) {
-            // Просто открываем инвойс без колбэка
-            // Обработка результата происходит в компоненте через onEvent
-            window.Telegram.WebApp.openInvoice(data.invoiceUrl);
-          }
-        } catch (error) {
-          console.error("Error opening invoice:", error);
-          toast.error("Ошибка при открытии инвойса");
-        }
-      },
       onError: (error) => {
         toast.error(
           `Ошибка при создании инвойса: ${error instanceof Error ? error.message : "Неизвестная ошибка"}`,
@@ -55,10 +46,47 @@ export const useUpgradeForStars = () => {
     }),
   );
 
+  useEffect(() => {
+    if (!createInvoice.data) return;
+
+    try {
+      if (window.Telegram?.WebApp) {
+        console.log("openInvoice()", createInvoice.data.invoiceUrl);
+        window.Telegram.WebApp.openInvoice(createInvoice.data.invoiceUrl);
+      }
+    } catch (error) {
+      console.error("Error opening invoice:", error);
+      toast.error("Ошибка при открытии инвойса");
+    }
+  }, [createInvoice.data]);
+
+  useEffect(() => {
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.onEvent("invoiceClosed", (payment: { status: string }) => {
+        if (payment.status === "paid") {
+          toast.success("Платеж успешно выполнен", { id: "payment-successful" });
+          queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+
+          // Call the callback if it exists
+          if (onPaymentSuccess) {
+            onPaymentSuccess();
+          }
+        } else if (payment.status === "cancelled" || payment.status === "failed") {
+          toast.error("Платеж не удался, попробуйте снова", { id: "payment-failed" });
+        }
+      });
+    }
+  }, [queryClient]);
+
   // Функция для покупки звезды
-  const handleUpgradeForStars = useCallback(() => {
-    createInvoice.mutate();
-  }, [createInvoice]);
+  const handleUpgradeForStars = useCallback(
+    (callback?: () => void) => {
+      // Save the callback to be called when payment is successful
+      onPaymentSuccess = callback || null;
+      createInvoice.mutate();
+    },
+    [createInvoice],
+  );
 
   return {
     upgradeForStars: {
