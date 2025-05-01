@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -17,24 +18,26 @@ export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  // Мутация для обновления статуса после оплаты
   const upgradeForStars = useMutation(
     trpc.tgTx.upgradeForStars.mutationOptions({
       onSuccess: () => {
-        toast.success("Оплата прошла успешно");
         queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
       },
       onError: () => {
-        toast.error("Ошибка при оплате");
+        toast.error("Ошибка при обновлении статуса");
       },
     }),
   );
 
+  // Мутация для создания инвойса
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
       onSuccess: (data) => {
         if (window.Telegram?.WebApp) {
           window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
             if (status === "paid") {
+              // Вызываем обновление статуса после успешной оплаты
               upgradeForStars.mutate();
               toast.success("Оплата прошла успешно");
             } else {
@@ -46,23 +49,26 @@ export const useUpgradeForStars = () => {
           toast.info("Инвойс открыт в новом окне");
         }
       },
-      onError: () => {
-        toast.error("Ошибка при создании инвойса");
+      onError: (error) => {
+        toast.error(
+          `Ошибка при создании инвойса: ${error instanceof Error ? error.message : "Неизвестная ошибка"}`,
+        );
       },
     }),
   );
 
+  // Функция для покупки звезды
+  const handleUpgradeForStars = useCallback(() => {
+    if (window.Telegram?.WebApp) {
+      createInvoice.mutate();
+    } else {
+      toast.error("Вы не можете оплатить звезду в браузере");
+    }
+  }, [createInvoice]);
+
   return {
     upgradeForStars: {
-      mutate: () => {
-        // If we're in Telegram, create an invoice first
-        if (window.Telegram?.WebApp) {
-          createInvoice.mutate();
-        } else {
-          // Otherwise directly call the upgrade mutation
-          toast.error("Вы не можете оплатить звезду в браузере");
-        }
-      },
+      mutate: handleUpgradeForStars,
       isPending: upgradeForStars.isPending || createInvoice.isPending,
     },
     createInvoice,
