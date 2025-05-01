@@ -1,47 +1,49 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
 import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
-import { Star } from "~/components/icons/Star";
-
+import { TelegramStar } from "~/components/icons/TelegramStar";
+import { useUpgradeForStars } from "~/hooks/useUpgradeForStars";
 export const Route = createFileRoute("/farms")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { upgradeForStars } = useUpgradeForStars();
   return (
     <div className="flex w-full flex-col px-4 pt-12 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
 
-      <div className="font-manrope mb-[31px] flex items-center justify-center text-2xl font-semibold text-white">
+      <div className="font-manrope mb-[48px] flex items-center justify-center text-2xl font-semibold text-white">
         Ферма
       </div>
-      <div className="mb-[28px] flex h-[76px] w-full items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px]">
-        <div className="flex items-center justify-center gap-5">
-          <div className="flex h-[54px] w-[54px] items-center justify-center gap-[6px] rounded-full border border-[#76AD10] bg-[#2A2A2A]">
-            <Star />
-          </div>
-          <div className="flex flex-col items-start justify-center gap-2">
-            <div className="font-manrope text-xs font-medium">Звездная ферма</div>
-            <div className="flex items-center gap-1">
-              <Star width={16} height={16} />
-              <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-                40 000
-              </div>
-            </div>
+      <div className="absolute top-[100px] left-1/2 flex h-[54px] w-[54px] -translate-x-1/2 items-center justify-center rounded-full border border-[#76AD10] bg-black text-3xl">
+        💎
+      </div>
+      <div className="mb-[15px] flex h-[145px] w-[full] flex-col items-center justify-center gap-3 rounded-4xl border border-[#575757] bg-[#2A2A2A] pt-8">
+        <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
+          <div>Лунная ферма</div>
+          <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
+            💎 Доходность: 0
           </div>
         </div>
-        <div
-          onClick={() => toast.error("К сожалению, прокачка пока недоступна")}
-          className="font-manrope flex h-[36px] w-[92px] cursor-pointer items-center justify-center rounded-full bg-[#4A4A4A] px-4 text-xs font-medium text-white"
-        >
-          Прокачать
+        <div className="flex items-center justify-center gap-2 pb-4">
+          <button className="full flex items-center justify-center rounded-full bg-[#76AD10] px-3 py-2">
+            💎 100 алмазов
+          </button>
+          <button
+            onClick={() => upgradeForStars.mutate()}
+            disabled={upgradeForStars.isPending}
+            className="full flex items-center justify-center gap-1 rounded-full bg-[#76AD10] px-3 py-2"
+          >
+            <TelegramStar /> 1 звезда
+          </button>
         </div>
       </div>
+
       <div className="font-manrope mb-[20px] text-base font-semibold">
         Покупай фермы и получай токены
       </div>
