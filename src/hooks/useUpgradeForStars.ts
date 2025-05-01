@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -9,6 +9,7 @@ declare global {
     Telegram?: {
       WebApp?: {
         openInvoice: (invoiceUrl: string, callback: (status: string) => void) => void;
+        onEvent: (eventName: string, callback: (data: any) => void) => void;
       };
     };
   }
@@ -56,6 +57,19 @@ export const useUpgradeForStars = () => {
       },
     }),
   );
+
+  // Общий обработчик событий invoiceClosed
+  useEffect(() => {
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.onEvent("invoiceClosed", (payment) => {
+        if (payment.status === "paid") {
+          queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+        } else if (payment.status === "cancelled" || payment.status === "failed") {
+          toast.error("Платеж не удался, попробуйте снова", { id: "payment-failed" });
+        }
+      });
+    }
+  }, [queryClient, trpc.main.getUser]);
 
   // Функция для покупки звезды
   const handleUpgradeForStars = useCallback(() => {
