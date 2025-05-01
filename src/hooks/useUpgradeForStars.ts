@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -8,7 +8,7 @@ declare global {
   interface Window {
     Telegram?: {
       WebApp?: {
-        openInvoice: (invoiceUrl: string, callback?: (status: string) => void) => void;
+        openInvoice: (invoiceUrl: string) => void;
         onEvent: (eventName: string, callback: (data: any) => void) => void;
       };
     };
@@ -38,11 +38,9 @@ export const useUpgradeForStars = () => {
       onSuccess: (data) => {
         try {
           if (window.Telegram?.WebApp) {
-            // Открываем инвойс без колбэка, будем использовать onEvent
+            // Просто открываем инвойс без колбэка
+            // Обработка результата происходит в компоненте через onEvent
             window.Telegram.WebApp.openInvoice(data.invoiceUrl);
-          } else {
-            window.open(data.invoiceUrl, "_blank");
-            toast.info("Инвойс открыт в новом окне");
           }
         } catch (error) {
           console.error("Error opening invoice:", error);
@@ -56,31 +54,6 @@ export const useUpgradeForStars = () => {
       },
     }),
   );
-
-  // Настраиваем обработчик события закрытия инвойса
-  useEffect(() => {
-    const handleInvoiceClosed = (payment: { status: string }) => {
-      if (payment.status === "paid") {
-        // Вызываем обновление статуса после успешной оплаты
-        upgradeForStars.mutate();
-        toast.success("Оплата прошла успешно");
-      } else if (payment.status === "cancelled" || payment.status === "failed") {
-        toast.error("Платеж не был завершен");
-      }
-    };
-
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.onEvent("invoiceClosed", handleInvoiceClosed);
-    }
-
-    // Очистка обработчика при размонтировании компонента
-    return () => {
-      if (window.Telegram?.WebApp) {
-        // Здесь должен быть метод для удаления обработчика, если он есть в API
-        // window.Telegram.WebApp.offEvent("invoiceClosed", handleInvoiceClosed);
-      }
-    };
-  }, [upgradeForStars]);
 
   // Функция для покупки звезды
   const handleUpgradeForStars = useCallback(() => {
