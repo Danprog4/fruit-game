@@ -1,16 +1,18 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import { useLocalStorage } from "usehooks-ts";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
 
 export const FarmList = () => {
   const trpc = useTRPC();
-
   const address = useTonAddress();
   const [tonConnectUI] = useTonConnectUI();
   const { getJettonTx } = usePrepareJettonTx();
+  const [isTXPending, setIsTXPending] = useLocalStorage("isTXPending", false);
 
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
@@ -30,6 +32,7 @@ export const FarmList = () => {
         await tonConnectUI.sendTransaction(jettonTx);
 
         toast.success(`Транзакция отправлена, ожидайте`);
+        setIsTXPending(true);
       },
       onError: (error) => {
         console.log("error", error);
@@ -40,6 +43,12 @@ export const FarmList = () => {
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const userFarms = user?.farms as Record<string, number> | undefined;
+
+  useEffect(() => {
+    if (isTXPending && userFarms) {
+      setIsTXPending(false);
+    }
+  }, [userFarms, isTXPending]);
 
   const handleBuyFarm = (farm: Farm) => {
     if (!address) {
@@ -81,10 +90,16 @@ export const FarmList = () => {
           <button
             type="button"
             onClick={() => handleBuyFarm(farm)}
-            disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
+            disabled={
+              (buyFarm.isPending && buyFarm.variables?.farmId === farm.id) ||
+              (isTXPending && buyFarm.variables?.farmId === farm.id)
+            }
             className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
             {farm.enabled ? `${farm.priceInFRU.toLocaleString()} FRU` : "Недоступно"}
+            {isTXPending && buyFarm.variables?.farmId === farm.id && (
+              <span className="text-xs text-white">Ожидайте...</span>
+            )}
           </button>
         </div>
       ))}
