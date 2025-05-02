@@ -87,7 +87,7 @@ export const authRouter = {
             await db
               .update(usersTable)
               .set({
-                diamondBalance: (referrer.diamondBalance || 0) + 10,
+                starBalance: (referrer.starBalance || 0) + 10,
               })
               .where(eq(usersTable.id, Number(referrerId)));
           }
