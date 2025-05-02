@@ -29,10 +29,10 @@ bot.on("pre_checkout_query", async (ctx) => {
 const update = webhookCallback(bot, "std/http");
 
 const handleUpdate = async (request: Request) => {
-  const url = new URL(request.url);
-  if (url.searchParams.get("secret") !== bot.token) {
-    return new Response("not allowed", { status: 405 });
-  }
+  //   const url = new URL(request.url);
+  //   if (url.searchParams.get("secret") !== bot.token) {
+  //     return new Response("not allowed", { status: 405 });
+  //   }
   return await update(request);
 };
 

@@ -35,7 +35,13 @@ export const useUpgradeForStars = () => {
     trpc.tgTx.createInvoice.mutationOptions({
       onSuccess: (data) => {
         if (invoice.open.isAvailable()) {
-          const promise = invoice.open(data.invoiceUrl, "url");
+          const promise = invoice.open(data.invoiceUrl, "url").then((status) => {
+            if (status === "paid") {
+              upgradeForStars.mutate();
+            } else if (status === "cancelled" || status === "failed") {
+              toast.error("Платеж не был завершен");
+            }
+          });
           toast.success("Инвойс открыт");
         }
         // window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
