@@ -1,7 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
 import Farm from "~/components/icons/navbar/Farm";
@@ -10,6 +8,7 @@ import Wallet from "~/components/icons/navbar/Wallet";
 import { TelegramStar } from "~/components/icons/TelegramStar";
 import { useUpgradeForStars } from "~/hooks/useUpgradeForStars";
 import { useTRPC } from "~/trpc/init/react";
+
 export const Route = createFileRoute("/farms")({
   component: RouteComponent,
 });
@@ -19,17 +18,11 @@ function RouteComponent() {
   const { upgradeForStars } = useUpgradeForStars();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
-  useEffect(() => {
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.onEvent("invoiceClosed", (payment) => {
-        if (payment.status === "paid") {
-          queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
-        } else if (payment.status === "cancelled" || payment.status === "failed") {
-          toast.error("Платеж не удался, попробуйте снова", { id: "payment-failed" });
-        }
-      });
-    }
-  }, [queryClient, trpc.main.getUser]);
+
+  const webApp = window.Telegram?.WebApp;
+
+  console.log(webApp);
+
   return (
     <div className="flex w-full flex-col px-4 pt-12 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
