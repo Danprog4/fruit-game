@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invoice } from "@telegram-apps/sdk";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -33,15 +34,17 @@ export const useUpgradeForStars = () => {
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
       onSuccess: (data) => {
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
-            if (status === "paid") {
-              upgradeForStars.mutate();
-            } else if (status === "cancelled" || status === "failed") {
-              toast.error("Платеж не был завершен");
-            }
-          });
+        if (invoice.open.isAvailable()) {
+          const promise = invoice.open(data.invoiceUrl);
+          toast.success("Инвойс открыт");
         }
+        // window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
+        //   if (status === "paid") {
+        //     upgradeForStars.mutate();
+        //   } else if (status === "cancelled" || status === "failed") {
+        //     toast.error("Платеж не был завершен");
+        //   }
+        // });
       },
       onError: () => {
         toast.error("Ошибка при создании инвойса");
