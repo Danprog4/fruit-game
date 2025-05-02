@@ -41,9 +41,6 @@ export const useUpgradeForStars = () => {
               toast.error("Платеж не был завершен");
             }
           });
-        } else {
-          window.open(data.invoiceUrl, "_blank");
-          toast.info("Инвойс открыт в новом окне");
         }
       },
       onError: () => {
