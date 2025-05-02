@@ -1,3 +1,4 @@
+import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { Bot, webhookCallback } from "grammy";
 
 const token = process.env.BOT_TOKEN;
@@ -25,4 +26,13 @@ bot.on("pre_checkout_query", async (ctx) => {
   return ctx.answerPreCheckoutQuery(true);
 });
 
-export default webhookCallback(bot, "https");
+const handleUpdate = webhookCallback(bot, "std/http");
+
+export const APIRoute = createAPIFileRoute("/api/bot")({
+  GET: async ({ request }) => {
+    return handleUpdate(request);
+  },
+  POST: async ({ request }) => {
+    return handleUpdate(request);
+  },
+});
