@@ -70,13 +70,7 @@ export const useUpgradeForStars = () => {
   return {
     upgradeForStars: {
       mutate: () => {
-        // If we're in Telegram, create an invoice first
-        if (window.Telegram?.WebApp) {
-          createInvoice.mutate();
-        } else {
-          // Otherwise directly call the upgrade mutation
-          toast.error("Вы не можете оплатить звезду в браузере");
-        }
+        createInvoice.mutate();
       },
       isPending: upgradeForStars.isPending || createInvoice.isPending,
     },
