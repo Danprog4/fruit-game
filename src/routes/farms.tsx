@@ -7,7 +7,7 @@ import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { TelegramStar } from "~/components/icons/TelegramStar";
 import { useUpgradeForStars } from "~/hooks/useUpgradeForStars";
-import { getNextFarmLevel } from "~/lib/dm-farm.config";
+import { getFarmLevelByLevel, getNextFarmLevel } from "~/lib/dm-farm.config";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/farms")({
@@ -22,10 +22,21 @@ function RouteComponent() {
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const dmFarmLevel = user?.dmFarmLevel;
   const nextFarmLevel = getNextFarmLevel(dmFarmLevel ?? 1);
-
+  const farmLevel = getFarmLevelByLevel(dmFarmLevel ?? 1);
   const webApp = window.Telegram?.WebApp;
 
   console.log(webApp);
+  console.log(user);
+  if (farmLevel) {
+    const incomePerHour = farmLevel.incomePerHour;
+    const incomePerSecond = incomePerHour / 3600;
+    const dmIncome = incomePerSecond * 1;
+    console.log(dmIncome, "dmIncome");
+    console.log(user?.starBalance, "starBalance");
+    console.log(1, "elapsedSeconds");
+    console.log(incomePerHour, "incomePerHour");
+    console.log(incomePerSecond, "incomePerSecond");
+  }
 
   return (
     <div className="flex w-full flex-col px-4 pt-12 text-white">

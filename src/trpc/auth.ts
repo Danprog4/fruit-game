@@ -97,7 +97,6 @@ export const authRouter = {
       }
 
       await updateBalances(existingUser.id);
-      // await updateDmBalance(existingUser.id);
 
       // If user has a referrer, give 5% of all balances to the referrer
       if (existingUser.referrerId) {

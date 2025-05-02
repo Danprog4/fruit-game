@@ -1,11 +1,13 @@
 import { eq } from "drizzle-orm";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
+import { getFarmLevelByLevel } from "../dm-farm.config";
 import { FARMS_CONFIG } from "../farms.config";
 
 /**
  * Updates all farms' balances for the given user based on the time elapsed
  * since the user's last update, using mining rates from farms.config (GRUSH per hour).
+ * Also updates the DM farm balance based on the user's DM farm level.
  * @param userId - the ID of the user whose farms should be updated
  */
 export async function updateBalances(userId: string | number): Promise<void> {
@@ -46,11 +48,24 @@ export async function updateBalances(userId: string | number): Promise<void> {
     updatedBalances[farmId] = prev + amountMined;
   }
 
+  // Calculate DM farm income
+  const dmFarmLevel = user.dmFarmLevel;
+  const farmLevel = getFarmLevelByLevel(dmFarmLevel);
+  let starBalance = user.starBalance;
+
+  if (farmLevel) {
+    const incomePerHour = farmLevel.incomePerHour;
+    const incomePerSecond = incomePerHour / 3600;
+    const dmIncome = Math.floor(incomePerSecond * elapsedSeconds);
+    starBalance += dmIncome;
+  }
+
   // Update user record with new balances and timestamp
   await db
     .update(usersTable)
     .set({
       balances: updatedBalances,
+      starBalance: Math.floor(starBalance),
       lastUpdatedBalanceAt: new Date(nowMs),
     })
     .where(eq(usersTable.id, id));
