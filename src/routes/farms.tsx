@@ -50,9 +50,9 @@ function RouteComponent() {
       </div>
       <div className="mb-[15px] flex h-[145px] w-[full] flex-col items-center justify-center gap-3 rounded-4xl border border-[#575757] bg-[#2A2A2A] pt-8">
         <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
-          <div>Лунная ферма</div>
+          <div>Алмазная ферма</div>
           <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-            💎 Доходность: {nextFarmLevel?.incomePerHour}
+            Доходность: {nextFarmLevel?.incomePerHour} 💎/час
           </div>
         </div>
         <div className="flex items-center justify-center gap-2 pb-4">
