@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
@@ -7,6 +7,7 @@ import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
 import { TelegramStar } from "~/components/icons/TelegramStar";
 import { useUpgradeForStars } from "~/hooks/useUpgradeForStars";
+import { getNextFarmLevel } from "~/lib/dm-farm.config";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/farms")({
@@ -18,6 +19,9 @@ function RouteComponent() {
   const { upgradeForStars } = useUpgradeForStars();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const dmFarmLevel = user?.dmFarmLevel;
+  const nextFarmLevel = getNextFarmLevel(dmFarmLevel ?? 1);
 
   const webApp = window.Telegram?.WebApp;
 
@@ -37,19 +41,19 @@ function RouteComponent() {
         <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
           <div>Лунная ферма</div>
           <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-            💎 Доходность: 0
+            💎 Доходность: {nextFarmLevel?.incomePerHour}
           </div>
         </div>
         <div className="flex items-center justify-center gap-2 pb-4">
           <button className="full flex items-center justify-center rounded-full bg-[#76AD10] px-3 py-2">
-            💎 100 алмазов
+            💎 {nextFarmLevel?.priceInStars}
           </button>
           <button
             onClick={() => upgradeForStars.mutate()}
             disabled={upgradeForStars.isPending}
             className="full flex items-center justify-center gap-1 rounded-full bg-[#76AD10] px-3 py-2"
           >
-            <TelegramStar /> 1 звезда
+            <TelegramStar /> {nextFarmLevel?.priceInTgStars}
           </button>
         </div>
       </div>

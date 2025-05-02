@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { invoice } from "@telegram-apps/sdk";
 import { toast } from "sonner";
+import { getNextFarmLevel } from "~/lib/dm-farm.config";
 import { useTRPC } from "~/trpc/init/react";
 
 declare global {
@@ -17,6 +18,10 @@ declare global {
 export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const dmFarmLevel = user?.dmFarmLevel;
+  const nextFarmPriceInTgStars = getNextFarmLevel(dmFarmLevel ?? 1)?.priceInTgStars;
 
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
@@ -41,7 +46,7 @@ export const useUpgradeForStars = () => {
   return {
     upgradeForStars: {
       mutate: () => {
-        createInvoice.mutate();
+        createInvoice.mutate({ amount: nextFarmPriceInTgStars ?? 0 });
       },
       isPending: createInvoice.isPending,
     },

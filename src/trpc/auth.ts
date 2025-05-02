@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
 import { updateBalances } from "~/lib/utils/updateBalances";
+import { updateDmBalance } from "~/lib/utils/updateDmBalance";
 import { publicProcedure } from "./init";
 
 export const authRouter = {
@@ -97,6 +98,7 @@ export const authRouter = {
       }
 
       await updateBalances(existingUser.id);
+      await updateDmBalance(existingUser.id);
 
       // If user has a referrer, give 5% of all balances to the referrer
       if (existingUser.referrerId) {

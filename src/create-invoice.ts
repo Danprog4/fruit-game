@@ -4,14 +4,14 @@ export type PostCreateInvoiceResponse = {
 
 import { Bot } from "grammy";
 
-export const handleCreateInvoice = async (userId: number) => {
+export const handleCreateInvoice = async (userId: number, amount: number) => {
   const bot = new Bot(process.env.BOT_TOKEN!);
 
   const title = "Прокачать ферму";
   const description = "Прокачай свою алмазную ферму";
   const payload = JSON.stringify({ userId });
   const currency = "XTR";
-  const prices = [{ amount: 1, label: title }];
+  const prices = [{ amount: amount, label: title }];
   const provider_token = "";
 
   const invoiceUrl = await bot.api.createInvoiceLink(

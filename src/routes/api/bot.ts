@@ -23,9 +23,12 @@ bot.on("message:successful_payment", async (ctx) => {
   });
 
   if (user) {
+    const currentLevel = user.dmFarmLevel;
+    const nextLevel = currentLevel + 1;
+
     await db
       .update(usersTable)
-      .set({ starBalance: user.starBalance + 100 })
+      .set({ dmFarmLevel: nextLevel })
       .where(eq(usersTable.id, payload.userId));
   }
 });
