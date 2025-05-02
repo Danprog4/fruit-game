@@ -1,6 +1,8 @@
 import { createAPIFileRoute } from "@tanstack/react-start/api";
+import { eq } from "drizzle-orm";
 import { Bot, webhookCallback } from "grammy";
-
+import { db } from "~/lib/db";
+import { usersTable } from "~/lib/db/schema";
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error("BOT_TOKEN is unset");
 
@@ -15,6 +17,17 @@ bot.on("message:successful_payment", async (ctx) => {
   const payload = JSON.parse(payment.invoice_payload) as { userId: number };
 
   console.log("payload", payload);
+
+  const user = await db.query.usersTable.findFirst({
+    where: (users) => eq(users.id, payload.userId),
+  });
+
+  if (user) {
+    await db
+      .update(usersTable)
+      .set({ starBalance: user.starBalance + 100 })
+      .where(eq(usersTable.id, payload.userId));
+  }
 });
 
 bot.command("start", async (ctx) => {

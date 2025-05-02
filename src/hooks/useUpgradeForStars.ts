@@ -19,17 +19,17 @@ export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const upgradeForStars = useMutation(
-    trpc.tgTx.upgradeForStars.mutationOptions({
-      onSuccess: () => {
-        toast.success("Оплата прошла успешно");
-        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
-      },
-      onError: () => {
-        toast.error("Ошибка при оплате");
-      },
-    }),
-  );
+  // const upgradeForStars = useMutation(
+  //   trpc.tgTx.upgradeForStars.mutationOptions({
+  //     onSuccess: () => {
+  //       toast.success("Оплата прошла успешно");
+  //       queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+  //     },
+  //     onError: () => {
+  //       toast.error("Ошибка при оплате");
+  //     },
+  //   }),
+  // );
 
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
@@ -37,12 +37,12 @@ export const useUpgradeForStars = () => {
         if (invoice.open.isAvailable()) {
           const promise = invoice.open(data.invoiceUrl, "url").then((status) => {
             if (status === "paid") {
-              upgradeForStars.mutate();
+              toast.success("Оплата прошла успешно");
+              queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
             } else if (status === "cancelled" || status === "failed") {
               toast.error("Платеж не был завершен");
             }
           });
-          toast.success("Инвойс открыт");
         }
         // window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
         //   if (status === "paid") {
