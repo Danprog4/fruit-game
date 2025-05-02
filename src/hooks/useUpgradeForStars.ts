@@ -3,7 +3,6 @@ import { invoice } from "@telegram-apps/sdk";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
-// Add TypeScript declaration for Telegram WebApp
 declare global {
   interface Window {
     Telegram?: {
@@ -19,18 +18,6 @@ export const useUpgradeForStars = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  // const upgradeForStars = useMutation(
-  //   trpc.tgTx.upgradeForStars.mutationOptions({
-  //     onSuccess: () => {
-  //       toast.success("Оплата прошла успешно");
-  //       queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
-  //     },
-  //     onError: () => {
-  //       toast.error("Ошибка при оплате");
-  //     },
-  //   }),
-  // );
-
   const createInvoice = useMutation(
     trpc.tgTx.createInvoice.mutationOptions({
       onSuccess: (data) => {
@@ -44,13 +31,6 @@ export const useUpgradeForStars = () => {
             }
           });
         }
-        // window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
-        //   if (status === "paid") {
-        //     upgradeForStars.mutate();
-        //   } else if (status === "cancelled" || status === "failed") {
-        //     toast.error("Платеж не был завершен");
-        //   }
-        // });
       },
       onError: () => {
         toast.error("Ошибка при создании инвойса");
@@ -58,25 +38,12 @@ export const useUpgradeForStars = () => {
     }),
   );
 
-  // useEffect(() => {
-  //   if (window.Telegram?.WebApp) {
-  //     window.Telegram.WebApp.onEvent("invoiceClosed", (payment) => {
-  //       if (payment.status === "paid") {
-  //         upgradeForStars.mutate();
-  //         toast.success("Оплата прошла успешно");
-  //       } else if (payment.status === "cancelled" || payment.status === "failed") {
-  //         toast.error("Платеж не был завершен");
-  //       }
-  //     });
-  //   }
-  // }, []);
-
   return {
     upgradeForStars: {
       mutate: () => {
         createInvoice.mutate();
       },
-      isPending: upgradeForStars.isPending || createInvoice.isPending,
+      isPending: createInvoice.isPending,
     },
     createInvoice,
     isCreatingInvoice: createInvoice.isPending,
