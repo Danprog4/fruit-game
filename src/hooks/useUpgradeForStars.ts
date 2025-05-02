@@ -35,7 +35,7 @@ export const useUpgradeForStars = () => {
     trpc.tgTx.createInvoice.mutationOptions({
       onSuccess: (data) => {
         if (invoice.open.isAvailable()) {
-          const promise = invoice.open(data.invoiceUrl);
+          const promise = invoice.open(data.invoiceUrl, "url");
           toast.success("Инвойс открыт");
         }
         // window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
