@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -38,8 +37,7 @@ export const useUpgradeForStars = () => {
           window.Telegram.WebApp.openInvoice(data.invoiceUrl, (status) => {
             if (status === "paid") {
               upgradeForStars.mutate();
-              toast.success("Оплата прошла успешно");
-            } else {
+            } else if (status === "cancelled" || status === "failed") {
               toast.error("Платеж не был завершен");
             }
           });
@@ -54,18 +52,18 @@ export const useUpgradeForStars = () => {
     }),
   );
 
-  useEffect(() => {
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.onEvent("invoiceClosed", (payment) => {
-        if (payment.status === "paid") {
-          upgradeForStars.mutate();
-          toast.success("Оплата прошла успешно");
-        } else if (payment.status === "cancelled" || payment.status === "failed") {
-          toast.error("Платеж не был завершен");
-        }
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (window.Telegram?.WebApp) {
+  //     window.Telegram.WebApp.onEvent("invoiceClosed", (payment) => {
+  //       if (payment.status === "paid") {
+  //         upgradeForStars.mutate();
+  //         toast.success("Оплата прошла успешно");
+  //       } else if (payment.status === "cancelled" || payment.status === "failed") {
+  //         toast.error("Платеж не был завершен");
+  //       }
+  //     });
+  //   }
+  // }, []);
 
   return {
     upgradeForStars: {
