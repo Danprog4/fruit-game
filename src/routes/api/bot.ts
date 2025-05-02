@@ -25,7 +25,7 @@ bot.on("message:successful_payment", async (ctx) => {
   if (user) {
     await db
       .update(usersTable)
-      .set({ starBalance: user.starBalance + 100 })
+      .set({ diamondBalance: user.diamondBalance + 100 })
       .where(eq(usersTable.id, payload.userId));
   }
 });
