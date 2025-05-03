@@ -98,11 +98,7 @@ function RouteComponent() {
   const balances = user?.balances as Record<string, number> | undefined;
   const lastTxs = useQuery(trpc.farms.getLastTxs.queryOptions());
 
-  const ifPending = lastTxs.data?.map((tx) => {
-    if (tx.status === "pending") {
-      return true;
-    }
-  });
+  const isPending = lastTxs.data?.some((tx) => tx.status === "pending");
 
   useEffect(() => {
     if (lastTxs.data) {
@@ -132,7 +128,7 @@ function RouteComponent() {
   }, [lastTxs.data]);
 
   useEffect(() => {
-    if (ifPending) {
+    if (isPending) {
       const interval = setInterval(() => {
         queryClient.invalidateQueries({ queryKey: trpc.farms.getLastTxs.queryKey() });
         queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
@@ -140,7 +136,7 @@ function RouteComponent() {
 
       return () => clearInterval(interval);
     }
-  }, [lastTxs.data, queryClient, trpc.farms.getLastTxs, trpc.main.getUser, ifPending]);
+  }, [lastTxs.data, queryClient, trpc.farms.getLastTxs, trpc.main.getUser, isPending]);
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
