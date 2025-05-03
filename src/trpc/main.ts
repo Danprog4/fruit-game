@@ -68,6 +68,15 @@ export const router = {
         .where(eq(usersTable.id, ctx.userId));
     }),
 
+  disconnectWallet: procedure.mutation(async ({ ctx }) => {
+    await db
+      .update(usersTable)
+      .set({
+        walletAddress: null,
+      })
+      .where(eq(usersTable.id, ctx.userId));
+  }),
+
   exchange: procedure
     .input(
       z.object({

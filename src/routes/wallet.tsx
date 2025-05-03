@@ -70,10 +70,21 @@ function RouteComponent() {
     }),
   );
 
+  const disconnectWallet = useMutation(
+    trpc.main.disconnectWallet.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+      },
+    }),
+  );
+
   useEffect(
     () =>
       tonConnectUI.onStatusChange((wallet) => {
-        if (!wallet) return;
+        if (!wallet) {
+          disconnectWallet.mutate();
+          return;
+        }
 
         connectWallet.mutate({ walletAddress: wallet.account.address });
       }),
