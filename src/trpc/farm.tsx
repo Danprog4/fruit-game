@@ -11,6 +11,7 @@ import {
 } from "~/lib/db/schema";
 import { getFarmLevelByLevel } from "~/lib/dm-farm.config";
 import { FARMS_CONFIG } from "~/lib/farms.config";
+import { changeBlockchainPaymentStatus } from "~/lib/web3/db-repo";
 import { createMemo } from "~/lib/web3/memo";
 import { procedure } from "./init";
 export const farmRouter = {
@@ -47,6 +48,54 @@ export const farmRouter = {
       const memo = createMemo(txType, id);
 
       return memo;
+    }),
+  cancelPayment: procedure
+    .input(
+      z.object({
+        paymentId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { paymentId } = input;
+
+      // Проверяем, существует ли платеж и принадлежит ли он пользователю
+      const payment = await db.query.blockchainPaymentsTable.findFirst({
+        where: (payment) => eq(payment.id, paymentId) && eq(payment.userId, ctx.userId),
+      });
+
+      if (!payment) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Payment not found" });
+      }
+
+      // Обновляем статус платежа на "failed"
+      await changeBlockchainPaymentStatus(paymentId, "failed");
+
+      return { success: true };
+    }),
+  checkAndUpdatePaymentStatus: procedure
+    .input(
+      z.object({
+        paymentId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { paymentId } = input;
+
+      // Проверяем, существует ли платеж и принадлежит ли он пользователю
+      const payment = await db.query.blockchainPaymentsTable.findFirst({
+        where: (payment) => eq(payment.id, paymentId) && eq(payment.userId, ctx.userId),
+      });
+
+      if (!payment) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Payment not found" });
+      }
+
+      // Если платеж все еще в статусе "pending", меняем его на "failed"
+      if (payment.status === "pending") {
+        await changeBlockchainPaymentStatus(paymentId, "failed");
+      }
+
+      return { success: true, status: payment.status };
     }),
   buyDmFarm: procedure.mutation(async ({ ctx }) => {
     const userId = ctx.userId;

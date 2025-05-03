@@ -2,9 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
 
-import { useEffect } from "react";
 import { toast } from "sonner";
-import { useLocalStorage } from "usehooks-ts";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
@@ -14,8 +12,12 @@ export const FarmList = () => {
   const address = useTonAddress();
   const [tonConnectUI] = useTonConnectUI();
   const { getJettonTx } = usePrepareJettonTx();
-  const [isTXPending, setIsTXPending] = useLocalStorage("isTXPending", false);
   const navigate = useNavigate();
+
+  const checkAndUpdatePaymentStatus = useMutation(
+    trpc.farms.checkAndUpdatePaymentStatus.mutationOptions(),
+  );
+  const cancelPayment = useMutation(trpc.farms.cancelPayment.mutationOptions());
 
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
@@ -32,22 +34,47 @@ export const FarmList = () => {
           throw new Error("Jetton transaction not found");
         }
 
-        await tonConnectUI.sendTransaction(jettonTx);
+        try {
+          await tonConnectUI.sendTransaction(jettonTx);
 
-        toast.success(
-          <div>
-            Транзакция отправлена!{" "}
-            <a
-              onClick={() => {
-                navigate({ to: "/wallet" });
-              }}
-              className="cursor-pointer underline"
-            >
-              Перейти в кошелек
-            </a>
-          </div>,
-        );
-        setIsTXPending(true);
+          toast.success(
+            <div>
+              Транзакция отправлена!{" "}
+              <a
+                onClick={() => {
+                  navigate({ to: "/wallet" });
+                }}
+                className="cursor-pointer underline"
+              >
+                Перейти в кошелек
+              </a>
+            </div>,
+          );
+
+          // Добавляем обработчик для отслеживания статуса транзакции
+          const paymentId = memo.split("#")[1];
+          if (paymentId) {
+            // Через заданное время проверяем, завершилась ли транзакция
+            setTimeout(
+              async () => {
+                try {
+                  await checkAndUpdatePaymentStatus.mutateAsync({ paymentId });
+                } catch (error) {
+                  console.error("Failed to check payment status:", error);
+                }
+              },
+              3 * 60 * 1000,
+            ); // Проверяем через 3 минуты
+          }
+        } catch (error) {
+          console.error("Transaction failed or was cancelled:", error);
+          // Если пользователь отменил транзакцию, обновляем статус
+          const paymentId = memo.split("#")[1];
+          if (paymentId) {
+            await cancelPayment.mutateAsync({ paymentId });
+            toast.error("Транзакция была отменена");
+          }
+        }
       },
       onError: (error) => {
         console.log("error", error);
@@ -58,12 +85,6 @@ export const FarmList = () => {
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const userFarms = user?.farms as Record<string, number> | undefined;
-
-  useEffect(() => {
-    if (isTXPending && userFarms) {
-      setIsTXPending(false);
-    }
-  }, [userFarms, isTXPending]);
 
   const handleBuyFarm = (farm: Farm) => {
     if (!address) {
@@ -105,14 +126,10 @@ export const FarmList = () => {
           <button
             type="button"
             onClick={() => handleBuyFarm(farm)}
-            disabled={
-              (buyFarm.isPending && buyFarm.variables?.farmId === farm.id) ||
-              (isTXPending && buyFarm.variables?.farmId === farm.id)
-            }
+            disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
             className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
           >
-            {(buyFarm.isPending && buyFarm.variables?.farmId === farm.id) ||
-            (isTXPending && buyFarm.variables?.farmId === farm.id) ? (
+            {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
               <span className="text-xs text-white">Ожидайте...</span>
             ) : farm.enabled ? (
               `${farm.priceInFRU.toLocaleString()} FRU`
