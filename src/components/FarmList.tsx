@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
+
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
@@ -13,6 +15,7 @@ export const FarmList = () => {
   const [tonConnectUI] = useTonConnectUI();
   const { getJettonTx } = usePrepareJettonTx();
   const [isTXPending, setIsTXPending] = useLocalStorage("isTXPending", false);
+  const navigate = useNavigate();
 
   const buyFarm = useMutation(
     trpc.farms.buyFarm.mutationOptions({
@@ -31,7 +34,19 @@ export const FarmList = () => {
 
         await tonConnectUI.sendTransaction(jettonTx);
 
-        toast.success(`Транзакция отправлена, ожидайте`);
+        toast.success(
+          <div>
+            Транзакция отправлена!{" "}
+            <a
+              onClick={() => {
+                navigate({ to: "/wallet" });
+              }}
+              className="cursor-pointer underline"
+            >
+              Перейти в кошелек
+            </a>
+          </div>,
+        );
         setIsTXPending(true);
       },
       onError: (error) => {

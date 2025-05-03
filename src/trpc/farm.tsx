@@ -1,13 +1,18 @@
 import { toNano } from "@ton/core";
 import { TRPCError } from "@trpc/server";
+import { desc, eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db } from "~/lib/db";
-import { blockchainPaymentsTable, NewBlockchainPayment } from "~/lib/db/schema";
+import {
+  blockchainPaymentsTable,
+  NewBlockchainPayment,
+  usersTable,
+} from "~/lib/db/schema";
+import { getFarmLevelByLevel } from "~/lib/dm-farm.config";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { createMemo } from "~/lib/web3/memo";
 import { procedure } from "./init";
-
 export const farmRouter = {
   buyFarm: procedure
     .input(
@@ -43,4 +48,52 @@ export const farmRouter = {
 
       return memo;
     }),
+  buyDmFarm: procedure.mutation(async ({ ctx }) => {
+    const userId = ctx.userId;
+    const user = await db.query.usersTable.findFirst({
+      where: (users) => eq(users.id, userId),
+    });
+
+    if (!user) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    }
+
+    const currentLevel = user.dmFarmLevel;
+    const nextLevel = currentLevel + 1;
+
+    const farmLevel = getFarmLevelByLevel(nextLevel);
+
+    if (!farmLevel) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Farm level not found" });
+    }
+
+    const priceInStars = farmLevel.priceInStars;
+
+    const newBalance = user.starBalance - priceInStars;
+
+    if (newBalance < 0) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough stars" });
+    }
+
+    await db
+      .update(usersTable)
+      .set({
+        starBalance: newBalance,
+        dmFarmLevel: nextLevel,
+      })
+      .where(eq(usersTable.id, userId));
+
+    return {
+      success: true,
+    };
+  }),
+  getLastTxs: procedure.query(async ({ ctx }) => {
+    const userId = ctx.userId;
+    const txs = await db.query.blockchainPaymentsTable.findMany({
+      where: (blockchainPayments) => eq(blockchainPayments.userId, userId),
+      orderBy: (blockchainPayments) => desc(blockchainPayments.createdAt),
+      limit: 10,
+    });
+    return txs;
+  }),
 };

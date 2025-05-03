@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
 import Farm from "~/components/icons/navbar/Farm";
@@ -24,6 +25,19 @@ function RouteComponent() {
   const nextFarmLevel = getNextFarmLevel(dmFarmLevel ?? 1);
   const farmLevel = getFarmLevelByLevel(dmFarmLevel ?? 1);
   const webApp = window.Telegram?.WebApp;
+  const buyDmFarm = useMutation(
+    trpc.farms.buyDmFarm.mutationOptions({
+      onSuccess: () => {
+        toast.success("Вы успешно прокачали ферму");
+        queryClient.invalidateQueries({
+          queryKey: trpc.main.getUser.queryKey(),
+        });
+      },
+      onError: (error) => {
+        toast.error(`К сожалению, у вас недостаточно алмазов для прокачки фермы`);
+      },
+    }),
+  );
 
   console.log(webApp);
   console.log(user);
@@ -56,8 +70,16 @@ function RouteComponent() {
           </div>
         </div>
         <div className="flex items-center justify-center gap-2 pb-4">
-          <button className="full flex items-center justify-center rounded-full bg-[#76AD10] px-3 py-2">
-            💎 {nextFarmLevel?.priceInStars}
+          <button
+            className="full flex items-center justify-center rounded-full bg-[#76AD10] px-3 py-2"
+            onClick={() => buyDmFarm.mutate()}
+            disabled={buyDmFarm.isPending}
+          >
+            {buyDmFarm.isPending ? (
+              <div className="animate-spin">🔄</div>
+            ) : (
+              <>💎 {nextFarmLevel?.priceInStars}</>
+            )}
           </button>
           <button
             onClick={() => upgradeForStars.mutate()}

@@ -6,7 +6,9 @@ import {
   useTonConnectUI,
   useTonWallet,
 } from "@tonconnect/ui-react";
-import { useEffect, useState } from "react";
+import { Check, Loader2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
@@ -34,6 +36,8 @@ function RouteComponent() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletPage, setIsWalletPage] = useState(true);
   const address = useTonAddress(true);
+  const pendingTxsRef = useRef<Record<string, boolean>>({});
+  console.log(pendingTxsRef.current);
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
@@ -92,7 +96,51 @@ function RouteComponent() {
 
   // Get user balances from the user data
   const balances = user?.balances as Record<string, number> | undefined;
+  const lastTxs = useQuery(trpc.farms.getLastTxs.queryOptions());
 
+  const ifPending = lastTxs.data?.map((tx) => {
+    if (tx.status === "pending") {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    if (lastTxs.data) {
+      // Check for transactions that changed from pending to completed
+      lastTxs.data.forEach((tx) => {
+        if (tx.status === "completed" && pendingTxsRef.current[tx.id]) {
+          // Transaction was pending before and is now completed
+          toast.success(
+            <div>
+              Вы успешно приобрели ферму!{" "}
+              <a
+                onClick={() => navigate({ to: "/farms" })}
+                className="cursor-pointer underline"
+              >
+                Перейти
+              </a>
+            </div>,
+          );
+          // Remove from tracking
+          delete pendingTxsRef.current[tx.id];
+        } else if (tx.status === "pending") {
+          // Track pending transactions
+          pendingTxsRef.current[tx.id] = true;
+        }
+      });
+    }
+  }, [lastTxs.data]);
+
+  useEffect(() => {
+    if (ifPending) {
+      const interval = setInterval(() => {
+        queryClient.invalidateQueries({ queryKey: trpc.farms.getLastTxs.queryKey() });
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [lastTxs.data, queryClient, trpc.farms.getLastTxs, trpc.main.getUser, ifPending]);
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
@@ -175,7 +223,67 @@ function RouteComponent() {
             </div>
             <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
           </div>
-          {/* <div className="mx-auto mb-[32px] w-[80%] border-3 border-b border-[#75A818]"></div> */}
+          {isWalletPage && (
+            <div className="flex flex-col items-center justify-center">
+              <div className="font-manrope text-base font-semibold">
+                Последние транзакции
+              </div>
+              <div className="mt-4 flex w-full flex-col gap-3">
+                {lastTxs.data?.length ? (
+                  lastTxs.data.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="flex items-center justify-between rounded-full border border-[#3A3A3A] bg-[#2A2A2A] p-3 pr-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                            tx.status === "completed"
+                              ? "bg-[#76AD10]"
+                              : tx.status === "pending"
+                                ? "bg-[#F5A623]"
+                                : "bg-[#E74C3C]"
+                          }`}
+                        >
+                          {tx.status === "completed" ? (
+                            <Check className="text-white" />
+                          ) : tx.status === "pending" ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            <X className="text-white" />
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-manrope text-sm font-medium">
+                            {tx.txType}
+                          </span>
+                          <span className="font-manrope text-xs text-[#93A179]">
+                            {new Date(tx.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="font-manrope text-right">
+                        <div className="text-sm font-semibold">
+                          {Number(tx.fruAmount) / 1000000000} FRU
+                        </div>
+                        <div className="text-xs text-[#93A179]">
+                          {tx.status === "completed"
+                            ? "Завершено"
+                            : tx.status === "pending"
+                              ? "В обработке"
+                              : "Ошибка"}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-4 text-center text-[#93A179]">
+                    Транзакций пока нет
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {!isWalletPage && (
             <div className="mb-[35px] flex items-center justify-center gap-[23px]">
               <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
