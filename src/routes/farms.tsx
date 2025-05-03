@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
 import { FarmList } from "~/components/FarmList";
@@ -71,12 +72,14 @@ function RouteComponent() {
         </div>
         <div className="flex items-center justify-center gap-2 pb-4">
           <button
-            className="full flex items-center justify-center rounded-full bg-[#76AD10] px-3 py-2"
+            className="full flex min-w-[90px] items-center justify-center rounded-full bg-[#76AD10] px-3 py-2"
             onClick={() => buyDmFarm.mutate()}
             disabled={buyDmFarm.isPending}
           >
             {buyDmFarm.isPending ? (
-              <div className="animate-spin">🔄</div>
+              <div className="animate-spin">
+                <Loader2 />
+              </div>
             ) : (
               <>💎 {nextFarmLevel?.priceInStars}</>
             )}
@@ -84,7 +87,7 @@ function RouteComponent() {
           <button
             onClick={() => upgradeForStars.mutate()}
             disabled={upgradeForStars.isPending}
-            className="full flex items-center justify-center gap-1 rounded-full bg-[#76AD10] px-3 py-2"
+            className="full flex min-w-[90px] items-center justify-center gap-1 rounded-full bg-[#76AD10] px-3 py-2"
           >
             <TelegramStar /> {nextFarmLevel?.priceInTgStars}
           </button>
