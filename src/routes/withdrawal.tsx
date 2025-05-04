@@ -7,6 +7,7 @@ import { BackButton } from "~/components/BackButton";
 import { About } from "~/components/icons/About";
 import { History } from "~/components/icons/History";
 import { Swap } from "~/components/icons/Swap";
+import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/withdrawal")({
   component: RouteComponent,
@@ -199,7 +200,10 @@ function RouteComponent() {
             FRU
           </div>
           <div className="font-manrope text-[10px] font-medium text-[#8F8F8F]">
-            Комиссия <span className="text-white">10 FRU</span>
+            Комиссия{" "}
+            <span className="text-white">
+              {(Number(amount) * WITHDRAWAL_FEE).toFixed(2)} FRU
+            </span>
           </div>
         </div>
         <button
