@@ -1,13 +1,16 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
+import { useState } from "react";
 
 import { toast } from "sonner";
+import { Drawer } from "vaul";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
 
 export const FarmList = () => {
+  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const trpc = useTRPC();
   const address = useTonAddress();
   const [tonConnectUI] = useTonConnectUI();
@@ -36,7 +39,7 @@ export const FarmList = () => {
 
         try {
           await tonConnectUI.sendTransaction(jettonTx);
-
+          setSelectedFarm(null);
           toast.success(
             <div>
               Транзакция отправлена!{" "}
@@ -83,12 +86,37 @@ export const FarmList = () => {
     }),
   );
 
+  const buyFarmForFRU = useMutation(
+    trpc.farms.buyFarmForFRU.mutationOptions({
+      onSuccess: () => {
+        toast.success("Вы успешно купили ферму");
+        setSelectedFarm(null);
+      },
+      onError: (error) => {
+        console.log("error", error);
+        toast.error("К сожалению, у вас недостаточно баланса");
+      },
+    }),
+  );
+
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const userFarms = user?.farms as Record<string, number> | undefined;
 
   const handleBuyFarm = (farm: Farm) => {
     if (!address) {
-      toast.error("Подключите ваш TON-кошелек");
+      toast.error(
+        <div>
+          Подключите ваш TON-кошелек
+          <div
+            onClick={() => {
+              navigate({ to: "/wallet" });
+            }}
+            className="cursor-pointer underline"
+          >
+            Подключить
+          </div>
+        </div>,
+      );
       return;
     }
 
@@ -123,20 +151,86 @@ export const FarmList = () => {
                 : "Купите первую ферму!"}{" "}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => handleBuyFarm(farm)}
-            disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
-            className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
+          <Drawer.Root
+            open={selectedFarm?.id === farm.id}
+            onOpenChange={(open) =>
+              open ? setSelectedFarm(farm) : setSelectedFarm(null)
+            }
           >
-            {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
-              <span className="text-xs text-white">Ожидайте...</span>
-            ) : farm.enabled ? (
-              `${farm.priceInFRU.toLocaleString()} FRU`
-            ) : (
-              "Недоступно"
-            )}
-          </button>
+            <Drawer.Trigger asChild>
+              <button
+                type="button"
+                className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
+                disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
+              >
+                {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
+                  <span className="text-xs text-white">Ожидайте...</span>
+                ) : farm.enabled ? (
+                  `${farm.priceInFRU.toLocaleString()} FRU`
+                ) : (
+                  "Недоступно"
+                )}
+              </button>
+            </Drawer.Trigger>
+            <Drawer.Portal>
+              <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+              <Drawer.Content className="fixed right-0 bottom-0 left-0 flex max-h-[82vh] flex-col rounded-t-[10px] bg-[#2A2A2A]">
+                <div className="mx-auto w-full max-w-md overflow-auto rounded-t-[10px] p-4 text-white">
+                  <Drawer.Handle />
+                  <Drawer.Title className="mt-4 text-xl font-medium">
+                    {farm.name} ферма
+                  </Drawer.Title>
+                  <div className="mt-2 flex items-center gap-2">
+                    <div className="text-2xl">{farm.icon}</div>
+                    <div className="text-[#8F8F8F]">
+                      Доходность:{" "}
+                      {userFarms && userFarms[farm.id]
+                        ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2)} + ${farm.miningRate} ${farm.tokenName}/час`
+                        : farm.miningRate}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-lg bg-[#343D24] p-4">
+                    <div className="mb-2 text-sm">
+                      Купите ферму и начните получать {farm.tokenName} каждый час
+                    </div>
+                    <div className="mb-4 text-xs text-[#8F8F8F]">
+                      Собранные фрукты можно будет обменять на FRU и вывести на ваш
+                      TON-кошелек
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => handleBuyFarm(farm)}
+                        disabled={
+                          buyFarm.isPending && buyFarm.variables?.farmId === farm.id
+                        }
+                        className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#76AD10] font-medium text-white disabled:opacity-50"
+                      >
+                        {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
+                          <span>Ожидайте...</span>
+                        ) : (
+                          `Купить за ${farm.priceInFRU} FRU (TON)`
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => buyFarmForFRU.mutate({ farmId: farm.id })}
+                        disabled={buyFarmForFRU.isPending}
+                        className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#4A4A4A] font-medium text-white disabled:opacity-50"
+                      >
+                        {buyFarmForFRU?.isPending ? (
+                          <span>Ожидайте...</span>
+                        ) : (
+                          `Купить за ${farm.priceInFRU} FRU (баланс)`
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Drawer.Content>
+            </Drawer.Portal>
+          </Drawer.Root>
         </div>
       ))}
     </div>

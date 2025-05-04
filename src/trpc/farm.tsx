@@ -168,6 +168,10 @@ export const farmRouter = {
         throw new TRPCError({ code: "NOT_FOUND", message: "Farm not found" });
       }
 
+      if (!farm.enabled) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Farm is not enabled" });
+      }
+
       const priceInFRU = farm.priceInFRU;
 
       const newBalance = user.tokenBalance - priceInFRU;
