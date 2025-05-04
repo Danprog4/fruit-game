@@ -69,6 +69,9 @@ function RouteComponent() {
     await requestWithdraw.mutateAsync({ amount: parseFloat(amount) });
   };
 
+  console.log(amount, "amount");
+  console.log(user?.tokenBalance, "user?.tokenBalance");
+  console.log(user?.tokenBalance! < parseFloat(amount), "user?.tokenBalance < amount");
   return (
     <div
       className="flex h-screen w-full flex-col overflow-hidden px-4 pt-12 text-white"
@@ -141,7 +144,13 @@ function RouteComponent() {
           <input
             type="text"
             value={amount}
-            onChange={handleAmountChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value.length > 20) {
+                return;
+              }
+              setAmount(value);
+            }}
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             onKeyDown={(e) => {
@@ -182,7 +191,12 @@ function RouteComponent() {
             </div>
           </div>
           <div className="font-manrope text-lg font-medium">
-            {amount ? amount : "0,00"} FRU
+            {amount
+              ? amount.length > 15
+                ? `${amount.substring(0, 8)}...${amount.substring(amount.length - 6)}`
+                : amount.split(".")[0]
+              : "0,00"}{" "}
+            FRU
           </div>
           <div className="font-manrope text-[10px] font-medium text-[#8F8F8F]">
             Комиссия <span className="text-white">10 FRU</span>
@@ -196,11 +210,19 @@ function RouteComponent() {
           }}
           type="button"
           className={`font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full ${
-            !amount || parseFloat(amount) < MIN_AMOUNT
+            !amount ||
+            parseFloat(amount) < MIN_AMOUNT ||
+            user?.tokenBalance === undefined ||
+            user?.tokenBalance < parseFloat(amount)
               ? "cursor-not-allowed bg-[#76AD10]/50"
               : "cursor-pointer bg-[#76AD10]"
           } px-6 text-sm font-medium text-white`}
-          disabled={!amount || parseFloat(amount) < MIN_AMOUNT}
+          disabled={
+            !amount ||
+            parseFloat(amount) < MIN_AMOUNT ||
+            user?.tokenBalance === undefined ||
+            user?.tokenBalance < parseFloat(amount)
+          }
         >
           Вывод
         </button>

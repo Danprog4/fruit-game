@@ -246,6 +246,14 @@ export const router = {
       }
 
       const { amount } = input;
+
+      if (user.tokenBalance < amount) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Insufficient balance",
+        });
+      }
+
       // 10 FRU -> 10_000_000_000 (nano)
 
       const amountWithFee = amount * (1 - WITHDRAWAL_FEE);

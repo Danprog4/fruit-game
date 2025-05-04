@@ -18,7 +18,7 @@ function RouteComponent() {
         <div className="ml-1">
           <TasksIcon width={90} height={80} />
         </div>
-        <div className="font-manrope text-2xl font-semibold text-white">Задания</div>
+        <div className="font-manrope text-2xl font-semibold text-white">Квесты</div>
       </div>
       <Input
         placeholder="Искать"
@@ -31,12 +31,12 @@ function RouteComponent() {
           <TasksIcon width={26} height={26} />
         </div>
         <div className="font-manrope text-base font-semibold text-white">
-          Список заданий
+          Список квестов
         </div>
       </div>
       <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
         <div className="font-manrope text-sm text-white opacity-50">
-          К сожалению, заданий пока нет
+          К сожалению, квестов пока нет
         </div>
       </div>
     </div>

@@ -113,7 +113,7 @@ function RouteComponent() {
           >
             <div className="flex flex-col items-center gap-1">
               <TasksIcon />
-              <div className="font-manrope text-xs font-medium">Задания</div>
+              <div className="font-manrope text-xs font-medium">Квесты</div>
             </div>
           </div>
           <div
