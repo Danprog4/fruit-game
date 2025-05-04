@@ -8,6 +8,7 @@ import { Drawer } from "vaul";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
+import { Token } from "./icons/Token";
 
 export const FarmList = () => {
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
@@ -167,7 +168,10 @@ export const FarmList = () => {
               {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
                 <span className="text-xs text-white">Ожидайте...</span>
               ) : farm.enabled ? (
-                `${farm.priceInFRU.toLocaleString()} FRU`
+                <span className="flex items-center justify-center gap-1">
+                  {farm.priceInFRU.toLocaleString()}{" "}
+                  <Token width={20} height={20} viewBox="0 0 30 30" />
+                </span>
               ) : (
                 "Недоступно"
               )}
