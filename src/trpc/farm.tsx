@@ -145,4 +145,45 @@ export const farmRouter = {
     });
     return txs;
   }),
+  buyFarmForFRU: procedure
+    .input(
+      z.object({
+        farmId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+      const user = await db.query.usersTable.findFirst({
+        where: (users) => eq(users.id, userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const farm = FARMS_CONFIG.find((f) => f.id === input.farmId);
+
+      if (!farm) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Farm not found" });
+      }
+
+      const priceInFRU = farm.priceInFRU;
+
+      const newBalance = user.balances.fru - priceInFRU;
+
+      if (newBalance < 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough FRU" });
+      }
+
+      const newFarms = user.farms;
+
+      await db
+        .update(usersTable)
+        .set({
+          balances: {
+            fru: newBalance,
+          },
+        })
+        .where(eq(usersTable.id, userId));
+    }),
 };
