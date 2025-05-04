@@ -21,6 +21,8 @@ function RouteComponent() {
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
+  const wallet = user?.walletAddress;
+
   // add scroll save/restore logic
   const scrollPositionRef = useRef<number>(0);
   const handleInputFocus = () => {
@@ -125,32 +127,10 @@ function RouteComponent() {
       <div className="relative z-10"></div>
       <div className="font-manrope text-xs font-medium">Адрес</div>
       <div className="relative mt-4 mb-[22px] flex w-full items-center">
-        <div className="relative w-full">
-          <input
-            ref={inputRef}
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.currentTarget.blur();
-              }
-            }}
-            placeholder="Удерживайте чтобы вставить"
-            className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[19px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
-            size={500}
-            onTouchStart={() => {
-              const timer = setTimeout(handleLongPress, 500);
-              return () => clearTimeout(timer);
-            }}
-            onMouseDown={() => {
-              const timer = setTimeout(handleLongPress, 500);
-              return () => clearTimeout(timer);
-            }}
-          />
+        <div className="relative flex w-full">
+          <div className="flex h-[42px] w-full items-center rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[19px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none">
+            {wallet?.slice(0, 4)}...{wallet?.slice(-4)}
+          </div>
         </div>
       </div>
       <div className="font-manrope text-xs font-medium">Сумма вывода</div>
