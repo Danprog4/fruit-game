@@ -14,7 +14,7 @@ A Telegram mini-app game built with Tanstack, TRPC, and TON blockchain integrati
 
 ## 🔧 Tech Stack
 
-- **Frontend**: React 19, Tanstack Router, Tanstack Query
+- **Frontend**: React 19, Tanstack Router, Tanstack Quer
 - **Backend**: TRPC, Drizzle ORM, PostgreSQL (Neon Database)
 - **Blockchain**: TON Connect, TON SDK
 - **Styling**: TailwindCSS 4
@@ -33,28 +33,33 @@ A Telegram mini-app game built with Tanstack, TRPC, and TON blockchain integrati
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/fruit-game.git
    cd fruit-game
    ```
 
 2. Install dependencies:
+
    ```bash
    bun install
    ```
 
 3. Set up environment variables:
+
    ```bash
    cp .env.example .env
    ```
 
 4. Update `.env` with your credentials:
+
    - `DATABASE_URL`: Your PostgreSQL connection string
    - `BOT_TOKEN`: Your Telegram bot token
    - `JWT_SECRET`: Secret for JWT authentication
    - `R2_*`: Cloudflare R2 storage credentials
 
 5. Start the development server:
+
    ```bash
    bun dev
    ```
@@ -93,16 +98,19 @@ fruit-game/
 ## 🚀 Development Workflow
 
 1. Start the development server with hot reloading:
+
    ```bash
    bun dev
    ```
 
 2. Run ngrok for testing with Telegram:
+
    ```bash
    bun ngrok
    ```
 
 3. Update database schema (after changes):
+
    ```bash
    bun db:push
    ```
