@@ -73,7 +73,7 @@ bot.on("callback_query:data", async (ctx) => {
   await bot.api.editMessageText(
     chatId,
     messageId,
-    `<b>${statusText}</b> <code>${id}</code>\n\n@${user.name} <code>${userId}</code> ${formattedAmount} FRU - ${Number(fromNano(amountNumber)) * WITHDRAWAL_FEE} FRU (5%)`,
+    `<b>${statusText}</b> <code>${id}</code>\n\n${user.name} <code>${userId}</code> ${formattedAmount} FRU - ${Number(fromNano(amountNumber)) * WITHDRAWAL_FEE} FRU (5%)`,
     { parse_mode: "HTML" },
   );
 
