@@ -176,8 +176,16 @@ export const farmRouter = {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough FRU" });
       }
 
-      await incrementUserFarm(userId, input.farmId);
+      await db
+        .update(usersTable)
+        .set({
+          balances: {
+            fru: newBalance,
+          },
+        })
+        .where(eq(usersTable.id, userId));
 
+      await incrementUserFarm(userId, input.farmId);
       return { success: true };
     }),
 };
