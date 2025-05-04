@@ -170,7 +170,7 @@ export const farmRouter = {
 
       const priceInFRU = farm.priceInFRU;
 
-      const newBalance = user.balances.fru - priceInFRU;
+      const newBalance = user.tokenBalance - priceInFRU;
 
       if (newBalance < 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough FRU" });
@@ -180,7 +180,7 @@ export const farmRouter = {
         .update(usersTable)
         .set({
           balances: {
-            fru: newBalance,
+            tokenBalance: newBalance,
           },
         })
         .where(eq(usersTable.id, userId));
