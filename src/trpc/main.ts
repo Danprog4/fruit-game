@@ -1,6 +1,6 @@
 import { Address, toNano } from "@ton/core";
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { Bot } from "grammy";
 import { nanoid } from "nanoid";
 import { z } from "zod";
@@ -298,6 +298,13 @@ export const router = {
         },
       );
     }),
+  getLastWithdrawals: procedure.query(async ({ ctx }) => {
+    const withdrawals = await db.query.withdrawalsTable.findMany({
+      orderBy: (withdrawals) => desc(withdrawals.createdAt),
+      limit: 10,
+    });
+    return withdrawals;
+  }),
 } satisfies TRPCRouterRecord;
 
 export type Router = typeof router;

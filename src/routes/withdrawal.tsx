@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
 import { About } from "~/components/icons/About";
@@ -16,6 +17,7 @@ function RouteComponent() {
   const [amount, setAmount] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const MIN_AMOUNT = 1;
+  const navigate = useNavigate();
 
   const trpc = useTRPC();
 
@@ -187,7 +189,11 @@ function RouteComponent() {
           </div>
         </div>
         <button
-          onClick={handleWithdraw}
+          onClick={() => {
+            handleWithdraw();
+            navigate({ to: "/wallet" });
+            toast.success("Вывод средств успешно запрошен");
+          }}
           type="button"
           className={`font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full ${
             !amount || parseFloat(amount) < MIN_AMOUNT

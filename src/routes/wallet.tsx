@@ -78,6 +78,8 @@ function RouteComponent() {
     }),
   );
 
+  const getLastWithdrawals = useQuery(trpc.main.getLastWithdrawals.queryOptions());
+
   useEffect(
     () =>
       tonConnectUI.onStatusChange((wallet) => {
@@ -289,6 +291,54 @@ function RouteComponent() {
                   </div>
                 )}
               </div>
+              {getLastWithdrawals.data?.length ? (
+                <div className="mt-4 flex w-full flex-col gap-3">
+                  {getLastWithdrawals.data.map((withdrawal) => (
+                    <div
+                      key={withdrawal.id}
+                      className="flex items-center justify-between rounded-full border border-[#3A3A3A] bg-[#2A2A2A] p-3 pr-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                            withdrawal.status === "approved"
+                              ? "bg-[#76AD10]"
+                              : withdrawal.status === "waiting_for_approve"
+                                ? "bg-[#F5A623]"
+                                : "bg-[#E74C3C]"
+                          }`}
+                        >
+                          {withdrawal.status === "approved" ? (
+                            <Check className="text-white" />
+                          ) : withdrawal.status === "waiting_for_approve" ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            <X className="text-white" />
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-manrope text-sm font-medium">Вывод</span>
+                          <span className="font-manrope text-xs text-[#93A179]">
+                            {new Date(withdrawal.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="font-manrope text-right">
+                        <div className="text-sm font-semibold">
+                          {Number(withdrawal.amount) / 1000000000} FRU
+                        </div>
+                        <div className="text-xs text-[#93A179]">
+                          {withdrawal.status === "approved"
+                            ? "Принято"
+                            : withdrawal.status === "failed"
+                              ? "Ошибка"
+                              : "Ожидает подтверждения"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )}
           {!isWalletPage && (
