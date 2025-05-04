@@ -1,13 +1,17 @@
-import { Address } from "@ton/core";
+import { Address, toNano } from "@ton/core";
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { Bot } from "grammy";
+import { nanoid } from "nanoid";
 import { z } from "zod";
+import { WITHDRAW_CHAT_ID, WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { usersTable } from "~/lib/db/schema";
+import { usersTable, withdrawalsTable } from "~/lib/db/schema";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import { updateBalances } from "~/lib/utils/updateBalances";
 import { procedure, publicProcedure } from "./init";
+
 export const router = {
   getHello: publicProcedure.query(() => {
     return {
@@ -215,6 +219,84 @@ export const router = {
             ? Number(user.tokenBalance) + exchangeAmountNum
             : Number(user.tokenBalance),
       };
+    }),
+
+  requestWithdraw: procedure
+    .input(
+      z.object({
+        amount: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const adminBot = new Bot(process.env.ADMIN_BOT_TOKEN as string);
+
+      const userId = ctx.userId;
+      const user = await db.query.usersTable.findFirst({
+        where: (users) => eq(users.id, userId),
+      });
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      if (!user.walletAddress) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Wallet is not connected",
+        });
+      }
+
+      const { amount } = input;
+      // 10 FRU -> 10_000_000_000 (nano)
+
+      const amountWithFee = amount * (1 - WITHDRAWAL_FEE);
+      const nanoFru = toNano(amountWithFee);
+
+      const withdrawId = nanoid();
+
+      await db.insert(withdrawalsTable).values({
+        id: withdrawId,
+        userId,
+        amount: nanoFru,
+        status: "waiting_for_approve",
+      });
+
+      await db
+        .update(usersTable)
+        .set({
+          tokenBalance: user.tokenBalance - amount,
+        })
+        .where(eq(usersTable.id, userId));
+
+      // send message to the bot (approve/ reject)
+
+      const address = Address.parse(user.walletAddress).toString({
+        urlSafe: true,
+        bounceable: true,
+      });
+
+      const shortAddress = address.slice(0, 4) + "..." + address.slice(-4);
+
+      await adminBot.api.sendMessage(
+        WITHDRAW_CHAT_ID,
+        `Withdraw <b>${amount} FRU</b>\n<b>${user.name}</b> <code>${userId} ${shortAddress}</code>\nBalance: ${user.tokenBalance} FRU`,
+        {
+          parse_mode: "HTML",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: "Reject ❌",
+                  callback_data: `reject:${withdrawId}:${userId}:${nanoFru}`,
+                },
+                {
+                  text: "Ok ✅",
+                  callback_data: `approve:${withdrawId}:${userId}:${nanoFru}`,
+                },
+              ],
+            ],
+          },
+        },
+      );
     }),
 } satisfies TRPCRouterRecord;
 

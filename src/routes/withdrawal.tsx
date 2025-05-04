@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { Drawer } from "vaul";
@@ -5,6 +6,7 @@ import { BackButton } from "~/components/BackButton";
 import { About } from "~/components/icons/About";
 import { History } from "~/components/icons/History";
 import { Swap } from "~/components/icons/Swap";
+import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/withdrawal")({
   component: RouteComponent,
 });
@@ -13,7 +15,11 @@ function RouteComponent() {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const MIN_AMOUNT = 14;
+  const MIN_AMOUNT = 1;
+
+  const trpc = useTRPC();
+
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
   // add scroll save/restore logic
   const scrollPositionRef = useRef<number>(0);
@@ -44,7 +50,19 @@ function RouteComponent() {
   };
 
   const handleMaxAmount = () => {
-    setAmount("59.2110");
+    setAmount(user?.tokenBalance.toString() || "0");
+  };
+
+  const requestWithdraw = useMutation(
+    trpc.main.requestWithdraw.mutationOptions({
+      onSuccess: () => {
+        console.log("success");
+      },
+    }),
+  );
+
+  const handleWithdraw = async () => {
+    await requestWithdraw.mutateAsync({ amount: parseFloat(amount) });
   };
 
   return (
@@ -170,7 +188,7 @@ function RouteComponent() {
           Доступно
         </div>
         <div className="font-manrope text-[10px] font-medium text-[#8F8F8F]">
-          59,2110 FRU
+          {user?.tokenBalance} FRU
         </div>
       </div>
       <div className="mt-auto mb-[34px] flex items-center justify-between">
@@ -189,6 +207,8 @@ function RouteComponent() {
           </div>
         </div>
         <button
+          onClick={handleWithdraw}
+          type="button"
           className={`font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full ${
             !amount || parseFloat(amount) < MIN_AMOUNT
               ? "cursor-not-allowed bg-[#76AD10]/50"

@@ -59,6 +59,21 @@ export const blockchainPaymentsTable = pgTable("blockchain_payments", {
   txId: varchar("tx_id", { length: 255 }),
 });
 
+export const withdrawalsTable = pgTable("withdrawals", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: bigint("user_id", { mode: "number" })
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
+  amount: bigint("amount", { mode: "bigint" }).notNull(),
+  status: varchar("status", { length: 255 })
+    .$type<
+      "waiting_for_approve" | "approved" | "sending_to_wallet" | "completed" | "failed"
+    >()
+    .notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+});
+
 export type BlockchainPayment = typeof blockchainPaymentsTable.$inferSelect;
 export type NewBlockchainPayment = typeof blockchainPaymentsTable.$inferInsert;
 
