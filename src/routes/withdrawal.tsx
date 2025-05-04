@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -58,10 +58,16 @@ function RouteComponent() {
     setAmount(user?.tokenBalance.toString() || "0");
   };
 
+  const queryClient = useQueryClient();
+
   const requestWithdraw = useMutation(
     trpc.main.requestWithdraw.mutationOptions({
       onSuccess: () => {
-        console.log("success");
+        navigate({ to: "/wallet" });
+        queryClient.invalidateQueries({
+          queryKey: trpc.main.getLastWithdrawals.queryKey(),
+        });
+        toast.success("Вывод средств успешно запрошен");
       },
     }),
   );
@@ -209,15 +215,14 @@ function RouteComponent() {
         <button
           onClick={() => {
             handleWithdraw();
-            navigate({ to: "/wallet" });
-            toast.success("Вывод средств успешно запрошен");
           }}
           type="button"
           className={`font-manrope left-4 flex h-[52px] w-[150px] items-center justify-center rounded-full ${
             !amount ||
             parseFloat(amount) < MIN_AMOUNT ||
             user?.tokenBalance === undefined ||
-            user?.tokenBalance < parseFloat(amount)
+            user?.tokenBalance < parseFloat(amount) ||
+            requestWithdraw.isPending
               ? "cursor-not-allowed bg-[#76AD10]/50"
               : "cursor-pointer bg-[#76AD10]"
           } px-6 text-sm font-medium text-white`}
@@ -225,10 +230,11 @@ function RouteComponent() {
             !amount ||
             parseFloat(amount) < MIN_AMOUNT ||
             user?.tokenBalance === undefined ||
-            user?.tokenBalance < parseFloat(amount)
+            user?.tokenBalance < parseFloat(amount) ||
+            requestWithdraw.isPending
           }
         >
-          Вывод
+          {requestWithdraw.isPending ? "Вывод..." : "Вывод"}
         </button>
       </div>
     </div>
