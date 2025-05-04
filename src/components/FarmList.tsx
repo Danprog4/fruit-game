@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
 import { useState } from "react";
@@ -16,6 +16,7 @@ export const FarmList = () => {
   const [tonConnectUI] = useTonConnectUI();
   const { getJettonTx } = usePrepareJettonTx();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const checkAndUpdatePaymentStatus = useMutation(
     trpc.farms.checkAndUpdatePaymentStatus.mutationOptions(),
@@ -90,6 +91,7 @@ export const FarmList = () => {
     trpc.farms.buyFarmForFRU.mutationOptions({
       onSuccess: () => {
         toast.success("Вы успешно купили ферму");
+        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
         setSelectedFarm(null);
       },
       onError: (error) => {
