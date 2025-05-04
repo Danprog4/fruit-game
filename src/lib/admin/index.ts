@@ -1,6 +1,6 @@
 export const getAdminsIds = () => {
-  const rawIds = process.env.ADMIN_IDS;
-  if (!rawIds) throw new Error("ADMIN_IDS is unset");
+  const rawIds = process.env.ADMINS_IDS;
+  if (!rawIds) throw new Error("ADMINS_IDS is unset");
   const ids = rawIds.split(",").map((id) => parseInt(id));
   return ids;
 };
