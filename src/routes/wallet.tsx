@@ -112,6 +112,12 @@ function RouteComponent() {
   const lastTxs = useQuery(trpc.farms.getLastTxs.queryOptions());
 
   const isPending = lastTxs.data?.some((tx) => tx.status === "pending");
+  const isWithdrawPending = getLastWithdrawals.data?.some(
+    (withdrawal) =>
+      withdrawal.status === "waiting_for_approve" ||
+      withdrawal.status === "approved" ||
+      withdrawal.status === "sending_to_wallet",
+  );
 
   useEffect(() => {
     if (lastTxs.data) {
@@ -141,15 +147,32 @@ function RouteComponent() {
   }, [lastTxs.data]);
 
   useEffect(() => {
-    if (isPending) {
+    const somethingIsPending = isPending || isWithdrawPending;
+
+    if (somethingIsPending) {
       const interval = setInterval(() => {
-        queryClient.invalidateQueries({ queryKey: trpc.farms.getLastTxs.queryKey() });
+        if (isPending) {
+          queryClient.invalidateQueries({ queryKey: trpc.farms.getLastTxs.queryKey() });
+        }
+        if (isWithdrawPending) {
+          queryClient.invalidateQueries({
+            queryKey: trpc.main.getLastWithdrawals.queryKey(),
+          });
+        }
         queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
       }, 5000);
 
       return () => clearInterval(interval);
     }
-  }, [lastTxs.data, queryClient, trpc.farms.getLastTxs, trpc.main.getUser, isPending]);
+  }, [
+    isPending,
+    isWithdrawPending,
+    queryClient,
+    trpc.farms.getLastTxs,
+    trpc.main.getLastWithdrawals,
+    trpc.main.getUser,
+  ]);
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
