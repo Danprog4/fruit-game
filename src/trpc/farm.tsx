@@ -10,6 +10,7 @@ import {
   usersTable,
 } from "~/lib/db/schema";
 import { getFarmLevelByLevel } from "~/lib/dm-farm.config";
+import { incrementUserFarm } from "~/lib/farm/db-repo";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { changeBlockchainPaymentStatus } from "~/lib/web3/db-repo";
 import { createMemo } from "~/lib/web3/memo";
@@ -175,15 +176,8 @@ export const farmRouter = {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough FRU" });
       }
 
-      const newFarms = user.farms;
+      await incrementUserFarm(userId, input.farmId);
 
-      await db
-        .update(usersTable)
-        .set({
-          balances: {
-            fru: newBalance,
-          },
-        })
-        .where(eq(usersTable.id, userId));
+      return { success: true };
     }),
 };

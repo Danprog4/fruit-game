@@ -1,7 +1,9 @@
 import { json } from "@tanstack/react-start";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { startTonProcessor } from "~/lib/web3/ton-payment";
-export const runtime = "edge";
+export const config = {
+  runtime: "edge",
+};
 
 export const APIRoute = createAPIFileRoute("/api/txs")({
   GET: async () => {
