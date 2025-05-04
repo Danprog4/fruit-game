@@ -153,32 +153,33 @@ export const FarmList = () => {
                 : "Купите первую ферму!"}{" "}
             </div>
           </div>
-          <Drawer.Root
-            open={selectedFarm?.id === farm.id}
-            onOpenChange={(open) =>
-              open ? setSelectedFarm(farm) : setSelectedFarm(null)
-            }
-          >
-            <Drawer.Trigger asChild>
-              <button
-                type="button"
-                className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
-                disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
-              >
-                {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
-                  <span className="text-xs text-white">Ожидайте...</span>
-                ) : farm.enabled ? (
-                  `${farm.priceInFRU.toLocaleString()} FRU`
-                ) : (
-                  "Недоступно"
-                )}
-              </button>
-            </Drawer.Trigger>
+          <Drawer.Root open={selectedFarm?.id === farm.id}>
+            <button
+              type="button"
+              onClick={() =>
+                farm.enabled
+                  ? setSelectedFarm(farm)
+                  : toast.error("К сожалению, ферма пока недоступна")
+              }
+              className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
+              disabled={buyFarm.isPending && buyFarm.variables?.farmId === farm.id}
+            >
+              {buyFarm.isPending && buyFarm.variables?.farmId === farm.id ? (
+                <span className="text-xs text-white">Ожидайте...</span>
+              ) : farm.enabled ? (
+                `${farm.priceInFRU.toLocaleString()} FRU`
+              ) : (
+                "Недоступно"
+              )}
+            </button>
             <Drawer.Portal>
-              <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+              <Drawer.Overlay
+                className="fixed inset-0 bg-black/40"
+                onClick={() => setSelectedFarm(null)}
+              />
               <Drawer.Content className="fixed right-0 bottom-0 left-0 flex max-h-[82vh] flex-col rounded-t-[10px] bg-[#2A2A2A]">
                 <div className="mx-auto w-full max-w-md overflow-auto rounded-t-[10px] p-4 text-white">
-                  <Drawer.Handle />
+                  <Drawer.Handle onClick={() => setSelectedFarm(null)} />
                   <Drawer.Title className="mt-4 text-xl font-medium">
                     {farm.name} ферма
                   </Drawer.Title>

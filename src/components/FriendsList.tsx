@@ -9,7 +9,7 @@ export const FriendsList = () => {
   const { data: friends } = useQuery(trpc.main.getFriends.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
-  const getAllFarms = (friendId: number) => {
+  const getAllFriendFarms = (friendId: number) => {
     const friend = friends?.find((friend) => friend.id === friendId);
     const farmEntries = Object.entries(friend?.farms || {});
     return farmEntries.reduce((acc, [_, count]) => acc + count, 0);
@@ -32,7 +32,7 @@ export const FriendsList = () => {
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
                   Уровень
                   <div className="flex h-[16px] w-[23px] items-center justify-center rounded-full bg-[#B0F72C] text-black">
-                    {getFriendLevel(getAllFarms(friend.id)).level}
+                    {getFriendLevel(getAllFriendFarms(friend.id)).level}
                   </div>
                 </div>
               </div>
