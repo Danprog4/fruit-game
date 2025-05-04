@@ -301,19 +301,21 @@ function RouteComponent() {
                       <div className="flex items-center gap-3">
                         <div
                           className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                            withdrawal.status === "completed" ||
                             withdrawal.status === "approved"
                               ? "bg-[#76AD10]"
-                              : withdrawal.status === "waiting_for_approve"
-                                ? "bg-[#F5A623]"
-                                : "bg-[#E74C3C]"
+                              : withdrawal.status === "failed"
+                                ? "bg-[#E74C3C]"
+                                : "bg-[#F5A623]"
                           }`}
                         >
-                          {withdrawal.status === "approved" ? (
+                          {withdrawal.status === "completed" ||
+                          withdrawal.status === "approved" ? (
                             <Check className="text-white" />
-                          ) : withdrawal.status === "waiting_for_approve" ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
+                          ) : withdrawal.status === "failed" ? (
                             <X className="text-white" />
+                          ) : (
+                            <Loader2 className="animate-spin" />
                           )}
                         </div>
                         <div className="flex flex-col">
@@ -328,7 +330,8 @@ function RouteComponent() {
                           {Number(withdrawal.amount) / 1000000000} FRU
                         </div>
                         <div className="text-xs text-[#93A179]">
-                          {withdrawal.status === "approved"
+                          {withdrawal.status === "completed" ||
+                          withdrawal.status === "approved"
                             ? "Принято"
                             : withdrawal.status === "failed"
                               ? "Ошибка"
