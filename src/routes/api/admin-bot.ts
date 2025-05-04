@@ -81,6 +81,11 @@ bot.on("callback_query:data", async (ctx) => {
 
   try {
     await transferJetton(id, user.walletAddress, amountWithFeeNano);
+
+    await db
+      .update(withdrawalsTable)
+      .set({ status: "completed", completedAt: new Date() })
+      .where(eq(withdrawalsTable.id, id));
   } catch (error) {
     await db
       .update(withdrawalsTable)

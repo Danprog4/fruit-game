@@ -1,16 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import {
-  TonConnectButton,
-  useTonAddress,
-  useTonConnectUI,
-  useTonWallet,
-} from "@tonconnect/ui-react";
-import { Check, Loader2, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { fromNano } from "@ton/core";
+import { TonConnectButton, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { ArrowUp } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
-import { ArrowUp } from "~/components/icons/ArrowUp";
 import { Dollar } from "~/components/icons/Dollar";
 import { GreenDollar } from "~/components/icons/GreenDollar";
 import Farm from "~/components/icons/navbar/Farm";
@@ -19,6 +14,7 @@ import Wallet from "~/components/icons/navbar/Wallet";
 import { Refresh } from "~/components/icons/Refresh";
 import { Token } from "~/components/icons/Token";
 import { Wallet as WalletIcon } from "~/components/icons/Wallet";
+import { Transaction } from "~/components/Transaction";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { getShortAddress } from "~/lib/utils/address";
 import { useTRPC } from "~/trpc/init/react";
@@ -35,9 +31,8 @@ function RouteComponent() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletPage, setIsWalletPage] = useState(true);
-  const address = useTonAddress(true);
+
   const pendingTxsRef = useRef<Record<string, boolean>>({});
-  console.log(pendingTxsRef.current);
 
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
@@ -173,6 +168,49 @@ function RouteComponent() {
     trpc.main.getUser,
   ]);
 
+  const allTransactions = useMemo(() => {
+    const farmTransactions =
+      lastTxs.data?.map((tx) => ({
+        id: tx.id,
+        createdAt: tx.createdAt,
+        amount: Number(fromNano(tx.fruAmount)),
+        label: tx.txType,
+        status: tx.status,
+        statusText:
+          tx.status === "completed"
+            ? "Завершено"
+            : tx.status === "pending"
+              ? "В обработке"
+              : "Ошибка",
+      })) || [];
+
+    const withdrawalTransactions =
+      getLastWithdrawals.data?.map((withdrawal) => ({
+        id: withdrawal.id,
+        createdAt: withdrawal.createdAt,
+        amount: Number(fromNano(withdrawal.amount)),
+        label: "Вывод",
+        status:
+          withdrawal.status === "completed"
+            ? "completed"
+            : withdrawal.status === "failed"
+              ? "failed"
+              : "pending",
+        statusText:
+          withdrawal.status === "completed"
+            ? "Завершено"
+            : withdrawal.status === "failed"
+              ? "Ошибка"
+              : "Ожидает подтверждения",
+      })) || [];
+
+    const txs = [...farmTransactions, ...withdrawalTransactions];
+
+    return txs.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }, [lastTxs.data, getLastWithdrawals.data]);
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
@@ -241,7 +279,8 @@ function RouteComponent() {
               </div>
             </>
           )}
-          <div className="mt-[15px] mb-[37px] flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#75A818] bg-[#343D24] p-[14px]">
+
+          <div className="mt-[15px] flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#75A818] bg-[#343D24] p-[14px]">
             <div className="flex items-center gap-[20px]">
               <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
                 <Token width={30} height={34} viewBox="0 0 30 30" />
@@ -255,141 +294,54 @@ function RouteComponent() {
             </div>
             <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
           </div>
+
+          <div className="mt-4 mb-8 flex items-center justify-center gap-4">
+            <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
+              <div className="flex items-center gap-4">
+                <div
+                  onClick={() => navigate({ to: "/exchange" })}
+                  className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
+                >
+                  <Dollar />
+                </div>
+                <div>Обмен</div>
+              </div>
+            </div>
+            <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
+              <div className="flex items-center justify-start gap-4">
+                <div
+                  onClick={() => navigate({ to: "/withdrawal" })}
+                  className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
+                >
+                  <ArrowUp />
+                </div>
+                <div>Вывод</div>
+              </div>
+            </div>
+          </div>
+
           {isWalletPage && (
             <div className="flex flex-col items-center justify-center">
               <div className="font-manrope text-base font-semibold">
                 Последние транзакции
               </div>
               <div className="mt-4 flex w-full flex-col gap-3">
-                {lastTxs.data?.length ? (
-                  lastTxs.data.map((tx) => (
-                    <div
+                {allTransactions.length > 0 ? (
+                  allTransactions.map((tx) => (
+                    <Transaction
                       key={tx.id}
-                      className="flex items-center justify-between rounded-full border border-[#3A3A3A] bg-[#2A2A2A] p-3 pr-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                            tx.status === "completed"
-                              ? "bg-[#76AD10]"
-                              : tx.status === "pending"
-                                ? "bg-[#F5A623]"
-                                : "bg-[#E74C3C]"
-                          }`}
-                        >
-                          {tx.status === "completed" ? (
-                            <Check className="text-white" />
-                          ) : tx.status === "pending" ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            <X className="text-white" />
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-manrope text-sm font-medium">
-                            {tx.txType}
-                          </span>
-                          <span className="font-manrope text-xs text-[#93A179]">
-                            {new Date(tx.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="font-manrope text-right">
-                        <div className="text-sm font-semibold">
-                          {Number(tx.fruAmount) / 1000000000} FRU
-                        </div>
-                        <div className="text-xs text-[#93A179]">
-                          {tx.status === "completed"
-                            ? "Завершено"
-                            : tx.status === "pending"
-                              ? "В обработке"
-                              : "Ошибка"}
-                        </div>
-                      </div>
-                    </div>
+                      label={tx.label}
+                      createdAt={tx.createdAt}
+                      status={tx.status as "pending" | "completed" | "failed"}
+                      amount={tx.amount}
+                      statusText={tx.statusText}
+                    />
                   ))
                 ) : (
                   <div className="py-4 text-center text-[#93A179]">
                     Транзакций пока нет
                   </div>
                 )}
-              </div>
-              {getLastWithdrawals.data?.length ? (
-                <div className="mt-4 flex w-full flex-col gap-3">
-                  {getLastWithdrawals.data.map((withdrawal) => (
-                    <div
-                      key={withdrawal.id}
-                      className="flex items-center justify-between rounded-full border border-[#3A3A3A] bg-[#2A2A2A] p-3 pr-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                            withdrawal.status === "completed" ||
-                            withdrawal.status === "approved"
-                              ? "bg-[#76AD10]"
-                              : withdrawal.status === "failed"
-                                ? "bg-[#E74C3C]"
-                                : "bg-[#F5A623]"
-                          }`}
-                        >
-                          {withdrawal.status === "completed" ||
-                          withdrawal.status === "approved" ? (
-                            <Check className="text-white" />
-                          ) : withdrawal.status === "failed" ? (
-                            <X className="text-white" />
-                          ) : (
-                            <Loader2 className="animate-spin" />
-                          )}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-manrope text-sm font-medium">Вывод</span>
-                          <span className="font-manrope text-xs text-[#93A179]">
-                            {new Date(withdrawal.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="font-manrope text-right">
-                        <div className="text-sm font-semibold">
-                          {Number(withdrawal.amount) / 1000000000} FRU
-                        </div>
-                        <div className="text-xs text-[#93A179]">
-                          {withdrawal.status === "completed" ||
-                          withdrawal.status === "approved"
-                            ? "Принято"
-                            : withdrawal.status === "failed"
-                              ? "Ошибка"
-                              : "Ожидает подтверждения"}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          )}
-          {!isWalletPage && (
-            <div className="mb-[35px] flex items-center justify-center gap-[23px]">
-              <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-                <div className="flex items-center gap-4">
-                  <div
-                    onClick={() => navigate({ to: "/exchange" })}
-                    className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
-                  >
-                    <Dollar />
-                  </div>
-                  <div>Обмен</div>
-                </div>
-              </div>
-              <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-                <div className="flex items-center justify-start gap-4">
-                  <div
-                    onClick={() => navigate({ to: "/withdrawal" })}
-                    className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
-                  >
-                    <ArrowUp />
-                  </div>
-                  <div>Вывод</div>
-                </div>
               </div>
             </div>
           )}
