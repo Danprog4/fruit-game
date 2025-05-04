@@ -4,10 +4,10 @@ import { shareURL } from "@telegram-apps/sdk";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
+import { FriendsList } from "~/components/FriendsList";
 import { Share } from "~/components/icons/Share";
 import { Token } from "~/components/icons/Token";
 import { User } from "~/components/icons/User";
-import { List } from "~/components/List";
 import { ruFriends } from "~/lib/intl";
 import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
@@ -82,7 +82,7 @@ function RouteComponent() {
         </div>
       </div>
       {friends && friends.length > 0 ? (
-        <List />
+        <FriendsList />
       ) : (
         <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
           <div className="font-manrope text-sm opacity-50">У вас пока нет друзей</div>

@@ -185,7 +185,7 @@ function RouteComponent() {
             {amount ? amount : "0,00"} FRU
           </div>
           <div className="font-manrope text-[10px] font-medium text-[#8F8F8F]">
-            Комиссия сети <span className="text-white">7,37 FRU</span>
+            Комиссия <span className="text-white">10 FRU</span>
           </div>
         </div>
         <button
