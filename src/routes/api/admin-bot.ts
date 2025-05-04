@@ -1,10 +1,12 @@
 import { createAPIFileRoute } from "@tanstack/react-start/api";
-import { fromNano } from "@ton/core";
+import { fromNano, toNano } from "@ton/core";
 import { eq } from "drizzle-orm";
 import { Bot, webhookCallback } from "grammy";
 import { isAdmin } from "~/lib/admin";
+import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { withdrawalsTable } from "~/lib/db/schema";
+import { usersTable, withdrawalsTable } from "~/lib/db/schema";
+import { transferJetton } from "~/lib/web3/send-withdraw";
 
 const token = process.env.ADMIN_BOT_TOKEN;
 if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
@@ -26,13 +28,10 @@ bot.on("callback_query:data", async (ctx) => {
 
   const chatId = ctx.callbackQuery.message?.chat.id;
   const messageId = ctx.callbackQuery.message?.message_id;
-  const amountNumber = Number(amount);
+  const amountNumber = BigInt(amount);
   const formattedAmount = fromNano(amountNumber);
-
-  if (isNaN(amountNumber)) {
-    console.error("Invalid amount (NaN)", amount);
-    return;
-  }
+  const amountWithFee = Number(formattedAmount) * (1 - WITHDRAWAL_FEE);
+  const amountWithFeeNano = toNano(amountWithFee);
 
   if (!chatId || !messageId) {
     console.error("Invalid chatId or messageId", chatId, messageId);
@@ -52,35 +51,43 @@ bot.on("callback_query:data", async (ctx) => {
     console.error("User has no wallet", userId);
     return;
   }
+  if (action !== "approve" && action !== "reject") {
+    console.error("Unknown action", action);
+    return;
+  }
 
-  if (action === "approve") {
-    await bot.api.editMessageText(
-      chatId,
-      messageId,
-      `<b>APPROVED ✅</b> <code>${id}</code>\n\n@${user.name}  <code>${userId}</code> ${formattedAmount} FRU`,
-      { parse_mode: "HTML" },
-    );
+  const isApprove = action === "approve";
+  const status = isApprove ? "approved" : "failed";
+  const statusText = isApprove ? "APPROVED ✅" : "REJECTED ❌";
 
+  // status actually is rejected here
+  if (status === "failed") {
+    await db
+      .update(usersTable)
+      .set({ tokenBalance: user.tokenBalance + Number(fromNano(amountNumber)) })
+      .where(eq(usersTable.id, Number(userId)));
+  }
+
+  await db.update(withdrawalsTable).set({ status }).where(eq(withdrawalsTable.id, id));
+
+  await bot.api.editMessageText(
+    chatId,
+    messageId,
+    `<b>${statusText}</b> <code>${id}</code>\n\n@${user.name} <code>${userId}</code> ${formattedAmount} FRU - ${Number(fromNano(amountNumber)) * WITHDRAWAL_FEE} FRU (5%)`,
+    { parse_mode: "HTML" },
+  );
+
+  if (!isApprove) return;
+
+  try {
+    await transferJetton(id, user.walletAddress, amountWithFeeNano);
+  } catch (error) {
     await db
       .update(withdrawalsTable)
-      .set({
-        status: "approved",
-      })
-      .where(eq(withdrawalsTable.id, id));
-  } else if (action === "reject") {
-    await db
-      .update(withdrawalsTable)
-      .set({
-        status: "failed",
-      })
+      .set({ status: "failed" })
       .where(eq(withdrawalsTable.id, id));
 
-    await bot.api.editMessageText(
-      chatId,
-      messageId,
-      `<b>REJECTED ❌</b> <code>${id}</code>\n\n@${user.name} <code>${userId}</code> ${formattedAmount} FRU`,
-      { parse_mode: "HTML" },
-    );
+    console.error("Error sending withdraw", error);
   }
 });
 

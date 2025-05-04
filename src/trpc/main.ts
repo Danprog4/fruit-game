@@ -256,8 +256,7 @@ export const router = {
 
       // 10 FRU -> 10_000_000_000 (nano)
 
-      const amountWithFee = amount * (1 - WITHDRAWAL_FEE);
-      const nanoFru = toNano(amountWithFee);
+      const nanoFru = toNano(amount);
 
       const withdrawId = nanoid();
 
@@ -286,7 +285,7 @@ export const router = {
 
       await adminBot.api.sendMessage(
         WITHDRAW_CHAT_ID,
-        `Withdraw <b>${amount} FRU</b>\n<b>${user.name}</b> <code>${userId} ${shortAddress}</code>\nBalance: ${user.tokenBalance} FRU`,
+        `Withdraw <b>${amount} FRU</b> - ${amount * WITHDRAWAL_FEE} (5%)\n<b>${user.name}</b> <code>${userId} ${shortAddress}</code>\nBalance: ${user.tokenBalance} FRU`,
         {
           parse_mode: "HTML",
           reply_markup: {
