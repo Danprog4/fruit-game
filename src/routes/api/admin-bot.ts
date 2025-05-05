@@ -14,7 +14,7 @@ if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
 const bot = new Bot(token);
 
 bot.command("start", async (ctx) => {
-  if (!ctx.from?.id || !isAdmin(ctx.from.id)) {
+  if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
   }
@@ -51,6 +51,21 @@ bot.on("callback_query:data", async (ctx) => {
     console.error("User has no wallet", userId);
     return;
   }
+
+  const tx = await db.query.withdrawalsTable.findFirst({
+    where: (withdrawals) => eq(withdrawals.id, id),
+  });
+
+  if (!tx) {
+    console.error("Withdrawal not found", id);
+    return;
+  }
+
+  if (tx.status === "completed" || tx.status === "failed") {
+    console.error("Withdrawal is already completed or failed", id);
+    return;
+  }
+
   if (action !== "approve" && action !== "reject") {
     console.error("Unknown action", action);
     return;
