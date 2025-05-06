@@ -201,15 +201,12 @@ function RouteComponent() {
             {amount
               ? amount.length > 15
                 ? `${amount.substring(0, 8)}...${amount.substring(amount.length - 6)}`
-                : amount.split(".")[0]
+                : (Number(amount) * (1 - WITHDRAWAL_FEE)).toFixed(2)
               : "0,00"}{" "}
             FRU
           </div>
           <div className="font-manrope text-[10px] font-medium text-[#8F8F8F]">
-            Комиссия{" "}
-            <span className="text-white">
-              {(Number(amount) * WITHDRAWAL_FEE).toFixed(2)} FRU
-            </span>
+            Комиссия <span className="text-white">5%</span>
           </div>
         </div>
         <button

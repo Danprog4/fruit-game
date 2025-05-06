@@ -281,11 +281,22 @@ export const router = {
         bounceable: true,
       });
 
-      const shortAddress = address.slice(0, 4) + "..." + address.slice(-4);
+      const userFriends = await db.query.usersTable.findMany({
+        where: (users) => eq(users.referrerId, userId),
+      });
+
+      const userFarmsSum = Object.values(user.balances).reduce(
+        (acc, curr) => acc + curr,
+        0,
+      );
 
       await adminBot.api.sendMessage(
         WITHDRAW_CHAT_ID,
-        `Withdraw <b>${amount.toFixed(2)} FRU</b> - ${(amount * WITHDRAWAL_FEE).toFixed(2)} (5%)\n<b>${user.name}</b> <code>${userId} ${shortAddress}</code>\nBalance: ${user.tokenBalance.toFixed(2)} FRU`,
+        `Withdraw <b>${(amount * (1 - WITHDRAWAL_FEE)).toFixed(2)}</b> FRU
+<b>${user.name}</b> <code>${userId} ${address}</code>
+Balance: ${user.tokenBalance.toFixed(2)} FRU
+Friends: ${userFriends.length}
+Farms: ${userFarmsSum}`,
         {
           parse_mode: "HTML",
           reply_markup: {
