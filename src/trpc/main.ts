@@ -285,18 +285,15 @@ export const router = {
         where: (users) => eq(users.referrerId, userId),
       });
 
-      const userFarmsSum = Object.values(user.balances).reduce(
-        (acc, curr) => acc + curr,
-        0,
-      );
+      const userFarmsSum = Object.values(user.farms).reduce((acc, curr) => acc + curr, 0);
 
       await adminBot.api.sendMessage(
         WITHDRAW_CHAT_ID,
         `Withdraw <b>${(amount * (1 - WITHDRAWAL_FEE)).toFixed(2)}</b> FRU
 <b>${user.name}</b> <code>${userId} ${address}</code>
 Balance: ${user.tokenBalance.toFixed(2)} FRU
-Friends: ${userFriends.length}
-Farms: ${userFarmsSum}`,
+Friends: ${userFriends.length.toFixed(0)}
+Farms: ${userFarmsSum.toFixed(0)}`,
         {
           parse_mode: "HTML",
           reply_markup: {
