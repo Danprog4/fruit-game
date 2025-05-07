@@ -25,6 +25,7 @@ function RouteComponent() {
   const dmFarmLevel = user?.dmFarmLevel;
   const nextFarmLevel = getNextFarmLevel(dmFarmLevel ?? 1);
   const farmLevel = getFarmLevelByLevel(dmFarmLevel ?? 1);
+  const diamondBalance = user?.starBalance?.toString() || "0";
 
   const buyDmFarm = useMutation(
     trpc.farms.buyDmFarm.mutationOptions({
@@ -56,8 +57,8 @@ function RouteComponent() {
     <div className="flex w-full flex-col px-4 pt-12 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
 
-      <div className="font-manrope mb-[48px] flex items-center justify-center text-2xl font-semibold text-white">
-        Ферма
+      <div className="font-manrope mb-[48px] flex items-center justify-center text-3xl font-extrabold text-white">
+        💎 {diamondBalance}
       </div>
       <div className="absolute top-[100px] left-1/2 flex h-[54px] w-[54px] -translate-x-1/2 items-center justify-center rounded-full border border-[#76AD10] bg-black text-3xl">
         💎

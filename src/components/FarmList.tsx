@@ -131,7 +131,7 @@ export const FarmList = () => {
   };
 
   return (
-    <div className="flex flex-col gap-[14px]">
+    <div className="flex h-auto w-full flex-col gap-[14px] overflow-y-auto pb-32">
       {FARMS_CONFIG.map((farm) => (
         <div
           key={farm.id}
