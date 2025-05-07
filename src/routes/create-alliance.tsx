@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChangeEvent, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/create-alliance")({
 
 function RouteComponent() {
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const createAlliance = useMutation(trpc.alliances.createAlliance.mutationOptions());
   const [allianceName, setAllianceName] = useState("");
@@ -56,13 +57,15 @@ function RouteComponent() {
       const base64 = await convertToBase64(fileToProcess);
       console.log(base64);
 
-      await createAlliance.mutateAsync({
+      const createdAlliance = await createAlliance.mutateAsync({
         name: allianceName,
         telegramChannelUrl: telegramUrl,
         imageBase64: base64,
       });
 
-      await navigate({ to: "/alliances" });
+      console.log(createdAlliance, "createdAlliance");
+
+      await navigate({ to: "/alliance/$id", params: { id: String(createdAlliance.id) } });
     } catch (error) {
       console.error("Error creating alliance:", error);
     }

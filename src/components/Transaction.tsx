@@ -49,7 +49,9 @@ export function Transaction({
         </div>
       </div>
       <div className="font-manrope text-right">
-        <div className="text-sm font-semibold">{amount.toFixed(2)} FRU</div>
+        <div className="text-sm font-semibold">
+          {amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FRU
+        </div>
         <div className="text-xs text-[#93A179]">{statusText}</div>
       </div>
     </div>

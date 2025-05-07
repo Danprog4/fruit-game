@@ -280,7 +280,7 @@ function RouteComponent() {
             </>
           )}
 
-          <div className="mt-[15px] flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#75A818] bg-[#343D24] p-[14px]">
+          <div className="mt-[15px] mb-8 flex h-[76px] w-full items-center justify-between rounded-full border-1 border-[#75A818] bg-[#343D24] p-[14px]">
             <div className="flex items-center gap-[20px]">
               <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-[#141414]">
                 <Token width={30} height={34} viewBox="0 0 30 30" />
@@ -288,37 +288,40 @@ function RouteComponent() {
               <div className="flex flex-col items-start gap-1">
                 <div className="font-manrope text-base font-semibold">FRU</div>
                 <div className="font-manrope text-xs font-medium text-[#93A179]">
-                  {user?.tokenBalance?.toLocaleString() || "0"} FRU
+                  {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                  FRU
                 </div>
               </div>
             </div>
             <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
           </div>
 
-          <div className="mt-4 mb-8 flex items-center justify-center gap-4">
-            <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-              <div className="flex items-center gap-4">
-                <div
-                  onClick={() => navigate({ to: "/exchange" })}
-                  className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
-                >
-                  <Dollar />
+          {!isWalletPage && (
+            <div className="mt-4 mb-8 flex items-center justify-center gap-4">
+              <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
+                <div className="flex items-center gap-4">
+                  <div
+                    onClick={() => navigate({ to: "/exchange" })}
+                    className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
+                  >
+                    <Dollar />
+                  </div>
+                  <div>Обмен</div>
                 </div>
-                <div>Обмен</div>
+              </div>
+              <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
+                <div className="flex items-center justify-start gap-4">
+                  <div
+                    onClick={() => navigate({ to: "/withdrawal" })}
+                    className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
+                  >
+                    <ArrowUp />
+                  </div>
+                  <div>Вывод</div>
+                </div>
               </div>
             </div>
-            <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-              <div className="flex items-center justify-start gap-4">
-                <div
-                  onClick={() => navigate({ to: "/withdrawal" })}
-                  className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
-                >
-                  <ArrowUp />
-                </div>
-                <div>Вывод</div>
-              </div>
-            </div>
-          </div>
+          )}
 
           {isWalletPage && (
             <div className="flex flex-col items-center justify-center">
@@ -380,13 +383,14 @@ function RouteComponent() {
                       {farm.id.charAt(0).toUpperCase() + farm.id.slice(1)}
                     </div>
                     <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-                      {balances[farm.id]?.toFixed(2) || "0"} {farm.tokenName}
+                      {balances[farm.id].toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                      {farm.tokenName}
                     </div>
                   </div>
                 </div>
                 <div className="font-manrope pr-4 text-lg font-semibold">
                   {farm.rateFru
-                    ? `${(balances[farm.id] / farm.rateFru / 1).toFixed(2)}$`
+                    ? `${(balances[farm.id] / farm.rateFru / 1).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}$`
                     : "0$"}
                 </div>
               </div>

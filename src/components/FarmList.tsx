@@ -149,7 +149,7 @@ export const FarmList = () => {
             <div className="font-manrope text-xs font-medium">{farm.name} ферма</div>
             <div className="font-manrope text-xs font-medium text-nowrap text-[#8F8F8F]">
               {userFarms && userFarms[farm.id]
-                ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2)} ${farm.tokenName}/час`
+                ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${farm.tokenName}/час`
                 : "Купите первую ферму!"}{" "}
             </div>
           </div>
@@ -188,8 +188,8 @@ export const FarmList = () => {
                     <div className="text-[#8F8F8F]">
                       Доходность:{" "}
                       {userFarms && userFarms[farm.id]
-                        ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2)} + ${farm.miningRate} ${farm.tokenName}/час`
-                        : farm.miningRate}
+                        ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} + ${farm.miningRate.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${farm.tokenName}/час`
+                        : `${farm.miningRate.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${farm.tokenName}/час`}
                     </div>
                   </div>
 

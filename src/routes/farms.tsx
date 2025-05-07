@@ -25,7 +25,7 @@ function RouteComponent() {
   const dmFarmLevel = user?.dmFarmLevel;
   const nextFarmLevel = getNextFarmLevel(dmFarmLevel ?? 1);
   const farmLevel = getFarmLevelByLevel(dmFarmLevel ?? 1);
-  const webApp = window.Telegram?.WebApp;
+
   const buyDmFarm = useMutation(
     trpc.farms.buyDmFarm.mutationOptions({
       onSuccess: () => {
@@ -40,7 +40,6 @@ function RouteComponent() {
     }),
   );
 
-  console.log(webApp);
   console.log(user);
   if (farmLevel) {
     const incomePerHour = farmLevel.incomePerHour;
@@ -67,7 +66,11 @@ function RouteComponent() {
         <div className="flex flex-col items-center justify-center gap-1 text-xs font-medium">
           <div>Алмазная ферма</div>
           <div className="font-manrope text-xs font-medium text-[#8F8F8F]">
-            Доходность: {nextFarmLevel?.incomePerHour} 💎/час
+            Доходность:{" "}
+            {nextFarmLevel?.incomePerHour
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+            💎/час
           </div>
         </div>
         <div className="flex items-center justify-center gap-2 pb-4">
@@ -81,7 +84,12 @@ function RouteComponent() {
                 <Loader2 />
               </div>
             ) : (
-              <>💎 {nextFarmLevel?.priceInStars}</>
+              <>
+                💎{" "}
+                {nextFarmLevel?.priceInStars
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+              </>
             )}
           </button>
           <button
@@ -89,7 +97,10 @@ function RouteComponent() {
             disabled={upgradeForStars.isPending}
             className="full flex min-w-[90px] items-center justify-center gap-1 rounded-full bg-[#76AD10] px-3 py-2"
           >
-            <TelegramStar /> {nextFarmLevel?.priceInTgStars}
+            <TelegramStar />{" "}
+            {nextFarmLevel?.priceInTgStars
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
           </button>
         </div>
       </div>

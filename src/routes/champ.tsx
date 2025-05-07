@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AlliancesList } from "~/components/AliancesList";
+import { AlliancesList } from "~/components/AlliancesList";
 import { BackButton } from "~/components/BackButton";
 import { ChampIcon } from "~/components/icons/ChampIcon";
 import { TasksIcon } from "~/components/icons/Tasks";

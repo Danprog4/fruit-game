@@ -10,9 +10,11 @@ import { AllianceMini } from "./icons/AlianceMini";
 export const AlliancesList = ({
   searchQuery = "",
   limit,
+  isOwner,
 }: {
   searchQuery?: string;
   limit?: number;
+  isOwner: boolean;
 }) => {
   const trpc = useTRPC();
   const navigate = useNavigate();
@@ -52,12 +54,49 @@ export const AlliancesList = ({
 
   const alliancesToDisplay = limit ? sortedAlliances : filteredAlliances;
 
-  const isOwner = alliancesToDisplay?.some((alliance) => alliance.ownerId === user?.id);
+  const userAlliance = alliancesToDisplay?.find(
+    (alliance) => alliance.ownerId === user?.id,
+  );
+
+  const otherAlliances = alliancesToDisplay?.filter(
+    (alliance) => alliance.ownerId !== user?.id,
+  );
 
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
-        {alliancesToDisplay?.map((alliance) => (
+        {userAlliance && (
+          <div
+            className="flex h-[76px] cursor-pointer items-center justify-between rounded-full border bg-[#2A2A2A] pr-[19px] pl-[11px]"
+            onClick={() =>
+              navigate({ to: "/alliance/$id", params: { id: String(userAlliance.id) } })
+            }
+          >
+            <div className="flex items-center gap-4">
+              {userAlliance.avatarId ? (
+                <img
+                  src={getImageUrl(userAlliance.avatarId)}
+                  alt={userAlliance.name}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#3A3A3A]">
+                  <AllianceMini />
+                </div>
+              )}
+              <div className="flex flex-col items-start justify-center gap-[8px]">
+                <div className="font-manrope text-xs leading-none font-medium">
+                  {userAlliance.name} (Ваш альянс)
+                </div>
+                <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
+                  <div>{pluralizeRuIntl(userAlliance.members || 1, ruPeople)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {otherAlliances?.map((alliance) => (
           <Drawer.Root key={alliance.id}>
             <div
               className="flex h-[76px] cursor-pointer items-center justify-between rounded-full border border-[#575757] bg-[#2A2A2A] pr-[19px] pl-[11px]"

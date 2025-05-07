@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AllianceMembList } from "~/components/AllianceMembList";
+import { toast } from "sonner";
+import { Drawer } from "vaul";
+import { AllianceMembList } from "~/components/AlianceMembList";
 import { BackButton } from "~/components/BackButton";
 import { NameInput } from "~/components/DynamicInput";
 import { AllianceMini } from "~/components/icons/AlianceMini";
@@ -10,7 +12,6 @@ import { ClockIcon } from "~/components/icons/ClockIcon";
 import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
 import { FARMS_CONFIG } from "~/lib/farms.config";
-import { ruPeople } from "~/lib/intl";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
 import { getImageUrl } from "~/lib/utils/images";
@@ -64,6 +65,14 @@ function RouteComponent() {
   const { data: alliances, isLoading: isAlliancesLoading } = useQuery(
     trpc.alliances.getAlliances.queryOptions(),
   );
+  const deleteAlliance = useMutation({
+    ...trpc.alliances.deleteAlliance.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
+      toast.success("Альянс расформирован");
+      navigate({ to: "/alliances" });
+    },
+  });
 
   // Initialize channelUrl with the alliance's URL when data is loaded
   useEffect(() => {
@@ -126,6 +135,12 @@ function RouteComponent() {
     });
   };
 
+  const handleDisbandAlliance = async () => {
+    await deleteAlliance.mutateAsync({
+      allianceId: userAlliance?.id!,
+    });
+  };
+
   const handleAddCapacity = async () => {
     if (!userAlliance) return;
 
@@ -169,6 +184,43 @@ function RouteComponent() {
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
       <BackButton onClick={() => navigate({ to: "/alliances" })} />
+      {isOwner && (
+        <Drawer.Root>
+          <Drawer.Trigger asChild>
+            <div className="absolute top-20 right-[16px] flex -translate-y-1/2 items-center justify-center gap-2 rounded-full bg-red-600 p-3">
+              <div className="font-manrope text-xs leading-none font-medium">
+                Расформировать
+              </div>
+            </div>
+          </Drawer.Trigger>
+          <Drawer.Portal>
+            <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
+            <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 h-fit overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] shadow-lg outline-none">
+              <div className="flex flex-col p-6">
+                <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-[#575757]" />
+                <div className="font-manrope mb-4 text-center text-2xl font-bold text-white">
+                  Расформировать альянс
+                </div>
+                <div className="font-manrope mb-8 text-center text-base text-white opacity-90">
+                  Вы действительно хотите расформировать ваш альянс? Это действие нельзя
+                  будет отменить.
+                </div>
+                <div className="flex w-full gap-4">
+                  <button className="font-manrope h-[52px] w-full rounded-full border border-[#575757] text-base font-medium text-white transition-all hover:bg-[#3A3A3A]">
+                    Отмена
+                  </button>
+                  <button
+                    className="font-manrope flex h-[52px] w-full items-center justify-center rounded-full bg-red-600 text-base font-medium text-white transition-all hover:bg-[#B01F31]"
+                    onClick={handleDisbandAlliance}
+                  >
+                    Расформировать
+                  </button>
+                </div>
+              </div>
+            </Drawer.Content>
+          </Drawer.Portal>
+        </Drawer.Root>
+      )}
       <div className="mt-[97px] flex items-center gap-4">
         {isOwner ? (
           <label htmlFor="alliance-photo-upload" className="z-10 cursor-pointer">
@@ -318,10 +370,10 @@ function RouteComponent() {
         searchQuery={searchQuery}
         isOwner={isOwner}
         ownerId={ownerId!}
-        createdAt={userAlliance?.createdAt!}
+        createdAt={userAlliance?.createdAt || new Date()}
         owner={owner}
       />
-      {isOwner && (
+      {/* {isOwner && (
         <div className="fixed bottom-[21px] left-1/2 flex h-[59px] w-[88vw] -translate-x-1/2 items-center justify-between rounded-full bg-[#222221] pr-[10px] pl-[14px]">
           <AllianceMini />
           <div className="flex flex-col gap-[3px]">
@@ -352,7 +404,7 @@ function RouteComponent() {
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

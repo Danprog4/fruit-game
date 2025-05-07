@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { AlliancesList } from "~/components/AliancesList";
+import { AlliancesList } from "~/components/AlliancesList";
 import { BackButton } from "~/components/BackButton";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
@@ -18,6 +18,8 @@ function RouteComponent() {
   const createAlliance = useMutation(trpc.alliances.createAlliance.mutationOptions());
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const isOwner = alliances?.some((alliance) => alliance.ownerId === user?.id);
 
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
@@ -34,14 +36,16 @@ function RouteComponent() {
           icon={<AllianceMini />}
         />
       </div>
-      <AlliancesList searchQuery={searchQuery} />
+      <AlliancesList searchQuery={searchQuery} isOwner={isOwner || false} />
 
-      <button
-        onClick={() => navigate({ to: "/create-alliance" })}
-        className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[52px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
-      >
-        Создать свой альянс
-      </button>
+      {!isOwner && (
+        <button
+          onClick={() => navigate({ to: "/create-alliance" })}
+          className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[52px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+        >
+          Создать свой альянс
+        </button>
+      )}
     </div>
   );
 }

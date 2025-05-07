@@ -20,12 +20,15 @@ export const alliancesRouter = {
 
       const imageUUID = await uploadBase64Image(imageBase64);
 
-      const alliance = await db.insert(alliancesTable).values({
-        name,
-        telegramChannelUrl,
-        avatarId: imageUUID,
-        ownerId: ctx.userId,
-      });
+      const [alliance] = await db
+        .insert(alliancesTable)
+        .values({
+          name,
+          telegramChannelUrl,
+          avatarId: imageUUID,
+          ownerId: ctx.userId,
+        })
+        .returning();
 
       return alliance;
     }),
@@ -189,4 +192,14 @@ export const alliancesRouter = {
       };
     }
   }),
+  deleteAlliance: procedure
+    .input(z.object({ allianceId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { allianceId } = input;
+      if (!allianceId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Alliance ID is required" });
+      }
+      await db.delete(alliancesTable).where(eq(alliancesTable.id, allianceId));
+      await db.delete(usersTable).where(eq(usersTable.allianceId, allianceId));
+    }),
 } satisfies TRPCRouterRecord;

@@ -32,7 +32,7 @@ function RouteComponent() {
         <div className="flex flex-col gap-[7px]">
           <div className="font-manrope text-base font-semibold">Пригласите друзей</div>
           <div className="font-manrope text-xs font-medium text-[rgb(147,161,121)]">
-            И получите <span className="text-[#85BF1A]">5%</span> от дохода друзей
+            100 💎 за друга и 5% от дохода его ферм
           </div>
         </div>
 
@@ -58,7 +58,7 @@ function RouteComponent() {
             <User />
           </div>
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium text-nowrap">
-            С вами в игре:{" "}
+            У вас:{" "}
             <span className="text-[#85BF1A]">
               {pluralizeRuIntl(friends?.length || 0, ruFriends)}
             </span>

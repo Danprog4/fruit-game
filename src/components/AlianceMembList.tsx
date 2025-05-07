@@ -42,13 +42,19 @@ export const AllianceMembList = ({
       queryClient.invalidateQueries({ queryKey: trpc.main.getUsers.queryKey() });
     },
   });
-
+  console.log(createdAt, "createdAt2");
   const allianceMembers =
     users?.filter((user) => user.allianceId === Number(allianceId)) || [];
 
   const filteredMembers = allianceMembers.filter((member) =>
     member.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const formattedDate = createdAt.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
   return (
     <div className="w-full">
@@ -73,12 +79,7 @@ export const AllianceMembList = ({
               </div>
 
               <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                Создал{" "}
-                {createdAt.toLocaleDateString("ru-RU", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
+                Создал {formattedDate}
               </div>
             </div>
           </div>
@@ -111,12 +112,7 @@ export const AllianceMembList = ({
                   </div>
                 ) : (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    В альянсе с{" "}
-                    {member.allianceJoinDate?.toLocaleDateString("ru-RU", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
+                    В альянсе с {formattedDate}
                   </div>
                 )}
               </div>

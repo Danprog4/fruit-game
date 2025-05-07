@@ -29,6 +29,7 @@ function RouteComponent() {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const { height } = useWindowSize();
 
   const getScale = () => {
@@ -36,6 +37,14 @@ function RouteComponent() {
     const scaleFactor = Math.max(0.6, Math.min(1.2, height / baseHeight));
     return scaleFactor;
   };
+
+  const isOwner = alliances?.some((alliance) => alliance.ownerId === user?.id);
+
+  const allianceId = isOwner
+    ? alliances?.find((alliance) => alliance.ownerId === user?.id)?.id
+    : user?.allianceId;
+
+  const alliancePath = allianceId ? `/alliance/${allianceId}` : "/alliances";
 
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
@@ -98,7 +107,7 @@ function RouteComponent() {
           </div>
           <div
             className="absolute bottom-30 left-4 z-10 flex"
-            onClick={() => navigate({ to: "/alliances" })}
+            onClick={() => navigate({ to: alliancePath })}
           >
             <div className="flex flex-col items-center gap-1">
               <AllianceGroupMini width={45} height={45} viewBox="0 0 35 20" />
