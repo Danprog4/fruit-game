@@ -350,17 +350,6 @@ function RouteComponent() {
         createdAt={userAlliance?.createdAt || new Date()}
         owner={owner}
       />
-      {(isOwner || isMember) && (
-        <div className="bg-opacity-70 fixed bottom-15 left-4 z-100 gap-2">
-          <div
-            className="flex flex-col items-center gap-2"
-            onClick={() => navigate({ to: "/alliances" })}
-          >
-            <AllianceGroupMini width={45} height={45} viewBox="0 0 35 20" />
-            <div className="font-manrope text-xs font-medium">К альянсам</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
