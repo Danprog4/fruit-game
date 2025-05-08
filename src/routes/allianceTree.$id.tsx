@@ -231,6 +231,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col items-center p-4 pt-12 text-white">
+      <button onClick={() => navigate({ to: "/alliances" })}>Backbutton</button>
       <div className="mb-8 text-2xl font-bold">Дерево прокачки</div>
       <div className="flex w-full justify-between gap-4">
         {allianceStats.map((stat, index) => (

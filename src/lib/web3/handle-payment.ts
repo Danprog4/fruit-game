@@ -89,7 +89,14 @@ export const handlePayment = async ({
   const isAlliancePayment = ALLIANCE_TX_TYPES.includes(txType as AllianceTxType);
   const allianceUpgradeType = ALLIANCE_TX_TYPE_MAPPING[txType as AllianceTxType];
 
+  console.log({
+    isAlliancePayment,
+    allianceId: user.allianceId,
+    allianceUpgradeType,
+    txType,
+  });
   if (isAlliancePayment && user.allianceId) {
+    console.log("UPGRADING ALLIANCE");
     await upgradeAlliance(user.id, user.allianceId, allianceUpgradeType);
   }
 };
