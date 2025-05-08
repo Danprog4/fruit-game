@@ -149,7 +149,7 @@ function RouteComponent() {
     (farm) => farm.id === seasonCurr,
   )?.allianceName;
 
-  const pathURL = isMember ? "/" : "/alliances";
+  const pathURL = isMember || isOwner ? "/" : "/alliances";
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
       <BackButton onClick={() => navigate({ to: pathURL })} />
@@ -296,17 +296,7 @@ function RouteComponent() {
               Здесь будет информация о канале
             </div>
           </div>
-          <div
-            className="my-4 flex cursor-pointer items-center justify-center rounded-full bg-[#76AD10] p-2"
-            onClick={() =>
-              navigate({
-                to: "/allianceTree/$id",
-                params: { id: String(userAlliance?.id) },
-              })
-            }
-          >
-            <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
-          </div>
+
           <div className="mb-[15px] flex items-center justify-between">
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
               <div className="text-lg">{fruitIcon}</div>

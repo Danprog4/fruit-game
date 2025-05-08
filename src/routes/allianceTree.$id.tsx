@@ -42,16 +42,19 @@ function RouteComponent() {
 
   const capacityLevel = getCurrentAllianceLevelObject(
     "capacity",
-    alliance.levels.capacity,
+    alliance.levels.capacity || 0,
   );
   const coefficientLevel = getCurrentAllianceLevelObject(
     "coefficient",
-    alliance.levels.coefficient,
+    alliance.levels.coefficient || 0,
   );
   const profitabilityLevel = getCurrentAllianceLevelObject(
     "profitability",
-    alliance.levels.profitability,
+    alliance.levels.profitability || 0,
   );
+
+  console.log(capacityLevel, coefficientLevel, profitabilityLevel);
+  console.log(alliance.levels.capacity);
 
   // Calculate progress percentages based on current level vs max level
   const getProgressPercentage = (
