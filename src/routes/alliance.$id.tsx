@@ -149,9 +149,10 @@ function RouteComponent() {
     (farm) => farm.id === seasonCurr,
   )?.allianceName;
 
+  const pathURL = isMember ? "/" : "/alliances";
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
-      <BackButton onClick={() => navigate({ to: "/alliances" })} />
+      <BackButton onClick={() => navigate({ to: pathURL })} />
       {isOwner && (
         <Drawer.Root>
           <Drawer.Trigger asChild>
@@ -294,17 +295,17 @@ function RouteComponent() {
             <div className="font-manrope text-[] text-sm font-medium opacity-50">
               Здесь будет информация о канале
             </div>
-            <div
-              className="my-4 flex cursor-pointer items-center justify-center rounded-full bg-[#76AD10] p-2"
-              onClick={() =>
-                navigate({
-                  to: "/allianceTree/$id",
-                  params: { id: String(userAlliance?.id) },
-                })
-              }
-            >
-              <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
-            </div>
+          </div>
+          <div
+            className="my-4 flex cursor-pointer items-center justify-center rounded-full bg-[#76AD10] p-2"
+            onClick={() =>
+              navigate({
+                to: "/allianceTree/$id",
+                params: { id: String(userAlliance?.id) },
+              })
+            }
+          >
+            <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
           </div>
           <div className="mb-[15px] flex items-center justify-between">
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
@@ -362,7 +363,7 @@ function RouteComponent() {
         owner={owner}
       />
       {(isOwner || isMember) && (
-        <div className="fixed bottom-15 left-4 gap-2">
+        <div className="bg-opacity-70 fixed bottom-15 left-4 z-100 gap-2">
           <div
             className="flex flex-col items-center gap-2"
             onClick={() => navigate({ to: "/alliances" })}
