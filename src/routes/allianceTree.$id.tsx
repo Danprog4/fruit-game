@@ -21,8 +21,19 @@ function RouteComponent() {
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const upgradeAlliance = useMutation({
     ...trpc.alliances.upgradeAlliance.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(trpc.alliances.getAlliances.queryKey(), (old) => {
+        return old?.map((alliance) => {
+          if (alliance.id === Number(id)) {
+            return {
+              ...alliance,
+              levels: { ...alliance.levels, [variables.type]: data.level },
+            };
+          }
+          return alliance;
+        });
+      });
+      toast.success("Уровень прокачен");
     },
     onError: () => {
       toast.error("У вас недостаточно средств");
@@ -109,7 +120,7 @@ function RouteComponent() {
       valueDisplay: (
         <div className="flex items-center gap-1 text-sm text-nowrap text-gray-300">
           {capacityLevel?.level} LVL | {capacityLevel?.value}
-          <div className="text-xs">👤</div>
+          <div className="text-xs"></div>
         </div>
       ),
     },
