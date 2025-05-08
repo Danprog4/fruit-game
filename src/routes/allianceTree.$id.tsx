@@ -1,14 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useTonConnectUI } from "@tonconnect/ui-react";
-import { toast } from "sonner";
+import { BackButton } from "~/components/BackButton";
+import { useAllianceUpgrade } from "~/hooks/useAllianceUpgrade";
 import {
   ALLIANCE_LEVELS,
   AllianceLevelType,
   getCurrentAllianceLevelObject,
-  getNextAllianceLevelObject,
 } from "~/lib/alliance-levels.config";
-import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/allianceTree/$id")({
@@ -17,69 +15,13 @@ export const Route = createFileRoute("/allianceTree/$id")({
 
 function RouteComponent() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
   const { id } = Route.useParams();
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
-  const upgradeAlliance = useMutation({
-    ...trpc.alliances.upgradeAlliance.mutationOptions(),
-    onError: () => {
-      toast.error("У вас недостаточно средств");
-    },
-  });
-
   const navigate = useNavigate();
-  const [tonConnectUI] = useTonConnectUI();
-  const { getJettonTx } = usePrepareJettonTx();
 
-  const upgradeAlliancePayment = useMutation({
-    ...trpc.alliances.createUpgradeAlliancePayment.mutationOptions(),
-    onSuccess: async (memo, variables) => {
-      const { allianceId, type } = variables;
-      const alliance = alliances?.find((a) => a.id === allianceId);
-
-      if (!alliance) {
-        throw new Error("Alliance not found");
-      }
-
-      const nextLevel = getNextAllianceLevelObject(type, alliance.levels[type] || 0);
-
-      if (!nextLevel) {
-        throw new Error("Alliance is at max level");
-      }
-
-      const jettonTx = await getJettonTx(nextLevel.price, memo);
-
-      if (!jettonTx) {
-        throw new Error("Jetton transaction not found");
-      }
-
-      try {
-        await tonConnectUI.sendTransaction(jettonTx);
-        toast.success(
-          <div>
-            Транзакция отправлена!{" "}
-            <a
-              onClick={() => {
-                navigate({ to: "/wallet" });
-              }}
-              className="cursor-pointer underline"
-            >
-              Перейти в кошелек
-            </a>
-          </div>,
-        );
-      } catch (error) {
-        console.error("Error creating payment:", error);
-        toast.error("Не удалось создать платеж для улучшения альянса");
-      }
-    },
-    onError: (error) => {
-      console.error("Error creating payment:", error);
-      toast.error("Не удалось создать платеж для улучшения альянса");
-    },
-  });
+  const { upgradeWithTON, upgradeWithFRU } = useAllianceUpgrade();
 
   const alliance = alliances?.find((alliance) => alliance.id === Number(id));
 
@@ -87,8 +29,15 @@ function RouteComponent() {
     return <div>Альянс не найден</div>;
   }
 
-  const allianceMembers = users?.filter((user) => user.allianceId === Number(id));
+  const handleUpgradeForFRU = (type: AllianceLevelType) => {
+    upgradeWithFRU.mutate({ allianceId: Number(id), type, alliance });
+  };
 
+  const handleUpgradeForTON = (type: AllianceLevelType) => {
+    upgradeWithTON.mutate({ allianceId: Number(id), type, alliance });
+  };
+
+  const allianceMembers = users?.filter((user) => user.allianceId === Number(id));
   const isMember = allianceMembers?.find((member) => member.id === user?.id);
   const isOwner = alliance.ownerId === user?.id;
 
@@ -105,15 +54,11 @@ function RouteComponent() {
     alliance.levels.profitability || 0,
   );
 
-  console.log(capacityLevel, coefficientLevel, profitabilityLevel);
-  console.log(alliance.levels.capacity);
-
-  // Calculate progress percentages based on current level vs max level
   const getProgressPercentage = (
     type: AllianceLevelType,
     currentLevel: number,
   ): number => {
-    const maxLevel = ALLIANCE_LEVELS[type].length - 1; // Max level is the last index
+    const maxLevel = ALLIANCE_LEVELS[type].length - 1;
     return (currentLevel / maxLevel) * 100;
   };
 
@@ -130,39 +75,16 @@ function RouteComponent() {
     alliance.levels.profitability || 0,
   );
 
-  // Calculate stroke dashoffset based on progress (301.6 is the circumference of the circle)
   const getStrokeDashoffset = (percentage: number): number => {
     return 301.6 - (301.6 * percentage) / 100;
   };
 
-  // Get color based on level progress
   const getProgressColor = (percentage: number): string => {
-    if (percentage <= 20) return "#4CAF50"; // Light green
-    if (percentage <= 40) return "#45a049"; // Medium green
-    if (percentage <= 60) return "#3d9142"; // Darker green
-    if (percentage <= 80) return "#34833a"; // Even darker green
-    return "#2b7433"; // Darkest green
-  };
-  const handleUpgradeAlliance = (type: AllianceLevelType) => {
-    upgradeAlliance.mutate({ allianceId: Number(id), type });
-    queryClient.setQueryData(trpc.alliances.getAlliances.queryKey(), (old) => {
-      if (!old) return old;
-      return old.map((alliance) => {
-        if (alliance.id === Number(id)) {
-          const nextLevel =
-            getNextAllianceLevelObject(type, alliance.levels[type] || 0)?.level || 0;
-          return {
-            ...alliance,
-            levels: {
-              ...alliance.levels,
-              [type]: nextLevel,
-            },
-          };
-        }
-        return alliance;
-      });
-    });
-    toast.success("Уровень прокачен");
+    if (percentage <= 20) return "#4CAF50";
+    if (percentage <= 40) return "#45a049";
+    if (percentage <= 60) return "#3d9142";
+    if (percentage <= 80) return "#34833a";
+    return "#2b7433";
   };
 
   const allianceStats = [
@@ -231,7 +153,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col items-center p-4 pt-12 text-white">
-      <button onClick={() => navigate({ to: "/alliances" })}>Backbutton</button>
+      <BackButton onClick={() => navigate({ to: "/alliances" })} />
       <div className="mb-8 text-2xl font-bold">Дерево прокачки</div>
       <div className="flex w-full justify-between gap-4">
         {allianceStats.map((stat, index) => (
@@ -239,9 +161,8 @@ function RouteComponent() {
             <button
               type="button"
               className="relative mb-2"
-              onClick={() =>
-                upgradeAlliancePayment.mutate({ allianceId: Number(id), type: stat.type })
-              }
+              onClick={() => handleUpgradeForFRU(stat.type)}
+              disabled={upgradeWithFRU.isPending}
             >
               <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
                 <svg
@@ -271,6 +192,16 @@ function RouteComponent() {
                 </svg>
               </div>
             </button>
+
+            <button
+              type="button"
+              className="mt-2 rounded-md bg-blue-500 px-3 py-1 text-sm transition-colors hover:bg-blue-600"
+              onClick={() => handleUpgradeForTON(stat.type)}
+              disabled={upgradeWithTON.isPending}
+            >
+              Улучшить за TON
+            </button>
+
             <div className="text-center font-medium">{stat.title}</div>
             {stat.valueDisplay}
           </div>
