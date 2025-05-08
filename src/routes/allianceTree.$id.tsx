@@ -5,6 +5,7 @@ import {
   ALLIANCE_LEVELS,
   AllianceLevelType,
   getCurrentAllianceLevelObject,
+  getNextAllianceLevelObject,
 } from "~/lib/alliance-levels.config";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -22,17 +23,6 @@ function RouteComponent() {
   const upgradeAlliance = useMutation({
     ...trpc.alliances.upgradeAlliance.mutationOptions(),
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(trpc.alliances.getAlliances.queryKey(), (old) => {
-        return old?.map((alliance) => {
-          if (alliance.id === Number(id)) {
-            return {
-              ...alliance,
-              levels: { ...alliance.levels, [variables.type]: data.level },
-            };
-          }
-          return alliance;
-        });
-      });
       toast.success("Уровень прокачен");
     },
     onError: () => {
@@ -101,6 +91,26 @@ function RouteComponent() {
     if (percentage <= 60) return "#3d9142"; // Darker green
     if (percentage <= 80) return "#34833a"; // Even darker green
     return "#2b7433"; // Darkest green
+  };
+  const handleUpgradeAlliance = (type: AllianceLevelType) => {
+    upgradeAlliance.mutate({ allianceId: Number(id), type });
+    queryClient.setQueryData(trpc.alliances.getAlliances.queryKey(), (old) => {
+      if (!old) return old;
+      return old.map((alliance) => {
+        if (alliance.id === Number(id)) {
+          const nextLevel =
+            getNextAllianceLevelObject(type, alliance.levels[type] || 0)?.level || 0;
+          return {
+            ...alliance,
+            levels: {
+              ...alliance.levels,
+              [type]: nextLevel,
+            },
+          };
+        }
+        return alliance;
+      });
+    });
   };
 
   const allianceStats = [

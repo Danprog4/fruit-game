@@ -56,10 +56,10 @@ export const ALLIANCE_LEVELS: AllianceLevelsConfig = {
   ],
 };
 
-export const getNextAllianceLevelObject = (type: AllianceLevelType, level: number) => {
-  return ALLIANCE_LEVELS[type].find((l) => l.level === level + 1);
-};
-
 export const getCurrentAllianceLevelObject = (type: AllianceLevelType, level: number) => {
   return ALLIANCE_LEVELS[type].find((l) => l.level === level);
+};
+
+export const getNextAllianceLevelObject = (type: AllianceLevelType, level: number) => {
+  return ALLIANCE_LEVELS[type].find((l) => l.level === level + 1);
 };
