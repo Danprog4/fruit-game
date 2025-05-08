@@ -111,6 +111,7 @@ function RouteComponent() {
         return alliance;
       });
     });
+    toast.success("Уровень прокачен");
   };
 
   const allianceStats = [
@@ -185,9 +186,7 @@ function RouteComponent() {
           <div key={index} className="flex flex-col items-center">
             <div
               className="relative mb-2"
-              onClick={() =>
-                upgradeAlliance.mutate({ allianceId: alliance.id, type: stat.type })
-              }
+              onClick={() => handleUpgradeAlliance(stat.type)}
             >
               <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
                 <svg
