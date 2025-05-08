@@ -4,7 +4,10 @@ import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { getNextAllianceLevelObject } from "~/lib/alliance-levels.config";
-import { upgradeAlliance } from "~/lib/alliances/db-repo";
+import {
+  payForAllianceUpgradeWithBalance,
+  upgradeAlliance,
+} from "~/lib/alliances/db-repo";
 import { db } from "~/lib/db";
 import {
   alliancesTable,
@@ -197,7 +200,8 @@ export const alliancesRouter = {
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return upgradeAlliance(ctx.userId, input.allianceId, input.type);
+      await payForAllianceUpgradeWithBalance(ctx.userId, input.allianceId, input.type);
+      return upgradeAlliance(input.allianceId, input.type);
     }),
 
   createUpgradeAlliancePayment: procedure
