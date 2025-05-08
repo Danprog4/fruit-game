@@ -46,9 +46,9 @@ export const AllianceMembList = ({
   const allianceMembers =
     users?.filter((user) => user.allianceId === Number(allianceId)) || [];
 
-  const filteredMembers = allianceMembers.filter((member) =>
-    member.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredMembers = allianceMembers
+    .filter((member) => member.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((member) => member.id !== ownerId);
 
   const formattedDate = createdAt.toLocaleDateString("ru-RU", {
     day: "2-digit",

@@ -97,6 +97,6 @@ export const handlePayment = async ({
   });
   if (isAlliancePayment && user.allianceId) {
     console.log("UPGRADING ALLIANCE");
-    await upgradeAlliance(user.id, user.allianceId, allianceUpgradeType);
+    await upgradeAlliance(user.allianceId, allianceUpgradeType);
   }
 };

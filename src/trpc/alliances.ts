@@ -48,6 +48,12 @@ export const alliancesRouter = {
           },
         })
         .returning();
+      await db
+        .update(usersTable)
+        .set({
+          allianceId: alliance.id,
+        })
+        .where(eq(usersTable.id, ctx.userId));
 
       return alliance;
     }),
