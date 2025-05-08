@@ -328,9 +328,7 @@ function RouteComponent() {
       )}
       <div
         className="my-4 flex items-center justify-center rounded-full bg-[#76AD10] p-2"
-        onClick={() =>
-          navigate({ to: "/allianceTree/$id", params: { id: String(userAlliance?.id) } })
-        }
+        onClick={() => navigate({ to: "/allianceTree/$id", params: { id: String(id) } })}
       >
         <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
       </div>
