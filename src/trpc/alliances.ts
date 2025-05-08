@@ -1,6 +1,7 @@
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { getNextAllianceLevelObject } from "~/lib/alliance-levels.config";
 import { db } from "~/lib/db";
 import { alliancesTable, usersTable } from "~/lib/db/schema";
 import { uploadBase64Image } from "~/lib/s3/upload";
@@ -27,6 +28,11 @@ export const alliancesRouter = {
           telegramChannelUrl,
           avatarId: imageUUID,
           ownerId: ctx.userId,
+          levels: {
+            capacity: 0,
+            coefficient: 0,
+            profitability: 0,
+          },
         })
         .returning();
 
@@ -71,40 +77,7 @@ export const alliancesRouter = {
 
       return alliance;
     }),
-  addCapacity: procedure
-    .input(
-      z.object({
-        allianceId: z.string(),
-        capacity: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { allianceId, capacity } = input;
 
-      const alliance = await db
-        .update(alliancesTable)
-        .set({ capacity: capacity })
-        .where(eq(alliancesTable.id, Number(allianceId)));
-
-      return alliance;
-    }),
-  removeCapacity: procedure
-    .input(
-      z.object({
-        allianceId: z.string(),
-        capacity: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { allianceId, capacity } = input;
-
-      const alliance = await db
-        .update(alliancesTable)
-        .set({ capacity: capacity })
-        .where(eq(alliancesTable.id, Number(allianceId)));
-
-      return alliance;
-    }),
   joinAlliance: procedure
     .input(
       z.object({
@@ -125,6 +98,10 @@ export const alliancesRouter = {
       });
       if (!alliance) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Alliance not found" });
+      }
+
+      if (alliance.members === alliance.levels.capacity) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Alliance is fully" });
       }
 
       if (user.allianceId !== null && user.allianceId !== allianceId) {
@@ -201,5 +178,55 @@ export const alliancesRouter = {
       }
       await db.delete(alliancesTable).where(eq(alliancesTable.id, allianceId));
       await db.delete(usersTable).where(eq(usersTable.allianceId, allianceId));
+    }),
+  upgradeAlliance: procedure
+    .input(
+      z.object({
+        allianceId: z.number(),
+        type: z.enum(["capacity", "coefficient", "profitability"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { allianceId, type } = input;
+
+      const alliance = await db.query.alliancesTable.findFirst({
+        where: (alliances) => eq(alliances.id, allianceId),
+      });
+
+      if (!alliance) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Alliance not found" });
+      }
+
+      const newLevel = getNextAllianceLevelObject(type, alliance.levels[type] || 0);
+
+      if (!newLevel) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Alliance is at max level" });
+      }
+
+      const price = newLevel.price;
+
+      const user = await db.query.usersTable.findFirst({
+        where: (users) => eq(users.id, ctx.userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      if (user.tokenBalance < price) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
+      }
+
+      await db
+        .update(usersTable)
+        .set({ tokenBalance: user.tokenBalance - price })
+        .where(eq(usersTable.id, ctx.userId));
+
+      await db
+        .update(alliancesTable)
+        .set({ levels: { ...alliance.levels, [type]: newLevel.level } })
+        .where(eq(alliancesTable.id, allianceId));
+
+      return newLevel;
     }),
 } satisfies TRPCRouterRecord;

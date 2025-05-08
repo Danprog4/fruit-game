@@ -45,20 +45,6 @@ function RouteComponent() {
 
   console.log(season, "season");
 
-  const addCapacity = useMutation({
-    ...trpc.alliances.addCapacity.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
-    },
-  });
-
-  const removeCapacity = useMutation({
-    ...trpc.alliances.removeCapacity.mutationOptions(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
-    },
-  });
-
   const { data: user, isLoading: isUserLoading } = useQuery(
     trpc.main.getUser.queryOptions(),
   );
@@ -141,26 +127,6 @@ function RouteComponent() {
     });
   };
 
-  const handleAddCapacity = async () => {
-    if (!userAlliance) return;
-
-    const newCapacity = (userAlliance.capacity || 0) + 1;
-    await addCapacity.mutateAsync({
-      allianceId: userAlliance.id.toString(),
-      capacity: newCapacity,
-    });
-  };
-
-  const handleRemoveCapacity = async () => {
-    if (!userAlliance || (userAlliance.capacity || 0) <= 0) return;
-
-    const newCapacity = (userAlliance.capacity || 0) - 1;
-    await removeCapacity.mutateAsync({
-      allianceId: userAlliance.id.toString(),
-      capacity: newCapacity,
-    });
-  };
-
   const timeRemaining =
     (season && season?.seasonEnd.getTime() - Date.now()) || 30 * 24 * 60 * 60 * 1000;
   const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
@@ -170,6 +136,8 @@ function RouteComponent() {
   const seasonCurr = season?.seasonCurr || "strawberry";
 
   const allianceMembers = users?.filter((user) => user.allianceId === Number(id)) || [];
+
+  const isMember = allianceMembers.some((member) => member.id === user?.id);
 
   let countOfFruits = 0;
   allianceMembers.forEach((member) => {
@@ -326,6 +294,17 @@ function RouteComponent() {
             <div className="font-manrope text-[] text-sm font-medium opacity-50">
               Здесь будет информация о канале
             </div>
+            <div
+              className="my-4 flex cursor-pointer items-center justify-center rounded-full bg-[#76AD10] p-2"
+              onClick={() =>
+                navigate({
+                  to: "/allianceTree/$id",
+                  params: { id: String(userAlliance?.id) },
+                })
+              }
+            >
+              <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
+            </div>
           </div>
           <div className="mb-[15px] flex items-center justify-between">
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
@@ -347,6 +326,7 @@ function RouteComponent() {
           </div>
         </div>
       )}
+
       {isOwner && (
         <Input
           searchQuery={searchQuery}
@@ -355,6 +335,14 @@ function RouteComponent() {
           icon={<AllianceMini />}
         />
       )}
+      <div
+        className="my-4 flex items-center justify-center rounded-full bg-[#76AD10] p-2"
+        onClick={() =>
+          navigate({ to: "/allianceTree/$id", params: { id: String(userAlliance?.id) } })
+        }
+      >
+        <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
+      </div>
       <div className="mt-[24px] mb-[24px] flex items-center gap-[10px]">
         <img
           src={getImageUrl(userAlliance?.avatarId || "")}
@@ -373,38 +361,17 @@ function RouteComponent() {
         createdAt={userAlliance?.createdAt || new Date()}
         owner={owner}
       />
-      {/* {isOwner && (
-        <div className="fixed bottom-[21px] left-1/2 flex h-[59px] w-[88vw] -translate-x-1/2 items-center justify-between rounded-full bg-[#222221] pr-[10px] pl-[14px]">
-          <AllianceMini />
-          <div className="flex flex-col gap-[3px]">
-            <div className="font-manrope text-xs leading-none font-medium">
-              {pluralizeRuIntl(userAlliance?.capacity || 0, ruPeople)}
-            </div>
-            <div className="font-manrope text-xs leading-none font-medium text-[#8F8F8F]">
-              Вместимость альянса
-            </div>
-          </div>
-          <div className="flex items-center gap-[10px]">
-            <button
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#76AD10] text-lg font-medium text-white"
-              onClick={handleAddCapacity}
-              disabled={addCapacity.isPending}
-            >
-              +
-            </button>
-            <div className="font-manrope min-w-[30px] text-center text-xs leading-none font-medium">
-              {userAlliance?.capacity || 0}
-            </div>
-            <button
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#76AD10] text-lg font-medium text-white"
-              onClick={handleRemoveCapacity}
-              disabled={removeCapacity.isPending || (userAlliance?.capacity || 0) <= 0}
-            >
-              -
-            </button>
+      {(isOwner || isMember) && (
+        <div className="fixed bottom-15 left-4 gap-2">
+          <div
+            className="flex flex-col items-center gap-2"
+            onClick={() => navigate({ to: "/alliances" })}
+          >
+            <AllianceGroupMini width={45} height={45} viewBox="0 0 35 20" />
+            <div className="font-manrope text-xs font-medium">К альянсам</div>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

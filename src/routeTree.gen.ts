@@ -21,6 +21,7 @@ import { Route as CreateAllianceImport } from './routes/create-alliance'
 import { Route as ChampImport } from './routes/champ'
 import { Route as AlliancesImport } from './routes/alliances'
 import { Route as IndexImport } from './routes/index'
+import { Route as AllianceTreeIdImport } from './routes/allianceTree.$id'
 import { Route as AllianceIdImport } from './routes/alliance.$id'
 
 // Create/Update Routes
@@ -82,6 +83,12 @@ const AlliancesRoute = AlliancesImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AllianceTreeIdRoute = AllianceTreeIdImport.update({
+  id: '/allianceTree/$id',
+  path: '/allianceTree/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -172,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AllianceIdImport
       parentRoute: typeof rootRoute
     }
+    '/allianceTree/$id': {
+      id: '/allianceTree/$id'
+      path: '/allianceTree/$id'
+      fullPath: '/allianceTree/$id'
+      preLoaderRoute: typeof AllianceTreeIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -189,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
+  '/allianceTree/$id': typeof AllianceTreeIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -203,6 +218,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
+  '/allianceTree/$id': typeof AllianceTreeIdRoute
 }
 
 export interface FileRoutesById {
@@ -218,6 +234,7 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
+  '/allianceTree/$id': typeof AllianceTreeIdRoute
 }
 
 export interface FileRouteTypes {
@@ -234,6 +251,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
+    | '/allianceTree/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -247,6 +265,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
+    | '/allianceTree/$id'
   id:
     | '__root__'
     | '/'
@@ -260,6 +279,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
+    | '/allianceTree/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -275,6 +295,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   WithdrawalRoute: typeof WithdrawalRoute
   AllianceIdRoute: typeof AllianceIdRoute
+  AllianceTreeIdRoute: typeof AllianceTreeIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -289,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   WithdrawalRoute: WithdrawalRoute,
   AllianceIdRoute: AllianceIdRoute,
+  AllianceTreeIdRoute: AllianceTreeIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -311,7 +333,8 @@ export const routeTree = rootRoute
         "/tasks",
         "/wallet",
         "/withdrawal",
-        "/alliance/$id"
+        "/alliance/$id",
+        "/allianceTree/$id"
       ]
     },
     "/": {
@@ -346,6 +369,9 @@ export const routeTree = rootRoute
     },
     "/alliance/$id": {
       "filePath": "alliance.$id.tsx"
+    },
+    "/allianceTree/$id": {
+      "filePath": "allianceTree.$id.tsx"
     }
   }
 }

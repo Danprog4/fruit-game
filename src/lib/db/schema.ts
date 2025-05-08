@@ -33,8 +33,8 @@ export const alliancesTable = pgTable("alliances", {
   avatarId: uuid("avatarId"),
   telegramChannelUrl: varchar("telegramChannelUrl", { length: 255 }),
   members: bigint("members", { mode: "number" }).default(1),
-  capacity: bigint("capacity", { mode: "number" }).default(10),
   createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
+  levels: jsonb("levels").default({}).$type<Record<string, number>>().notNull(),
 });
 
 export const allianceSessionTable = pgTable("allianceSession", {
