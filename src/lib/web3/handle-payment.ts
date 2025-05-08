@@ -1,9 +1,16 @@
 import { eq } from "drizzle-orm";
+
+import { upgradeAlliance } from "../alliances/db-repo";
 import { db } from "../db";
 import { usersTable } from "../db/schema";
 import { incrementUserFarm } from "../farm/db-repo";
 import { FARMS_CONFIG } from "../farms.config";
-import { ALL_TX_TYPES } from "../tx-type.config";
+import {
+  ALL_TX_TYPES,
+  ALLIANCE_TX_TYPE_MAPPING,
+  ALLIANCE_TX_TYPES,
+  AllianceTxType,
+} from "../tx-type.config";
 import { changeBlockchainPaymentStatus, getOrCreateBlockchainPayment } from "./db-repo";
 
 // memo of tx is this format:
@@ -73,12 +80,16 @@ export const handlePayment = async ({
 
   await changeBlockchainPaymentStatus(id, "completed");
 
-  const farmId = FARMS_CONFIG.find((f) => f.txType === txType)?.id;
+  const farm = FARMS_CONFIG.find((f) => f.txType === txType);
 
-  if (!farmId) {
-    console.log("[handle_payment] Farm not found", { txType });
-    return;
+  if (farm) {
+    await incrementUserFarm(user.id, farm.id);
   }
 
-  await incrementUserFarm(user.id, farmId);
+  const isAlliancePayment = ALLIANCE_TX_TYPES.includes(txType as AllianceTxType);
+  const allianceUpgradeType = ALLIANCE_TX_TYPE_MAPPING[txType as AllianceTxType];
+
+  if (isAlliancePayment && user.allianceId) {
+    await upgradeAlliance(user.id, user.allianceId, allianceUpgradeType);
+  }
 };

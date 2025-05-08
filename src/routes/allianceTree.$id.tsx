@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useTonConnectUI } from "@tonconnect/ui-react";
 import { toast } from "sonner";
 import {
   ALLIANCE_LEVELS,
@@ -7,6 +8,7 @@ import {
   getCurrentAllianceLevelObject,
   getNextAllianceLevelObject,
 } from "~/lib/alliance-levels.config";
+import { usePrepareJettonTx } from "~/lib/web3/usePrepareTx";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/allianceTree/$id")({
@@ -22,11 +24,60 @@ function RouteComponent() {
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const upgradeAlliance = useMutation({
     ...trpc.alliances.upgradeAlliance.mutationOptions(),
-    onSuccess: (data, variables) => {
-      toast.success("Уровень прокачен");
-    },
     onError: () => {
       toast.error("У вас недостаточно средств");
+    },
+  });
+
+  const navigate = useNavigate();
+  const [tonConnectUI] = useTonConnectUI();
+  const { getJettonTx } = usePrepareJettonTx();
+
+  const upgradeAlliancePayment = useMutation({
+    ...trpc.alliances.createUpgradeAlliancePayment.mutationOptions(),
+    onSuccess: async (memo, variables) => {
+      const { allianceId, type } = variables;
+      const alliance = alliances?.find((a) => a.id === allianceId);
+
+      if (!alliance) {
+        throw new Error("Alliance not found");
+      }
+
+      const nextLevel = getNextAllianceLevelObject(type, alliance.levels[type] || 0);
+
+      if (!nextLevel) {
+        throw new Error("Alliance is at max level");
+      }
+
+      const jettonTx = await getJettonTx(nextLevel.price, memo);
+
+      if (!jettonTx) {
+        throw new Error("Jetton transaction not found");
+      }
+
+      try {
+        await tonConnectUI.sendTransaction(jettonTx);
+        toast.success(
+          <div>
+            Транзакция отправлена!{" "}
+            <a
+              onClick={() => {
+                navigate({ to: "/wallet" });
+              }}
+              className="cursor-pointer underline"
+            >
+              Перейти в кошелек
+            </a>
+          </div>,
+        );
+      } catch (error) {
+        console.error("Error creating payment:", error);
+        toast.error("Не удалось создать платеж для улучшения альянса");
+      }
+    },
+    onError: (error) => {
+      console.error("Error creating payment:", error);
+      toast.error("Не удалось создать платеж для улучшения альянса");
     },
   });
 
@@ -184,9 +235,12 @@ function RouteComponent() {
       <div className="flex w-full justify-between gap-4">
         {allianceStats.map((stat, index) => (
           <div key={index} className="flex flex-col items-center">
-            <div
+            <button
+              type="button"
               className="relative mb-2"
-              onClick={() => handleUpgradeAlliance(stat.type)}
+              onClick={() =>
+                upgradeAlliancePayment.mutate({ allianceId: Number(id), type: stat.type })
+              }
             >
               <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
                 <svg
@@ -215,7 +269,7 @@ function RouteComponent() {
                   />
                 </svg>
               </div>
-            </div>
+            </button>
             <div className="text-center font-medium">{stat.title}</div>
             {stat.valueDisplay}
           </div>

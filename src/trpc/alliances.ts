@@ -1,10 +1,20 @@
+import { toNano } from "@ton/core";
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
+import { nanoid } from "nanoid";
 import { z } from "zod";
 import { getNextAllianceLevelObject } from "~/lib/alliance-levels.config";
+import { upgradeAlliance } from "~/lib/alliances/db-repo";
 import { db } from "~/lib/db";
-import { alliancesTable, usersTable } from "~/lib/db/schema";
+import {
+  alliancesTable,
+  blockchainPaymentsTable,
+  NewBlockchainPayment,
+  usersTable,
+} from "~/lib/db/schema";
 import { uploadBase64Image } from "~/lib/s3/upload";
+import { ALLIANCE_TX_TYPE_MAPPING_REVERSE } from "~/lib/tx-type.config";
+import { createMemo } from "~/lib/web3/memo";
 import { procedure } from "./init";
 
 export const alliancesRouter = {
@@ -187,8 +197,23 @@ export const alliancesRouter = {
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      return upgradeAlliance(ctx.userId, input.allianceId, input.type);
+    }),
+
+  createUpgradeAlliancePayment: procedure
+    .input(
+      z.object({
+        allianceId: z.number(),
+        type: z.enum(["capacity", "coefficient", "profitability"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
       const { allianceId, type } = input;
 
+      // Get the appropriate transaction type for this alliance upgrade
+      const txType = ALLIANCE_TX_TYPE_MAPPING_REVERSE[type];
+
+      // Get the next level object to determine price
       const alliance = await db.query.alliancesTable.findFirst({
         where: (alliances) => eq(alliances.id, allianceId),
       });
@@ -197,36 +222,26 @@ export const alliancesRouter = {
         throw new TRPCError({ code: "NOT_FOUND", message: "Alliance not found" });
       }
 
-      const newLevel = getNextAllianceLevelObject(type, alliance.levels[type] || 0);
+      const nextLevel = getNextAllianceLevelObject(type, alliance.levels[type] || 0);
 
-      if (!newLevel) {
+      if (!nextLevel) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Alliance is at max level" });
       }
 
-      const price = newLevel.price;
+      const id = nanoid();
 
-      const user = await db.query.usersTable.findFirst({
-        where: (users) => eq(users.id, ctx.userId),
-      });
+      const newTransaction: NewBlockchainPayment = {
+        id,
+        userId: ctx.userId,
+        status: "pending",
+        txType,
+        fruAmount: toNano(nextLevel.price.toString()),
+      };
 
-      if (!user) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-      }
+      await db.insert(blockchainPaymentsTable).values(newTransaction);
 
-      if (user.tokenBalance < price) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient balance" });
-      }
+      const memo = createMemo(txType, id);
 
-      await db
-        .update(usersTable)
-        .set({ tokenBalance: user.tokenBalance - price })
-        .where(eq(usersTable.id, ctx.userId));
-
-      await db
-        .update(alliancesTable)
-        .set({ levels: { ...alliance.levels, [type]: newLevel.level } })
-        .where(eq(alliancesTable.id, allianceId));
-
-      return newLevel;
+      return memo;
     }),
 } satisfies TRPCRouterRecord;
