@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
+import { Switch } from "~/components/ui/switch";
 import { useAllianceUpgrade } from "~/hooks/useAllianceUpgrade";
 import {
   ALLIANCE_LEVELS,
   AllianceLevelType,
   getCurrentAllianceLevelObject,
+  getNextAllianceLevelPrice,
 } from "~/lib/alliance-levels.config";
 import { useTRPC } from "~/trpc/init/react";
 
@@ -20,7 +24,7 @@ function RouteComponent() {
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const navigate = useNavigate();
-
+  const [isTON, setIsTON] = useState(false);
   const { upgradeWithTON, upgradeWithFRU } = useAllianceUpgrade();
 
   const alliance = alliances?.find((alliance) => alliance.id === Number(id));
@@ -107,6 +111,15 @@ function RouteComponent() {
           <div className="text-xs"></div>
         </div>
       ),
+      priceDisplay: (
+        <div className="text-sm text-gray-300">
+          {getNextAllianceLevelPrice("capacity", alliance.levels.capacity || 0)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+          {isTON ? "TON" : "FRU"}
+          <span className="text-xs"></span>
+        </div>
+      ),
     },
     {
       type: "coefficient" as AllianceLevelType,
@@ -125,6 +138,15 @@ function RouteComponent() {
         <div className="text-sm text-gray-300">
           {coefficientLevel?.level} LVL |{" "}
           {coefficientLevel?.value === 0 ? "1" : coefficientLevel?.value}X
+          <span className="text-xs"></span>
+        </div>
+      ),
+      priceDisplay: (
+        <div className="text-sm text-gray-300">
+          {getNextAllianceLevelPrice("coefficient", alliance.levels.coefficient || 0)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+          {isTON ? "TON" : "FRU"}
           <span className="text-xs"></span>
         </div>
       ),
@@ -148,6 +170,15 @@ function RouteComponent() {
           <span className="text-xs"></span>
         </div>
       ),
+      priceDisplay: (
+        <div className="text-sm text-gray-300">
+          {getNextAllianceLevelPrice("profitability", alliance.levels.profitability || 0)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+          TON
+          <span className="text-xs"></span>
+        </div>
+      ),
     },
   ];
 
@@ -158,12 +189,7 @@ function RouteComponent() {
       <div className="flex w-full justify-between gap-4">
         {allianceStats.map((stat, index) => (
           <div key={index} className="flex flex-col items-center">
-            <button
-              type="button"
-              className="relative mb-2"
-              onClick={() => handleUpgradeForFRU(stat.type)}
-              disabled={upgradeWithFRU.isPending}
-            >
+            <button type="button" className="relative mb-2">
               <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
                 <svg
                   viewBox="0 0 24 24"
@@ -193,20 +219,94 @@ function RouteComponent() {
               </div>
             </button>
 
-            <button
-              type="button"
-              className="mt-2 rounded-md bg-blue-500 px-3 py-1 text-sm transition-colors hover:bg-blue-600"
-              onClick={() => handleUpgradeForTON(stat.type)}
-              disabled={upgradeWithTON.isPending}
-            >
-              Улучшить за TON
-            </button>
-
             <div className="text-center font-medium">{stat.title}</div>
             {stat.valueDisplay}
           </div>
         ))}
       </div>
+      <Drawer.Root>
+        <Drawer.Trigger asChild>
+          <button className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-12 w-auto items-center justify-center rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
+            Прокачать
+          </button>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+
+          <Drawer.Content className="fixed right-0 bottom-0 left-0 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] outline-none">
+            <div className="flex flex-col p-6">
+              <div className="mb-4 ml-auto flex items-center gap-2">
+                <div className="text-sm text-gray-300">Купить за TON</div>
+                <Switch
+                  checked={isTON}
+                  onCheckedChange={(checked) => setIsTON(checked)}
+                />
+              </div>
+              <div className="flex w-full justify-between gap-4">
+                {allianceStats.map((stat, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <button type="button" className="relative mb-2">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="40"
+                          height="40"
+                          fill="none"
+                          stroke="currentColor"
+                          className="text-gray-700"
+                        >
+                          {stat.icon}
+                        </svg>
+                      </div>
+                      <div className="absolute top-0 right-0 h-24 w-24">
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                          <circle
+                            cx="50"
+                            cy="50"
+                            r="48"
+                            fill="none"
+                            stroke={getProgressColor(stat.progress)}
+                            strokeWidth="4"
+                            strokeDasharray="301.6"
+                            strokeDashoffset={getStrokeDashoffset(stat.progress)}
+                            transform="rotate(-90 50 50)"
+                          />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {isTON ? (
+                      <button
+                        type="button"
+                        className="mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                        onClick={() => handleUpgradeForTON(stat.type)}
+                        disabled={upgradeWithTON.isPending}
+                      >
+                        Улучшить за TON
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="w- mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                        onClick={() => handleUpgradeForFRU(stat.type)}
+                        disabled={upgradeWithFRU.isPending}
+                      >
+                        Улучшить за FRU
+                      </button>
+                    )}
+
+                    <div className="mt-2 text-center text-sm font-medium">
+                      {stat.title}
+                    </div>
+
+                    {stat.priceDisplay}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   );
 }

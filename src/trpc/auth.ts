@@ -105,9 +105,6 @@ export const authRouter = {
         });
 
         if (referrer) {
-          // Calculate 5% of user's token balance
-          const referralBonus = Math.floor(existingUser.tokenBalance * 0.05);
-
           // Calculate 5% of each fruit in balances
           const userBalances = existingUser.balances as Record<string, number>;
           const referrerBalances = referrer.balances as Record<string, number>;
@@ -127,7 +124,6 @@ export const authRouter = {
           await db
             .update(usersTable)
             .set({
-              tokenBalance: referrer.tokenBalance + referralBonus,
               balances: updatedReferrerBalances,
             })
             .where(eq(usersTable.id, existingUser.referrerId));
