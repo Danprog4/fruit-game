@@ -110,21 +110,32 @@ export const handlePayment = async ({
   console.log(isAllianceCreation, "isAllianceCreation");
 
   if (isAllianceCreation) {
-    console.log("CREATING ALLIANCE", { userId: user.id, txType });
-    try {
-      console.log("Alliance creation data:", {
-        name,
-        telegramChannelUrl,
-        imageUUID,
-        userId: user.id,
-      });
+    console.log("[handle_payment] Starting alliance creation", {
+      userId: user.id,
+      txType: "alliance",
+    });
 
+    // Очищаем данные от нулевых байтов
+    const cleanName = name.replace(/\0/g, "").trim();
+    const cleanTelegramUrl = telegramChannelUrl.replace(/\0/g, "").trim();
+    const cleanImageUUID = imageUUID.replace(/\0/g, "").trim();
+
+    console.log("[handle_payment] Cleaned alliance data:", {
+      originalName: name,
+      cleanedName: cleanName,
+      originalUrl: telegramChannelUrl,
+      cleanedUrl: cleanTelegramUrl,
+      originalUUID: imageUUID,
+      cleanedUUID: cleanImageUUID,
+    });
+
+    try {
       const [alliance] = await db
         .insert(alliancesTable)
         .values({
-          name,
-          telegramChannelUrl,
-          avatarId: imageUUID,
+          name: cleanName,
+          telegramChannelUrl: cleanTelegramUrl,
+          avatarId: cleanImageUUID,
           ownerId: user.id,
           levels: {
             capacity: 0,
@@ -134,14 +145,9 @@ export const handlePayment = async ({
         })
         .returning();
 
-      console.log("Alliance created successfully:", {
+      console.log("[handle_payment] Alliance created successfully:", {
         allianceId: alliance.id,
-        allianceName: alliance.name,
-      });
-
-      console.log("Updating user with alliance ID:", {
-        userId: user.id,
-        allianceId: alliance.id,
+        name: alliance.name,
       });
 
       await db
@@ -151,17 +157,20 @@ export const handlePayment = async ({
         })
         .where(eq(usersTable.id, user.id));
 
-      console.log("User updated successfully with alliance ID");
+      console.log("[handle_payment] User updated with alliance ID");
+
       return alliance;
     } catch (error) {
-      console.error("ERROR CREATING ALLIANCE:", error);
-      console.log("Alliance creation failed with data:", {
-        name,
-        telegramChannelUrl,
-        imageUUID,
-        userId: user.id,
+      console.error("[handle_payment] Alliance creation failed:", {
+        error,
+        data: {
+          name: cleanName,
+          telegramChannelUrl: cleanTelegramUrl,
+          imageUUID: cleanImageUUID,
+          userId: user.id,
+        },
       });
-      throw error; // Re-throw to allow upstream error handling
+      throw error;
     }
   }
 };

@@ -33,8 +33,7 @@ export const processTonTransaction = async (
   }) => void,
 ) => {
   const hash = tx.raw.hash().toString("hex");
-
-  console.log(hash, "hash");
+  console.log("[ton payments] Processing transaction:", { hash });
 
   const uqToAddress = Address.parse(tx.inMessage?.info.dest?.toString() ?? "").toString({
     bounceable: false,
@@ -77,18 +76,36 @@ export const processTonTransaction = async (
     bounceable: false,
   });
 
-  console.log(`[ton payments] from ${uqFromAddress}`, { hash });
+  console.log(`[ton payments] Processing message from ${uqFromAddress}`, {
+    hash,
+    messageLength: message?.length,
+  });
 
   if (!message) {
     console.log(`[ton payments] No message in tx, return`, { hash });
     return;
   }
 
-  const [name, telegramChannelUrl, imageUUID] = message.split("#");
+  // Очищаем сообщение от нулевых байтов
+  const cleanMessage = message.replace(/\0/g, "").trim();
+  console.log("[ton payments] Cleaned message:", {
+    originalLength: message.length,
+    cleanedLength: cleanMessage.length,
+  });
+
+  const [name, telegramChannelUrl, imageUUID] = cleanMessage
+    .split("#")
+    .map((part) => part.replace(/\0/g, "").trim());
+
+  console.log("[ton payments] Parsed message parts:", {
+    name,
+    telegramChannelUrl,
+    imageUUID,
+  });
 
   onDeposit({
     amount,
-    message,
+    message: cleanMessage,
     walletAddress: uqFromAddress,
     name,
     telegramChannelUrl,
