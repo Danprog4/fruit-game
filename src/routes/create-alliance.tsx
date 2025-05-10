@@ -1,10 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChangeEvent, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { AllianceGroup } from "~/components/icons/AllianceGroup";
 import { PlusIcon } from "~/components/icons/PlusIcon";
 import { Token } from "~/components/icons/Token";
+import { useAllianceCreate } from "~/hooks/useAllianceCreate";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
 import { useTRPC } from "~/trpc/init/react";
@@ -17,7 +18,7 @@ function RouteComponent() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const createAlliance = useMutation(trpc.alliances.createAlliance.mutationOptions());
+  const { createWithFRU, createWithTON } = useAllianceCreate();
   const [allianceName, setAllianceName] = useState("");
   const [telegramUrl, setTelegramUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -40,7 +41,7 @@ function RouteComponent() {
     return file.name.toLowerCase().endsWith(".heic");
   };
 
-  const handleCreateAlliance = async () => {
+  const handleCreateAllianceForTON = async () => {
     if (!selectedFile || !allianceName) {
       setShowErrors(true);
       return;
@@ -57,7 +58,7 @@ function RouteComponent() {
       const base64 = await convertToBase64(fileToProcess);
       console.log(base64);
 
-      const createdAlliance = await createAlliance.mutateAsync({
+      const createdAlliance = await createWithTON.mutateAsync({
         name: allianceName,
         telegramChannelUrl: telegramUrl,
         imageBase64: base64,
@@ -65,17 +66,54 @@ function RouteComponent() {
 
       console.log(createdAlliance, "createdAlliance");
 
-      await navigate({ to: "/alliance/$id", params: { id: String(createdAlliance.id) } });
+      await navigate({ to: "/wallet" });
     } catch (error) {
       console.error("Error creating alliance:", error);
     }
   };
 
-  const handleButtonClick = () => {
+  const handleCreateAllianceForFRU = async () => {
+    if (!selectedFile || !allianceName) {
+      setShowErrors(true);
+      return;
+    }
+
+    try {
+      let fileToProcess = selectedFile;
+
+      // If file is HEIC, convert to PNG first
+      if (isHeicFile(selectedFile)) {
+        fileToProcess = await convertHeicToPng(selectedFile);
+      }
+
+      const base64 = await convertToBase64(fileToProcess);
+      console.log(base64);
+
+      await createWithFRU.mutateAsync({
+        name: allianceName,
+        telegramChannelUrl: telegramUrl,
+        imageBase64: base64,
+      });
+
+      await navigate({ to: "/alliances" });
+    } catch (error) {
+      console.error("Error creating alliance:", error);
+    }
+  };
+
+  const handleButtonClickFRU = () => {
     if (!selectedFile || !allianceName) {
       setShowErrors(true);
     } else {
-      handleCreateAlliance();
+      handleCreateAllianceForFRU();
+    }
+  };
+
+  const handleButtonClickTON = () => {
+    if (!selectedFile || !allianceName) {
+      setShowErrors(true);
+    } else {
+      handleCreateAllianceForTON();
     }
   };
 
@@ -166,7 +204,7 @@ function RouteComponent() {
             />
           </label>
         </div>
-        <div className="absolute bottom-[110px] flex h-[109px] w-[65vw] flex-col items-center justify-center rounded-full border border-[#575757] bg-[#2A2A2A]">
+        <div className="absolute bottom-[150px] flex h-[109px] w-[65vw] flex-col items-center justify-center rounded-full border border-[#575757] bg-[#2A2A2A]">
           <div className="font-manrope text-base font-semibold">Стоимость создания</div>
 
           <div className="flex items-center justify-center gap-2">
@@ -175,11 +213,18 @@ function RouteComponent() {
           </div>
         </div>
         <button
-          className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
-          onClick={handleButtonClick}
-          disabled={createAlliance.isPending}
+          className="font-manrope absolute right-4 bottom-[81px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+          onClick={handleButtonClickFRU}
+          disabled={createWithFRU.isPending}
         >
-          {createAlliance.isPending ? "Создание..." : "Создать"}
+          {createWithFRU.isPending ? "Создание..." : "Создать за FRU"}
+        </button>
+        <button
+          className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+          onClick={handleButtonClickTON}
+          disabled={createWithTON.isPending}
+        >
+          {createWithTON.isPending ? "Создание..." : "Создать за TON"}
         </button>
       </div>
     </div>

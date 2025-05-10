@@ -78,7 +78,7 @@ function RouteComponent() {
       <div className="mb-[16px] flex items-center gap-2">
         <Token width={24} height={24} viewBox="0 0 30 30" />
         <div className="font-manrope text-base leading-none font-semibold">
-          Прибыль от друзей
+          Список друзей
         </div>
       </div>
       {friends && friends.length > 0 ? (

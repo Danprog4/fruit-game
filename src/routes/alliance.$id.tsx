@@ -149,10 +149,9 @@ function RouteComponent() {
     (farm) => farm.id === seasonCurr,
   )?.allianceName;
 
-  const pathURL = isMember || isOwner ? "/" : "/alliances";
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
-      <BackButton onClick={() => navigate({ to: pathURL })} />
+      <BackButton onClick={() => navigate({ to: "/alliances" })} />
       {isOwner && (
         <Drawer.Root>
           <Drawer.Trigger asChild>
@@ -327,7 +326,7 @@ function RouteComponent() {
         />
       )}
       <div
-        className="my-4 flex items-center justify-center rounded-full bg-[#76AD10] p-2"
+        className="my-4 flex items-center justify-center rounded-full bg-[#76AD10] p-3"
         onClick={() => navigate({ to: "/allianceTree/$id", params: { id: String(id) } })}
       >
         <div className="font-manrope text-xs font-medium">Дерево прокачки</div>

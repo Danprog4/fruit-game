@@ -15,7 +15,9 @@ export const Route = createFileRoute("/alliances")({
 function RouteComponent() {
   const trpc = useTRPC();
   const navigate = useNavigate();
-  const createAlliance = useMutation(trpc.alliances.createAlliance.mutationOptions());
+  const createAlliance = useMutation(
+    trpc.alliances.createAllianceForFRU.mutationOptions(),
+  );
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const [searchQuery, setSearchQuery] = useState("");
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());

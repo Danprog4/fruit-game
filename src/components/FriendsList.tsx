@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getFriendLevel } from "~/lib/friends.config";
 import { useTRPC } from "~/trpc/init/react";
-import { Token } from "./icons/Token";
 import { UserPhoto } from "./icons/UserPhoto";
 
 export const FriendsList = () => {
@@ -38,9 +37,9 @@ export const FriendsList = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-1">
-              <Token width={26} height={26} viewBox="0 0 30 30" />
-              <div className="font-manrope text-[17px] font-[800]"> 40 000</div>
+            <div className="flex items-center justify-center gap-1 text-xl">
+              💎
+              <div className="font-manrope text-[17px] font-[800]"> 5</div>
             </div>
           </div>
         ))}

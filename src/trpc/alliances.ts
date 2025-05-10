@@ -21,7 +21,7 @@ import { createMemo } from "~/lib/web3/memo";
 import { procedure } from "./init";
 
 export const alliancesRouter = {
-  createAlliance: procedure
+  createAllianceForFRU: procedure
     .input(
       z.object({
         imageBase64: z.string(),
@@ -33,6 +33,25 @@ export const alliancesRouter = {
       const { name, telegramChannelUrl, imageBase64 } = input;
 
       const imageUUID = await uploadBase64Image(imageBase64);
+
+      const user = await db.query.usersTable.findFirst({
+        where: (users) => eq(users.id, ctx.userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      if (user.tokenBalance < 40000) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough FRU" });
+      }
+
+      await db
+        .update(usersTable)
+        .set({
+          tokenBalance: user.tokenBalance - 40000,
+        })
+        .where(eq(usersTable.id, ctx.userId));
 
       const [alliance] = await db
         .insert(alliancesTable)
@@ -57,6 +76,48 @@ export const alliancesRouter = {
 
       return alliance;
     }),
+
+  createAllianceForTON: procedure
+    .input(
+      z.object({
+        imageBase64: z.string(),
+        name: z.string(),
+        telegramChannelUrl: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { name, telegramChannelUrl, imageBase64 } = input;
+
+      const imageUUID = await uploadBase64Image(imageBase64);
+
+      const user = await db.query.usersTable.findFirst({
+        where: (users) => eq(users.id, ctx.userId),
+      });
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const id = nanoid();
+
+      const newTransaction: NewBlockchainPayment = {
+        id,
+        userId: ctx.userId,
+        status: "pending",
+        txType: "alliance",
+        fruAmount: toNano(40000),
+        avatarId: imageUUID,
+        name,
+        telegramChannelUrl,
+      };
+
+      await db.insert(blockchainPaymentsTable).values(newTransaction);
+
+      const memo = createMemo("alliance", id);
+
+      return memo;
+    }),
+
   getAlliances: procedure.query(async ({ ctx }) => {
     const alliances = await db.query.alliancesTable.findMany();
 

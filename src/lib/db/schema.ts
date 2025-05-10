@@ -57,6 +57,9 @@ export const blockchainPaymentsTable = pgTable("blockchain_payments", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp("completed_at", { withTimezone: true }),
   txId: varchar("tx_id", { length: 255 }),
+  avatarId: uuid("avatarId"),
+  name: varchar("name", { length: 255 }),
+  telegramChannelUrl: varchar("telegramChannelUrl", { length: 255 }),
 });
 
 export const withdrawalsTable = pgTable("withdrawals", {
