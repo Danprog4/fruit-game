@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AlliancesList } from "~/components/AlliancesList";
@@ -15,14 +15,14 @@ export const Route = createFileRoute("/alliances")({
 function RouteComponent() {
   const trpc = useTRPC();
   const navigate = useNavigate();
-  const createAlliance = useMutation(
-    trpc.alliances.createAllianceForFRU.mutationOptions(),
-  );
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const [searchQuery, setSearchQuery] = useState("");
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const isOwner = alliances?.some((alliance) => alliance.ownerId === user?.id);
-
+  const lastTxs = useQuery(trpc.farms.getLastTxs.queryOptions());
+  const isPending = lastTxs.data?.some(
+    (tx) => tx.status === "pending" && tx.txType === "alliance",
+  );
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
@@ -40,7 +40,7 @@ function RouteComponent() {
       </div>
       <AlliancesList searchQuery={searchQuery} isOwner={isOwner || false} />
 
-      {!isOwner && (
+      {!isOwner && !isPending && (
         <button
           onClick={() => navigate({ to: "/create-alliance" })}
           className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[52px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
