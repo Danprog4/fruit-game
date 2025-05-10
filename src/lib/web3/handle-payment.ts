@@ -107,29 +107,61 @@ export const handlePayment = async ({
 
   const isAllianceCreation = txType === "alliance";
 
+  console.log(isAllianceCreation, "isAllianceCreation");
+
   if (isAllianceCreation) {
-    console.log("CREATING ALLIANCE");
-    const [alliance] = await db
-      .insert(alliancesTable)
-      .values({
+    console.log("CREATING ALLIANCE", { userId: user.id, txType });
+    try {
+      console.log("Alliance creation data:", {
         name,
         telegramChannelUrl,
-        avatarId: imageUUID,
-        ownerId: user.id,
-        levels: {
-          capacity: 0,
-          coefficient: 0,
-          profitability: 0,
-        },
-      })
-      .returning();
-    await db
-      .update(usersTable)
-      .set({
-        allianceId: alliance.id,
-      })
-      .where(eq(usersTable.id, user.id));
+        imageUUID,
+        userId: user.id,
+      });
 
-    return alliance;
+      const [alliance] = await db
+        .insert(alliancesTable)
+        .values({
+          name,
+          telegramChannelUrl,
+          avatarId: imageUUID,
+          ownerId: user.id,
+          levels: {
+            capacity: 0,
+            coefficient: 0,
+            profitability: 0,
+          },
+        })
+        .returning();
+
+      console.log("Alliance created successfully:", {
+        allianceId: alliance.id,
+        allianceName: alliance.name,
+      });
+
+      console.log("Updating user with alliance ID:", {
+        userId: user.id,
+        allianceId: alliance.id,
+      });
+
+      await db
+        .update(usersTable)
+        .set({
+          allianceId: alliance.id,
+        })
+        .where(eq(usersTable.id, user.id));
+
+      console.log("User updated successfully with alliance ID");
+      return alliance;
+    } catch (error) {
+      console.error("ERROR CREATING ALLIANCE:", error);
+      console.log("Alliance creation failed with data:", {
+        name,
+        telegramChannelUrl,
+        imageUUID,
+        userId: user.id,
+      });
+      throw error; // Re-throw to allow upstream error handling
+    }
   }
 };
