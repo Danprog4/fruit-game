@@ -27,4 +27,10 @@ export const ALLIANCE_TX_TYPE_MAPPING_REVERSE = {
   profitability: "Alliance profitability",
 } as const;
 
-export const ALL_TX_TYPES = [...Object.values(TX_TYPE_CONFIG), ...ALLIANCE_TX_TYPES];
+export const ALLIANCE_CREATION_TX_TYPES = ["alliance"];
+
+export const ALL_TX_TYPES = [
+  ...Object.values(TX_TYPE_CONFIG),
+  ...ALLIANCE_TX_TYPES,
+  ...ALLIANCE_CREATION_TX_TYPES,
+];

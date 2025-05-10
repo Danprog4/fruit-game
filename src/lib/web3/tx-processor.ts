@@ -20,10 +20,16 @@ export const processTonTransaction = async (
     amount,
     message,
     walletAddress,
+    name,
+    telegramChannelUrl,
+    imageUUID,
   }: {
     amount: bigint;
     message: string;
     walletAddress: string;
+    name: string;
+    telegramChannelUrl: string;
+    imageUUID: string;
   }) => void,
 ) => {
   const hash = tx.raw.hash().toString("hex");
@@ -76,5 +82,14 @@ export const processTonTransaction = async (
     return;
   }
 
-  onDeposit({ amount, message, walletAddress: uqFromAddress });
+  const [name, telegramChannelUrl, imageUUID] = message.split("#");
+
+  onDeposit({
+    amount,
+    message,
+    walletAddress: uqFromAddress,
+    name,
+    telegramChannelUrl,
+    imageUUID,
+  });
 };

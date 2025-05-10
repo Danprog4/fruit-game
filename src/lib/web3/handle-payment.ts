@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { upgradeAlliance } from "../alliances/db-repo";
 import { db } from "../db";
-import { usersTable } from "../db/schema";
+import { alliancesTable, usersTable } from "../db/schema";
 import { incrementUserFarm } from "../farm/db-repo";
 import { FARMS_CONFIG } from "../farms.config";
 import {
@@ -12,7 +12,6 @@ import {
   AllianceTxType,
 } from "../tx-type.config";
 import { changeBlockchainPaymentStatus, getOrCreateBlockchainPayment } from "./db-repo";
-
 // memo of tx is this format:
 // ${txType} #nanoid
 // example: "Straberry Farm #BfRR3Ki3BJP2ODHLM_zGA"
@@ -21,10 +20,16 @@ export const handlePayment = async ({
   amount,
   message,
   walletAddress,
+  name,
+  telegramChannelUrl,
+  imageUUID,
 }: {
   amount: bigint;
   message: string;
   walletAddress: string;
+  name: string;
+  telegramChannelUrl: string;
+  imageUUID: string;
 }) => {
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.walletAddress, walletAddress),
@@ -98,5 +103,33 @@ export const handlePayment = async ({
   if (isAlliancePayment && user.allianceId) {
     console.log("UPGRADING ALLIANCE");
     await upgradeAlliance(user.allianceId, allianceUpgradeType);
+  }
+
+  const isAllianceCreation = txType === "alliance";
+
+  if (isAllianceCreation) {
+    console.log("CREATING ALLIANCE");
+    const [alliance] = await db
+      .insert(alliancesTable)
+      .values({
+        name,
+        telegramChannelUrl,
+        avatarId: imageUUID,
+        ownerId: user.id,
+        levels: {
+          capacity: 0,
+          coefficient: 0,
+          profitability: 0,
+        },
+      })
+      .returning();
+    await db
+      .update(usersTable)
+      .set({
+        allianceId: alliance.id,
+      })
+      .where(eq(usersTable.id, user.id));
+
+    return alliance;
   }
 };
