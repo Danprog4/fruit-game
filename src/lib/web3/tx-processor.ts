@@ -34,6 +34,8 @@ export const processTonTransaction = async (
 ) => {
   const hash = tx.raw.hash().toString("hex");
 
+  console.log(hash, "hash");
+
   const uqToAddress = Address.parse(tx.inMessage?.info.dest?.toString() ?? "").toString({
     bounceable: false,
   });

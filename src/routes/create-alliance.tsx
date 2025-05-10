@@ -1,3 +1,4 @@
+import { Switch } from "@radix-ui/react-switch";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChangeEvent, useRef, useState } from "react";
@@ -25,6 +26,7 @@ function RouteComponent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showErrors, setShowErrors] = useState(false);
   const scrollPositionRef = useRef<number>(0);
+  const [isForTON, setIsForTON] = useState(false);
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
@@ -212,6 +214,11 @@ function RouteComponent() {
             <div className="font-manrope text-[30px] font-extrabold">40 000</div>
           </div>
         </div>
+        <Switch
+          checked={isForTON}
+          onCheckedChange={() => setIsForTON(!isForTON)}
+          className="absolute right-4 bottom-[81px] left-4"
+        />
         <button
           className="font-manrope absolute right-4 bottom-[81px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
           onClick={handleButtonClickFRU}
