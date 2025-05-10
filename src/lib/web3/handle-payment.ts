@@ -20,16 +20,10 @@ export const handlePayment = async ({
   amount,
   message,
   walletAddress,
-  name,
-  telegramChannelUrl,
-  imageUUID,
 }: {
   amount: bigint;
   message: string;
   walletAddress: string;
-  name: string;
-  telegramChannelUrl: string;
-  imageUUID: string;
 }) => {
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.walletAddress, walletAddress),
@@ -110,32 +104,21 @@ export const handlePayment = async ({
   console.log(isAllianceCreation, "isAllianceCreation");
 
   if (isAllianceCreation) {
-    console.log("[handle_payment] Starting alliance creation", {
-      userId: user.id,
-      txType: "alliance",
-    });
-
-    // Очищаем данные от нулевых байтов
-    const cleanName = name.replace(/\0/g, "").trim();
-    const cleanTelegramUrl = telegramChannelUrl.replace(/\0/g, "").trim();
-    const cleanImageUUID = imageUUID.replace(/\0/g, "").trim();
-
-    console.log("[handle_payment] Cleaned alliance data:", {
-      originalName: name,
-      cleanedName: cleanName,
-      originalUrl: telegramChannelUrl,
-      cleanedUrl: cleanTelegramUrl,
-      originalUUID: imageUUID,
-      cleanedUUID: cleanImageUUID,
-    });
-
+    console.log("CREATING ALLIANCE", { userId: user.id, txType });
     try {
+      console.log("Alliance creation data:", {
+        name: blockchainPayment.name,
+        telegramChannelUrl: blockchainPayment.telegramChannelUrl,
+        imageUUID: blockchainPayment.avatarId,
+        userId: user.id,
+      });
+
       const [alliance] = await db
         .insert(alliancesTable)
         .values({
-          name: cleanName,
-          telegramChannelUrl: cleanTelegramUrl,
-          avatarId: cleanImageUUID,
+          name: blockchainPayment.name ?? "",
+          telegramChannelUrl: blockchainPayment.telegramChannelUrl ?? "",
+          avatarId: blockchainPayment.avatarId ?? null,
           ownerId: user.id,
           levels: {
             capacity: 0,
@@ -145,9 +128,14 @@ export const handlePayment = async ({
         })
         .returning();
 
-      console.log("[handle_payment] Alliance created successfully:", {
+      console.log("Alliance created successfully:", {
         allianceId: alliance.id,
-        name: alliance.name,
+        allianceName: alliance.name,
+      });
+
+      console.log("Updating user with alliance ID:", {
+        userId: user.id,
+        allianceId: alliance.id,
       });
 
       await db
@@ -157,20 +145,17 @@ export const handlePayment = async ({
         })
         .where(eq(usersTable.id, user.id));
 
-      console.log("[handle_payment] User updated with alliance ID");
-
+      console.log("User updated successfully with alliance ID");
       return alliance;
     } catch (error) {
-      console.error("[handle_payment] Alliance creation failed:", {
-        error,
-        data: {
-          name: cleanName,
-          telegramChannelUrl: cleanTelegramUrl,
-          imageUUID: cleanImageUUID,
-          userId: user.id,
-        },
+      console.error("ERROR CREATING ALLIANCE:", error);
+      console.log("Alliance creation failed with data:", {
+        name: blockchainPayment.name,
+        telegramChannelUrl: blockchainPayment.telegramChannelUrl,
+        imageUUID: blockchainPayment.avatarId,
+        userId: user.id,
       });
-      throw error;
+      throw error; // Re-throw to allow upstream error handling
     }
   }
 };
