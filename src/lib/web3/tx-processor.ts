@@ -78,8 +78,6 @@ export const processTonTransaction = async (
     return;
   }
 
-  const [name, telegramChannelUrl, imageUUID] = message.split("#");
-
   onDeposit({
     amount,
     message,

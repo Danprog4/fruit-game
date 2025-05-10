@@ -1,4 +1,3 @@
-import { Switch } from "@radix-ui/react-switch";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChangeEvent, useRef, useState } from "react";
@@ -6,6 +5,7 @@ import { BackButton } from "~/components/BackButton";
 import { AllianceGroup } from "~/components/icons/AllianceGroup";
 import { PlusIcon } from "~/components/icons/PlusIcon";
 import { Token } from "~/components/icons/Token";
+import { Switch } from "~/components/ui/switch";
 import { useAllianceCreate } from "~/hooks/useAllianceCreate";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
@@ -206,7 +206,11 @@ function RouteComponent() {
             />
           </label>
         </div>
-        <div className="absolute bottom-[150px] flex h-[109px] w-[65vw] flex-col items-center justify-center rounded-full border border-[#575757] bg-[#2A2A2A]">
+        <div className="absolute right-4 bottom-[82px] flex items-center justify-center gap-2">
+          <div>Купить за TON</div>
+          <Switch checked={isForTON} onCheckedChange={() => setIsForTON(!isForTON)} />
+        </div>
+        <div className="mt-4 flex h-[109px] w-[65vw] flex-col items-center justify-center rounded-full border border-[#575757] bg-[#2A2A2A]">
           <div className="font-manrope text-base font-semibold">Стоимость создания</div>
 
           <div className="flex items-center justify-center gap-2">
@@ -214,25 +218,24 @@ function RouteComponent() {
             <div className="font-manrope text-[30px] font-extrabold">40 000</div>
           </div>
         </div>
-        <Switch
-          checked={isForTON}
-          onCheckedChange={() => setIsForTON(!isForTON)}
-          className="absolute right-4 bottom-[81px] left-4"
-        />
-        <button
-          className="font-manrope absolute right-4 bottom-[81px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
-          onClick={handleButtonClickFRU}
-          disabled={createWithFRU.isPending}
-        >
-          {createWithFRU.isPending ? "Создание..." : "Создать за FRU"}
-        </button>
-        <button
-          className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
-          onClick={handleButtonClickTON}
-          disabled={createWithTON.isPending}
-        >
-          {createWithTON.isPending ? "Создание..." : "Создать за TON"}
-        </button>
+
+        {isForTON ? (
+          <button
+            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+            onClick={handleButtonClickTON}
+            disabled={createWithTON.isPending}
+          >
+            {createWithTON.isPending ? "Создание..." : "Создать за TON"}
+          </button>
+        ) : (
+          <button
+            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+            onClick={handleButtonClickFRU}
+            disabled={createWithFRU.isPending}
+          >
+            {createWithFRU.isPending ? "Создание..." : "Создать за FRU"}
+          </button>
+        )}
       </div>
     </div>
   );
