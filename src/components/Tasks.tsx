@@ -94,8 +94,9 @@ const CheckButton = ({ id }: { id: number }) => {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const onClick = () => {
-    // optimistic
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
     const old = queryClient.getQueryData(trpc.tasks.getTasks.queryKey());
 
     try {
