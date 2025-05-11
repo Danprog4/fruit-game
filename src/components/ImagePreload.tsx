@@ -4,7 +4,11 @@ export const ImagePreload = () => {
   return (
     <>
       {Object.values(treeConfig).map((level) => (
-        <img key={level} src={level} />
+        <img
+          className="pointer-events-none invisible absolute -translate-x-[2000px] -translate-y-[2000px]"
+          key={level}
+          src={level}
+        />
       ))}
     </>
   );
