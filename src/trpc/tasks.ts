@@ -123,4 +123,24 @@ export const tasksRouter = {
         status: "checking" as TaskStatus,
       };
     }),
+
+  startTask: procedure
+    .input(z.object({ taskId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const task = await db
+        .select()
+        .from(tasksTable)
+        .where(eq(tasksTable.id, input.taskId))
+        .then((rows) => rows[0]);
+
+      if (!task) {
+        throw new Error("Task not found");
+      }
+
+      await db.insert(userTasksTable).values({
+        userId: ctx.userId,
+        taskId: input.taskId,
+        status: "checking",
+      });
+    }),
 };

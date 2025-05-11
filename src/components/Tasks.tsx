@@ -6,9 +6,7 @@ import { FrontendTask, TaskStatus } from "~/lib/db/schema";
 import { useTRPC } from "~/trpc/init/react";
 
 export const TasksList = () => {
-  const trpc = useTRPC();
-  const { tasks } = useTasks();
-  const queryClient = useQueryClient();
+  const { tasks, startTask } = useTasks();
 
   // Add polling hook to monitor server updates
   useTaskStatusPolling();
@@ -24,12 +22,7 @@ export const TasksList = () => {
       return;
     }
 
-    // Optimistically update status to "started"
-    queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
-      if (!oldTasks) return oldTasks;
-      return oldTasks.map((t) => (t.id === task.id ? { ...t, status: "started" } : t));
-    });
-
+    startTask.mutate({ taskId: task.id });
     const channelName =
       task.taskData?.type === "telegram" ? task.taskData.data.channelName : null;
     if (channelName) {

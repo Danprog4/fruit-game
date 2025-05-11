@@ -30,9 +30,24 @@ export const useTasks = () => {
     }),
   );
 
+  const startTask = useMutation(
+    trpc.tasks.startTask.mutationOptions({
+      onSuccess: (_, { taskId }) => {
+        queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+          if (!oldTasks) return oldTasks;
+
+          return oldTasks.map((t) =>
+            t.id === taskId ? { ...t, status: "checking" as TaskStatus } : t,
+          );
+        });
+      },
+    }),
+  );
+
   return {
     tasks,
     startVerification,
+    startTask,
   };
 };
 
