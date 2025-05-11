@@ -37,7 +37,7 @@ export const useTasks = () => {
           if (!oldTasks) return oldTasks;
 
           return oldTasks.map((t) =>
-            t.id === taskId ? { ...t, status: "checking" as TaskStatus } : t,
+            t.id === taskId ? { ...t, status: "started" as TaskStatus } : t,
           );
         });
       },
@@ -90,9 +90,11 @@ export function useTaskStatusPolling() {
     statuses.forEach(({ taskId, status }) => {
       if (status === "completed") {
         updateTaskStatus(taskId, "completed");
+        queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
         toast.success(`Task is completed`);
       } else if (status === "failed") {
         updateTaskStatus(taskId, "notStarted");
+        queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
         toast.error(`Task is not completed, try again`);
       }
     });

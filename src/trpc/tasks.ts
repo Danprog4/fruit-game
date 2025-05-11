@@ -140,7 +140,7 @@ export const tasksRouter = {
       await db.insert(userTasksTable).values({
         userId: ctx.userId,
         taskId: input.taskId,
-        status: "checking",
+        status: "started",
       });
     }),
 };
