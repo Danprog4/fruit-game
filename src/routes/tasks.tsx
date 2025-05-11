@@ -4,6 +4,8 @@ import { BackButton } from "~/components/BackButton";
 import { Flag } from "~/components/icons/Flag";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Input } from "~/components/Input";
+import { TasksList } from "~/components/Tasks";
+
 export const Route = createFileRoute("/tasks")({
   component: RouteComponent,
 });
@@ -39,6 +41,8 @@ function RouteComponent() {
           К сожалению, квестов пока нет
         </div>
       </div>
+
+      <TasksList />
     </div>
   );
 }

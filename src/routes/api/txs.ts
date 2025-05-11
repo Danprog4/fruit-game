@@ -5,6 +5,7 @@ import { startTonProcessor } from "~/lib/web3/ton-payment";
 export const APIRoute = createAPIFileRoute("/api/txs")({
   GET: async () => {
     await startTonProcessor();
+
     return json({ success: true });
   },
 });

@@ -1,7 +1,11 @@
 import {
   bigint,
+  boolean,
+  index,
+  integer,
   jsonb,
   pgTable,
+  primaryKey,
   serial,
   timestamp,
   uuid,
@@ -76,6 +80,69 @@ export const withdrawalsTable = pgTable("withdrawals", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp("completed_at", { withTimezone: true }),
 });
+
+export type TaskDataTelegram = {
+  type: "telegram";
+  data: {
+    chatId: string;
+    channelName: string;
+  };
+};
+
+export type TaskDataLink = {
+  type: "link";
+};
+
+export type TaskData = TaskDataTelegram | TaskDataLink;
+
+export const tasksTable = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  imageUrl: varchar("image_url", { length: 300 }),
+  reward: integer("reward").notNull().default(100),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  completed: integer("completed").notNull().default(0),
+  limit: integer("limit"),
+  active: boolean("active").notNull().default(true),
+  type: varchar("type", { length: 50 }).notNull().default("join"), // telegram, fake, twitter, external
+  data: jsonb("data").$type<TaskData>(),
+});
+
+export type Task = typeof tasksTable.$inferSelect;
+export type TaskInsert = typeof tasksTable.$inferInsert;
+
+export type FrontendTask = {
+  id: number;
+  name: string;
+  imageUrl: string | null;
+  reward: number;
+  status: TaskStatus;
+  taskData: TaskData;
+};
+
+/**
+ * If you want user-task statuses, define a join table with a status field.
+ */
+export const userTasksTable = pgTable(
+  "user_tasks",
+  {
+    userId: bigint("user_id", { mode: "number" }).notNull(),
+    taskId: integer("task_id").notNull(),
+    status: varchar("task_status", { length: 32 }).notNull().default("checking"),
+  },
+  (table) => {
+    return [
+      {
+        pk: primaryKey({ columns: [table.userId, table.taskId] }),
+        userIdIdx: index("user_task_user_id_idx").on(table.userId),
+      },
+    ];
+  },
+);
+
+export type UserTask = typeof userTasksTable.$inferSelect;
+
+export type TaskStatus = "checking" | "completed" | "failed" | "notStarted" | "started";
 
 export type BlockchainPayment = typeof blockchainPaymentsTable.$inferSelect;
 export type NewBlockchainPayment = typeof blockchainPaymentsTable.$inferInsert;

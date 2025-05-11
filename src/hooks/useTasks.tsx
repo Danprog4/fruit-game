@@ -1,0 +1,84 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { TaskStatus } from "~/lib/db/schema";
+import { useTRPC } from "~/trpc/init/react";
+
+export const useTasks = () => {
+  const trpc = useTRPC();
+  const { data: tasks } = useQuery(
+    trpc.tasks.getTasks.queryOptions(undefined, {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+    }),
+  );
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: startVerification } = useMutation(
+    trpc.tasks.startVerification.mutationOptions({
+      onSuccess: (_, { taskId }) => {
+        queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+          if (!oldTasks) return oldTasks;
+
+          return oldTasks.map((t) =>
+            t.id === taskId ? { ...t, status: "checking" as TaskStatus } : t,
+          );
+        });
+      },
+    }),
+  );
+
+  return {
+    tasks,
+    startVerification,
+  };
+};
+
+export function useTaskStatusPolling() {
+  const trpc = useTRPC();
+  const { data: tasks } = useQuery(trpc.tasks.getTasks.queryOptions());
+  const queryClient = useQueryClient();
+
+  const checkingTaskIds = tasks?.filter((t) => t.status === "checking").map((t) => t.id);
+
+  const enabled = Boolean(checkingTaskIds?.length);
+
+  const { data: statuses } = useQuery(
+    trpc.tasks.getTasksStatuses.queryOptions(
+      {
+        tasksIds: checkingTaskIds ?? [],
+      },
+      {
+        enabled,
+        refetchInterval: enabled ? 5000 : false,
+      },
+    ),
+  );
+
+  const updateTaskStatus = (taskId: number, status: TaskStatus) => {
+    queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+      if (!oldTasks) return oldTasks;
+
+      return oldTasks.map((task) => (task.id === taskId ? { ...task, status } : task));
+    });
+  };
+
+  useEffect(() => {
+    if (!statuses) {
+      return;
+    }
+
+    statuses.forEach(({ taskId, status }) => {
+      if (status === "completed") {
+        updateTaskStatus(taskId, "completed");
+      } else if (status === "failed") {
+        updateTaskStatus(taskId, "notStarted");
+        toast.error(`Task is not completed, try again`);
+      }
+    });
+  }, [statuses]);
+
+  return null;
+}
