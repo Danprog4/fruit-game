@@ -96,7 +96,10 @@ export const tasksRouter = {
         .then((rows) => rows[0]);
 
       if (existingUserTask) {
-        throw new Error("Task already exists for this user");
+        return {
+          id: input.taskId,
+          status: "checking" as TaskStatus,
+        };
       }
 
       // create new task as checking in users table

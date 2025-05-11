@@ -65,6 +65,8 @@ export function useTaskStatusPolling() {
     });
   };
 
+  console.log("statuses", statuses);
+
   useEffect(() => {
     if (!statuses) {
       return;

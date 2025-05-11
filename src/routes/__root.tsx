@@ -23,6 +23,7 @@ import { useTRPC } from "~/trpc/init/react";
 import { TRPCRouter } from "~/trpc/init/router";
 
 import { Buffer } from "buffer";
+import { useTaskStatusPolling } from "~/hooks/useTasks";
 
 // @ts-expect-error
 if (typeof window !== "undefined" && !window.Buffer) {
@@ -102,6 +103,8 @@ function RootComponent() {
       viewport.expand();
     }
   }, []);
+
+  useTaskStatusPolling();
 
   return (
     <RootDocument>
