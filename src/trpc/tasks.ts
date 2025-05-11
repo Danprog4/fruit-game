@@ -9,7 +9,6 @@ import {
   TaskStatus,
   userTasksTable,
 } from "~/lib/db/schema";
-import { checkMembership } from "~/lib/tasks/check-task";
 import { procedure } from "./init";
 
 export const tasksRouter = {
@@ -107,10 +106,7 @@ export const tasksRouter = {
         status: "checking",
       });
 
-      await checkMembership({
-        userId: ctx.userId,
-        taskId: input.taskId,
-      });
+      // Removed direct checking - will be handled by polling
 
       return {
         id: input.taskId,
