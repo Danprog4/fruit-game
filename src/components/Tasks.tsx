@@ -2,7 +2,7 @@ import { useTasks } from "~/hooks/useTasks";
 
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { CircleCheck as CheckIcon, Loader2 as Spinner } from "lucide-react";
-import { createContext, use, useCallback, useMemo, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { FrontendTask, TaskStatus } from "~/lib/db/schema";
 
 type TaskStatusContextType = {
@@ -31,22 +31,37 @@ export const TasksList = () => {
 
   const [statuses, setStatuses] = useState<Record<number, TaskStatus>>(initialStatuses);
 
+  useEffect(() => {
+    if (tasks?.length) {
+      console.log("Initial task statuses:", initialStatuses);
+    }
+  }, [tasks]);
+
   const updateStatus = useCallback(
     (taskId: number, status: TaskStatus) => {
-      setStatuses((prev) => ({
-        ...prev,
-        [taskId]: status,
-      }));
+      console.log(`Updating task ${taskId} status to: ${status}`);
+      setStatuses((prev) => {
+        const newStatuses = {
+          ...prev,
+          [taskId]: status,
+        };
+        console.log("Updated statuses:", newStatuses);
+        return newStatuses;
+      });
     },
     [setStatuses],
   );
 
   const onGo = (task: FrontendTask) => {
+    console.log(`Task ${task.id} clicked, current status: ${statuses[task.id]}`);
+
     if (statuses[task.id] === "completed") {
+      console.log(`Task ${task.id} is already completed, ignoring click`);
       return;
     }
 
     if (!task.taskData) {
+      console.log(`Task ${task.id} has no task data, ignoring click`);
       return;
     }
 
@@ -54,16 +69,22 @@ export const TasksList = () => {
       task.taskData?.type === "telegram" ? task.taskData.data.channelName : null;
 
     if (channelName) {
+      console.log(`Opening Telegram channel: ${channelName}`);
       openTelegramLink(`https://t.me/${channelName}`);
     }
 
+    console.log(`Setting task ${task.id} status to "started"`);
     updateStatus(task.id, "started");
   };
 
   const value = useMemo(() => ({ statuses, updateStatus }), [statuses, updateStatus]);
 
+  useEffect(() => {
+    console.log("Current task statuses:", statuses);
+  }, [statuses]);
+
   return (
-    <TaskStatusContext value={value}>
+    <TaskStatusContext.Provider value={value}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           {tasks?.map((task) => (
@@ -100,7 +121,7 @@ export const TasksList = () => {
           )}
         </div>
       </div>
-    </TaskStatusContext>
+    </TaskStatusContext.Provider>
   );
 };
 
@@ -120,12 +141,14 @@ const CheckButton = ({ id }: { id: number }) => {
   const { updateStatus } = useTaskStatus();
 
   const onClick = () => {
+    console.log(`Check button clicked for task ${id}`);
     try {
-      startVerification({ taskId: id });
+      console.log(`Setting task ${id} status to "checking"`);
       updateStatus(id, "checking");
-    } catch {
-      // If verification fails, we don't need to do anything
-      // as the status wasn't updated in the context
+      console.log(`Starting verification for task ${id}`);
+      startVerification({ taskId: id });
+    } catch (error) {
+      console.error(`Verification failed for task ${id}:`, error);
     }
   };
 
@@ -142,6 +165,7 @@ const CheckButton = ({ id }: { id: number }) => {
 };
 
 const CompletedTask = () => {
+  console.log("Rendering completed task UI");
   return (
     <button className="flex h-9 w-14 items-center justify-center rounded-xl border border-white/10 p-2 text-white opacity-80">
       <CheckIcon className="size-4" />
@@ -150,11 +174,15 @@ const CompletedTask = () => {
 };
 
 const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => {
+  console.log(`Rendering status block for task ${id} with status: ${status}`);
+
   if (status === "started") {
+    console.log(`Task ${id} is started, showing check button`);
     return <CheckButton id={id} />;
   }
 
   if (status === "checking") {
+    console.log(`Task ${id} is checking, showing spinner`);
     return (
       <button className="flex h-9 w-14 items-center justify-end rounded-xl p-2 text-white opacity-80">
         <Spinner className="size-4" />
@@ -163,12 +191,15 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
   }
 
   if (status === "failed") {
+    console.log(`Task ${id} failed, showing check button again`);
     return <CheckButton id={id} />;
   }
 
   if (status === "completed") {
+    console.log(`Task ${id} is completed, showing completed UI`);
     return <CompletedTask />;
   }
 
+  console.log(`Task ${id} has unknown status: ${status}`);
   return null;
 };
