@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/lib/db";
@@ -55,13 +54,8 @@ export const tasksRouter = {
           ),
         );
 
-      // Check if we found all requested tasks
-      if (userTasks.length !== input.tasksIds.length) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Some tasks not found",
-        });
-      }
+      console.log("input.tasksIds", input.tasksIds);
+      console.log("userTasks", userTasks);
 
       // Map tasks to required format
       return userTasks.map((task) => ({
