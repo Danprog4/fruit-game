@@ -75,6 +75,7 @@ export function useTaskStatusPolling() {
     statuses.forEach(({ taskId, status }) => {
       if (status === "completed") {
         updateTaskStatus(taskId, "completed");
+        toast.success(`Task is completed`);
       } else if (status === "failed") {
         updateTaskStatus(taskId, "notStarted");
         toast.error(`Task is not completed, try again`);
