@@ -18,7 +18,7 @@ export const makeTaskCompleted = async (userId: number, taskId: number) => {
   await db
     .update(usersTable)
     .set({
-      tokenBalance: sql`token_balance + ${task.reward}`,
+      tokenBalance: sql`${usersTable.tokenBalance} + ${task.reward}`,
     })
     .where(eq(usersTable.id, userId));
 };
