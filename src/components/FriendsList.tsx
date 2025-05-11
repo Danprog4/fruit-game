@@ -39,7 +39,7 @@ export const FriendsList = () => {
 
             <div className="flex items-center justify-center gap-1 text-xl">
               💎
-              <div className="font-manrope text-[17px] font-[800]"> 100</div>
+              <div className="font-manrope text-[17px] font-[800]"> 100 </div>
             </div>
           </div>
         ))}
