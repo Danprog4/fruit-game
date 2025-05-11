@@ -93,7 +93,6 @@ export function useTaskStatusPolling() {
         toast.success(`Task is completed`, { id: "task-completed" });
       } else if (status === "failed") {
         updateTaskStatus(taskId, "notStarted");
-        queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
         toast.error(`Task is not completed, try again`, { id: "task-failed" });
       }
     });
