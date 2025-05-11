@@ -141,7 +141,7 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
   if (status === "checking") {
     return (
       <button className="flex h-9 w-14 items-center justify-end rounded-xl p-2 text-white opacity-80">
-        <Spinner className="size-4" />
+        <Spinner className="size-4 rounded-full" />
       </button>
     );
   }

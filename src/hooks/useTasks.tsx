@@ -90,14 +90,14 @@ export function useTaskStatusPolling() {
       if (status === "completed") {
         updateTaskStatus(taskId, "completed");
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
-        toast.success(`Task is completed`);
+        toast.success(`Task is completed`, { id: "task-completed" });
       } else if (status === "failed") {
         updateTaskStatus(taskId, "notStarted");
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
-        toast.error(`Task is not completed, try again`);
+        toast.error(`Task is not completed, try again`, { id: "task-failed" });
       }
     });
-  }, [statuses]);
+  }, [queryClient, statuses, trpc.tasks.getTasks, updateTaskStatus]);
 
   return null;
 }
