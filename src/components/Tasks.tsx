@@ -1,61 +1,20 @@
-import { useTasks } from "~/hooks/useTasks";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { CircleCheck as CheckIcon, Loader2 as Spinner } from "lucide-react";
-import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
+import { useTasks, useTaskStatusPolling } from "~/hooks/useTasks";
 import { FrontendTask, TaskStatus } from "~/lib/db/schema";
-
-type TaskStatusContextType = {
-  statuses: Record<number, TaskStatus>;
-  updateStatus: (taskId: number, status: TaskStatus) => void;
-};
-
-const TaskStatusContext = createContext<TaskStatusContextType | undefined>(undefined);
-
-const useTaskStatus = () => {
-  const context = use(TaskStatusContext);
-  if (!context) {
-    throw new Error("useTaskStatus must be used within a TaskStatusProvider");
-  }
-  return context;
-};
+import { useTRPC } from "~/trpc/init/react";
 
 export const TasksList = () => {
+  const trpc = useTRPC();
   const { tasks } = useTasks();
+  const queryClient = useQueryClient();
 
-  const initialStatuses =
-    tasks?.reduce<Record<number, TaskStatus>>((acc, task) => {
-      acc[task.id] = task.status;
-      return acc;
-    }, {}) || {};
-
-  const [statuses, setStatuses] = useState<Record<number, TaskStatus>>(initialStatuses);
-
-  useEffect(() => {
-    if (tasks?.length) {
-      console.log("Initial task statuses:", initialStatuses);
-    }
-  }, [tasks]);
-
-  const updateStatus = useCallback(
-    (taskId: number, status: TaskStatus) => {
-      console.log(`Updating task ${taskId} status to: ${status}`);
-      setStatuses((prev) => {
-        const newStatuses = {
-          ...prev,
-          [taskId]: status,
-        };
-        console.log("Updated statuses:", newStatuses);
-        return newStatuses;
-      });
-    },
-    [setStatuses],
-  );
+  // Add polling hook to monitor server updates
+  useTaskStatusPolling();
 
   const onGo = (task: FrontendTask) => {
-    console.log(`Task ${task.id} clicked, current status: ${statuses[task.id]}`);
-
-    if (statuses[task.id] === "completed") {
+    if (task.status === "completed") {
       console.log(`Task ${task.id} is already completed, ignoring click`);
       return;
     }
@@ -65,63 +24,57 @@ export const TasksList = () => {
       return;
     }
 
+    // Optimistically update status to "started"
+    queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+      if (!oldTasks) return oldTasks;
+      return oldTasks.map((t) => (t.id === task.id ? { ...t, status: "started" } : t));
+    });
+
     const channelName =
       task.taskData?.type === "telegram" ? task.taskData.data.channelName : null;
-
     if (channelName) {
       console.log(`Opening Telegram channel: ${channelName}`);
       openTelegramLink(`https://t.me/${channelName}`);
     }
-
-    console.log(`Setting task ${task.id} status to "started"`);
-    updateStatus(task.id, "started");
   };
 
-  const value = useMemo(() => ({ statuses, updateStatus }), [statuses, updateStatus]);
-
-  useEffect(() => {
-    console.log("Current task statuses:", statuses);
-  }, [statuses]);
-
   return (
-    <TaskStatusContext.Provider value={value}>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          {tasks?.map((task) => (
-            <button
-              onClick={() => onGo(task)}
-              key={task.id}
-              className="flex h-20 items-center justify-between rounded-2xl px-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="size-10 border border-white/10">
-                  {task.imageUrl && (
-                    <img className="size-full object-cover" src={task.imageUrl} />
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2 *:leading-none">
-                  <div>{task.name}</div>
-                  <div>{task.reward} FRU</div>
-                </div>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        {tasks?.map((task) => (
+          <button
+            onClick={() => onGo(task)}
+            key={task.id}
+            className="flex h-20 items-center justify-between rounded-2xl px-4"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-10 border border-white/10">
+                {task.imageUrl && (
+                  <img className="size-full object-cover" src={task.imageUrl} />
+                )}
               </div>
 
-              {statuses[task.id] === "notStarted" ? (
-                <StartTaskButton onGo={() => onGo(task)} />
-              ) : (
-                <TaskStatusBlock id={task.id} status={statuses[task.id]} />
-              )}
-            </button>
-          ))}
-
-          {tasks?.length === 0 && (
-            <div className="text-muted-foreground flex h-16 items-center justify-center text-sm">
-              No tasks available
+              <div className="flex flex-col gap-2 *:leading-none">
+                <div>{task.name}</div>
+                <div>{task.reward} FRU</div>
+              </div>
             </div>
-          )}
-        </div>
+
+            {task.status === "notStarted" ? (
+              <StartTaskButton onGo={() => onGo(task)} />
+            ) : (
+              <TaskStatusBlock id={task.id} status={task.status} />
+            )}
+          </button>
+        ))}
+
+        {tasks?.length === 0 && (
+          <div className="text-muted-foreground flex h-16 items-center justify-center text-sm">
+            No tasks available
+          </div>
+        )}
       </div>
-    </TaskStatusContext.Provider>
+    </div>
   );
 };
 
@@ -138,18 +91,21 @@ const StartTaskButton = ({ onGo }: { onGo: () => void }) => {
 
 const CheckButton = ({ id }: { id: number }) => {
   const { startVerification } = useTasks();
-  const { updateStatus } = useTaskStatus();
+  const trpc = useTRPC();
+
+  const queryClient = useQueryClient();
 
   const onClick = () => {
     console.log(`Check button clicked for task ${id}`);
-    try {
-      console.log(`Setting task ${id} status to "checking"`);
-      updateStatus(id, "checking");
-      console.log(`Starting verification for task ${id}`);
-      startVerification({ taskId: id });
-    } catch (error) {
-      console.error(`Verification failed for task ${id}:`, error);
-    }
+    // Optimistically set status to "checking"
+    queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+      if (!oldTasks) return oldTasks;
+      return oldTasks.map((t) => (t.id === id ? { ...t, status: "checking" } : t));
+    });
+    // Start server verification
+    startVerification({ taskId: id }).catch((error) =>
+      console.error(`Verification failed for task ${id}:`, error),
+    );
   };
 
   return (
@@ -190,16 +146,11 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
     );
   }
 
-  if (status === "failed") {
-    console.log(`Task ${id} failed, showing check button again`);
-    return <CheckButton id={id} />;
-  }
-
   if (status === "completed") {
     console.log(`Task ${id} is completed, showing completed UI`);
     return <CompletedTask />;
   }
 
-  console.log(`Task ${id} has unknown status: ${status}`);
+  // Note: "failed" is handled by polling setting it to "notStarted", so no case needed here
   return null;
 };
