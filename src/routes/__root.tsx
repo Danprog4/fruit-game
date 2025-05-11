@@ -23,6 +23,7 @@ import { useTRPC } from "~/trpc/init/react";
 import { TRPCRouter } from "~/trpc/init/router";
 
 import { Buffer } from "buffer";
+import { ImagePreload } from "~/components/ImagePreload";
 import { useTaskStatusPolling } from "~/hooks/useTasks";
 
 // @ts-expect-error
@@ -108,6 +109,8 @@ function RootComponent() {
 
   return (
     <RootDocument>
+      <ImagePreload />
+
       <AuthProvider>
         <TonConnectUIProvider
           manifestUrl="https://fruit-game-eight.vercel.app/tonconnect-manifest.json"
