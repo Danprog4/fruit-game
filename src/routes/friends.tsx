@@ -58,7 +58,7 @@ function RouteComponent() {
             <User />
           </div>
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium text-nowrap">
-            У вас:{" "}
+            У вас{" "}
             <span className="text-[#85BF1A]">
               {pluralizeRuIntl(friends?.length || 0, ruFriends)}
             </span>

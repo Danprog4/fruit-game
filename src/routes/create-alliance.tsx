@@ -27,6 +27,8 @@ function RouteComponent() {
   const [showErrors, setShowErrors] = useState(false);
   const scrollPositionRef = useRef<number>(0);
   const [isForTON, setIsForTON] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
@@ -44,12 +46,13 @@ function RouteComponent() {
   };
 
   const handleCreateAllianceForTON = async () => {
-    if (!selectedFile || !allianceName) {
+    if (!selectedFile || !allianceName || isProcessing) {
       setShowErrors(true);
       return;
     }
 
     try {
+      setIsProcessing(true);
       let fileToProcess = selectedFile;
 
       // If file is HEIC, convert to PNG first
@@ -71,16 +74,19 @@ function RouteComponent() {
       await navigate({ to: "/wallet" });
     } catch (error) {
       console.error("Error creating alliance:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleCreateAllianceForFRU = async () => {
-    if (!selectedFile || !allianceName) {
+    if (!selectedFile || !allianceName || isProcessing) {
       setShowErrors(true);
       return;
     }
 
     try {
+      setIsProcessing(true);
       let fileToProcess = selectedFile;
 
       // If file is HEIC, convert to PNG first
@@ -100,11 +106,13 @@ function RouteComponent() {
       await navigate({ to: "/alliances" });
     } catch (error) {
       console.error("Error creating alliance:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleButtonClickFRU = () => {
-    if (!selectedFile || !allianceName) {
+    if (!selectedFile || !allianceName || isProcessing) {
       setShowErrors(true);
     } else {
       handleCreateAllianceForFRU();
@@ -112,7 +120,7 @@ function RouteComponent() {
   };
 
   const handleButtonClickTON = () => {
-    if (!selectedFile || !allianceName) {
+    if (!selectedFile || !allianceName || isProcessing) {
       setShowErrors(true);
     } else {
       handleCreateAllianceForTON();
@@ -221,19 +229,19 @@ function RouteComponent() {
 
         {isForTON ? (
           <button
-            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white disabled:opacity-70"
             onClick={handleButtonClickTON}
-            disabled={createWithTON.isPending}
+            disabled={createWithTON.isPending || isProcessing}
           >
-            {createWithTON.isPending ? "Создание..." : "Создать за TON"}
+            {createWithTON.isPending || isProcessing ? "Создание..." : "Создать за TON"}
           </button>
         ) : (
           <button
-            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
+            className="font-manrope absolute right-4 bottom-[21px] left-4 flex h-[52px] w-auto max-w-md items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white disabled:opacity-70"
             onClick={handleButtonClickFRU}
-            disabled={createWithFRU.isPending}
+            disabled={createWithFRU.isPending || isProcessing}
           >
-            {createWithFRU.isPending ? "Создание..." : "Создать за FRU"}
+            {createWithFRU.isPending || isProcessing ? "Создание..." : "Создать за FRU"}
           </button>
         )}
       </div>

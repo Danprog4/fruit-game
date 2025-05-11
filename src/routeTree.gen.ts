@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as WithdrawalImport } from './routes/withdrawal'
 import { Route as WalletImport } from './routes/wallet'
+import { Route as TestImport } from './routes/test'
 import { Route as TasksImport } from './routes/tasks'
 import { Route as FriendsImport } from './routes/friends'
 import { Route as FarmsImport } from './routes/farms'
@@ -35,6 +36,12 @@ const WithdrawalRoute = WithdrawalImport.update({
 const WalletRoute = WalletImport.update({
   id: '/wallet',
   path: '/wallet',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TestRoute = TestImport.update({
+  id: '/test',
+  path: '/test',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -158,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksImport
       parentRoute: typeof rootRoute
     }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestImport
+      parentRoute: typeof rootRoute
+    }
     '/wallet': {
       id: '/wallet'
       path: '/wallet'
@@ -200,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/farms': typeof FarmsRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/test': typeof TestRoute
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
@@ -215,6 +230,7 @@ export interface FileRoutesByTo {
   '/farms': typeof FarmsRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/test': typeof TestRoute
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
@@ -231,6 +247,7 @@ export interface FileRoutesById {
   '/farms': typeof FarmsRoute
   '/friends': typeof FriendsRoute
   '/tasks': typeof TasksRoute
+  '/test': typeof TestRoute
   '/wallet': typeof WalletRoute
   '/withdrawal': typeof WithdrawalRoute
   '/alliance/$id': typeof AllianceIdRoute
@@ -248,6 +265,7 @@ export interface FileRouteTypes {
     | '/farms'
     | '/friends'
     | '/tasks'
+    | '/test'
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
@@ -262,6 +280,7 @@ export interface FileRouteTypes {
     | '/farms'
     | '/friends'
     | '/tasks'
+    | '/test'
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
@@ -276,6 +295,7 @@ export interface FileRouteTypes {
     | '/farms'
     | '/friends'
     | '/tasks'
+    | '/test'
     | '/wallet'
     | '/withdrawal'
     | '/alliance/$id'
@@ -292,6 +312,7 @@ export interface RootRouteChildren {
   FarmsRoute: typeof FarmsRoute
   FriendsRoute: typeof FriendsRoute
   TasksRoute: typeof TasksRoute
+  TestRoute: typeof TestRoute
   WalletRoute: typeof WalletRoute
   WithdrawalRoute: typeof WithdrawalRoute
   AllianceIdRoute: typeof AllianceIdRoute
@@ -307,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   FarmsRoute: FarmsRoute,
   FriendsRoute: FriendsRoute,
   TasksRoute: TasksRoute,
+  TestRoute: TestRoute,
   WalletRoute: WalletRoute,
   WithdrawalRoute: WithdrawalRoute,
   AllianceIdRoute: AllianceIdRoute,
@@ -331,6 +353,7 @@ export const routeTree = rootRoute
         "/farms",
         "/friends",
         "/tasks",
+        "/test",
         "/wallet",
         "/withdrawal",
         "/alliance/$id",
@@ -360,6 +383,9 @@ export const routeTree = rootRoute
     },
     "/tasks": {
       "filePath": "tasks.tsx"
+    },
+    "/test": {
+      "filePath": "test.tsx"
     },
     "/wallet": {
       "filePath": "wallet.tsx"

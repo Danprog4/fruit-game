@@ -113,7 +113,7 @@ export const alliancesRouter = {
 
       await db.insert(blockchainPaymentsTable).values(newTransaction);
 
-      const memo = createMemo("alliance", id, name, telegramChannelUrl, imageUUID);
+      const memo = createMemo("alliance", id);
 
       return memo;
     }),

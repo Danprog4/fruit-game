@@ -83,11 +83,11 @@ export const authRouter = {
           });
 
           if (referrer) {
-            // Give 10 stars to referrer
+            // Give 100 stars to referrer
             await db
               .update(usersTable)
               .set({
-                starBalance: (referrer.starBalance || 0) + 10,
+                starBalance: (referrer.starBalance || 0) + 100,
               })
               .where(eq(usersTable.id, Number(referrerId)));
           }

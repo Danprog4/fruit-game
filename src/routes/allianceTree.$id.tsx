@@ -11,6 +11,7 @@ import {
   getCurrentAllianceLevelObject,
   getNextAllianceLevelPrice,
 } from "~/lib/alliance-levels.config";
+import { getImageByLevel } from "~/lib/tree.config";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/allianceTree/$id")({
@@ -182,131 +183,139 @@ function RouteComponent() {
     },
   ];
 
-  return (
-    <div className="flex flex-col items-center p-4 pt-12 text-white">
-      <BackButton onClick={() => navigate({ to: "/alliances" })} />
-      <div className="mb-8 text-2xl font-bold">Дерево прокачки</div>
-      <div className="flex w-full justify-between gap-4">
-        {allianceStats.map((stat, index) => (
-          <div key={index} className="flex flex-col items-center">
-            <button type="button" className="relative mb-2">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="40"
-                  height="40"
-                  fill="none"
-                  stroke="currentColor"
-                  className="text-gray-700"
-                >
-                  {stat.icon}
-                </svg>
-              </div>
-              <div className="absolute top-0 right-0 h-24 w-24">
-                <svg viewBox="0 0 100 100" width="100%" height="100%">
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="48"
-                    fill="none"
-                    stroke={getProgressColor(stat.progress)}
-                    strokeWidth="4"
-                    strokeDasharray="301.6"
-                    strokeDashoffset={getStrokeDashoffset(stat.progress)}
-                    transform="rotate(-90 50 50)"
-                  />
-                </svg>
-              </div>
-            </button>
+  const allianceLevel = Object.keys(alliance.levels).reduce((acc, level) => {
+    return acc + alliance.levels[level as keyof typeof alliance.levels];
+  }, 0);
 
-            <div className="text-center font-medium">{stat.title}</div>
-            {stat.valueDisplay}
-          </div>
+  const TreeImage = getImageByLevel(allianceLevel || 1);
+
+  return (
+    <div className="flex h-full flex-col items-center bg-[#3b390e] text-white">
+      <BackButton onClick={() => navigate({ to: "/alliances" })} />
+
+      <div className="relative">
+        <img src={TreeImage} alt="" className="object-cover" />
+        <div className="absolute bottom-0 h-20 w-full bg-gradient-to-t from-[#3b390e] to-transparent"></div>
+      </div>
+
+      <div className="mb-4 text-2xl font-bold">Дерево прокачки</div>
+      <div className="flex w-full justify-between gap-4 p-4">
+        {allianceStats.map((stat, index) => (
+          <Drawer.Root>
+            <div key={index} className="flex flex-col items-center">
+              <Drawer.Trigger asChild>
+                <button type="button" className="relative mb-2">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="40"
+                      height="40"
+                      fill="none"
+                      stroke="currentColor"
+                      className="text-white"
+                    >
+                      {stat.icon}
+                    </svg>
+                  </div>
+                  <div className="absolute top-0 right-0 h-24 w-24">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="48"
+                        fill="none"
+                        stroke={getProgressColor(stat.progress)}
+                        strokeWidth="4"
+                        strokeDasharray="301.6"
+                        strokeDashoffset={getStrokeDashoffset(stat.progress)}
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                  </div>
+                </button>
+              </Drawer.Trigger>
+              <div className="text-center font-medium">{stat.title}</div>
+              {stat.valueDisplay}
+            </div>
+            <Drawer.Portal>
+              <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+
+              <Drawer.Content className="fixed right-0 bottom-0 left-0 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#3b390e] outline-none">
+                <div className="flex flex-col p-6">
+                  <div className="mb-4 ml-auto flex items-center gap-2">
+                    <div className="text-sm text-gray-300">Купить за TON</div>
+                    <Switch
+                      checked={isTON}
+                      onCheckedChange={(checked: boolean) => setIsTON(checked)}
+                    />
+                  </div>
+                  <div className="flex w-full justify-between gap-4">
+                    {allianceStats.map((stat, index) => (
+                      <div key={index} className="flex flex-col items-center">
+                        <button type="button" className="relative mb-2">
+                          <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
+                            <svg
+                              viewBox="0 0 24 24"
+                              width="40"
+                              height="40"
+                              fill="none"
+                              stroke="currentColor"
+                              className="text-white"
+                            >
+                              {stat.icon}
+                            </svg>
+                          </div>
+                          <div className="absolute top-0 right-0 h-24 w-24">
+                            <svg viewBox="0 0 100 100" width="100%" height="100%">
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="48"
+                                fill="none"
+                                stroke={getProgressColor(stat.progress)}
+                                strokeWidth="4"
+                                strokeDasharray="301.6"
+                                strokeDashoffset={getStrokeDashoffset(stat.progress)}
+                                transform="rotate(-90 50 50)"
+                              />
+                            </svg>
+                          </div>
+                        </button>
+
+                        {isTON ? (
+                          <button
+                            type="button"
+                            className="mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                            onClick={() => handleUpgradeForTON(stat.type)}
+                            disabled={upgradeWithTON.isPending}
+                          >
+                            Улучшить за TON
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="w- mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                            onClick={() => handleUpgradeForFRU(stat.type)}
+                            disabled={upgradeWithFRU.isPending}
+                          >
+                            Улучшить за FRU
+                          </button>
+                        )}
+
+                        <div className="mt-2 text-center text-sm font-medium">
+                          {stat.title}
+                        </div>
+
+                        {stat.priceDisplay}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Drawer.Content>
+            </Drawer.Portal>
+          </Drawer.Root>
         ))}
       </div>
-      <Drawer.Root>
-        <Drawer.Trigger asChild>
-          <button className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-12 w-auto items-center justify-center rounded-full bg-[#7AB019] px-4 text-sm font-medium text-white">
-            Прокачать
-          </button>
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-
-          <Drawer.Content className="fixed right-0 bottom-0 left-0 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] outline-none">
-            <div className="flex flex-col p-6">
-              <div className="mb-4 ml-auto flex items-center gap-2">
-                <div className="text-sm text-gray-300">Купить за TON</div>
-                <Switch
-                  checked={isTON}
-                  onCheckedChange={(checked) => setIsTON(checked)}
-                />
-              </div>
-              <div className="flex w-full justify-between gap-4">
-                {allianceStats.map((stat, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <button type="button" className="relative mb-2">
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="40"
-                          height="40"
-                          fill="none"
-                          stroke="currentColor"
-                          className="text-gray-700"
-                        >
-                          {stat.icon}
-                        </svg>
-                      </div>
-                      <div className="absolute top-0 right-0 h-24 w-24">
-                        <svg viewBox="0 0 100 100" width="100%" height="100%">
-                          <circle
-                            cx="50"
-                            cy="50"
-                            r="48"
-                            fill="none"
-                            stroke={getProgressColor(stat.progress)}
-                            strokeWidth="4"
-                            strokeDasharray="301.6"
-                            strokeDashoffset={getStrokeDashoffset(stat.progress)}
-                            transform="rotate(-90 50 50)"
-                          />
-                        </svg>
-                      </div>
-                    </button>
-
-                    {isTON ? (
-                      <button
-                        type="button"
-                        className="mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
-                        onClick={() => handleUpgradeForTON(stat.type)}
-                        disabled={upgradeWithTON.isPending}
-                      >
-                        Улучшить за TON
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="w- mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
-                        onClick={() => handleUpgradeForFRU(stat.type)}
-                        disabled={upgradeWithFRU.isPending}
-                      >
-                        Улучшить за FRU
-                      </button>
-                    )}
-
-                    <div className="mt-2 text-center text-sm font-medium">
-                      {stat.title}
-                    </div>
-
-                    {stat.priceDisplay}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
     </div>
   );
 }
