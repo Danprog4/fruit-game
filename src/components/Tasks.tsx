@@ -1,32 +1,39 @@
+import { useTasks } from "~/hooks/useTasks";
+
 import { useQueryClient } from "@tanstack/react-query";
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { CircleCheck as CheckIcon, Loader2 as Spinner } from "lucide-react";
-import { useTasks, useTaskStatusPolling } from "~/hooks/useTasks";
 import { FrontendTask, TaskStatus } from "~/lib/db/schema";
 import { useTRPC } from "~/trpc/init/react";
 
 export const TasksList = () => {
-  const { tasks, startTask } = useTasks();
-
-  // Add polling hook to monitor server updates
-  useTaskStatusPolling();
+  const trpc = useTRPC();
+  const { tasks } = useTasks();
+  const queryClient = useQueryClient();
+  const { startTask } = useTasks();
 
   const onGo = (task: FrontendTask) => {
     if (task.status === "completed") {
-      console.log(`Task ${task.id} is already completed, ignoring click`);
       return;
     }
 
     if (!task.taskData) {
-      console.log(`Task ${task.id} has no task data, ignoring click`);
+      console.log("no task data", task);
       return;
     }
 
-    startTask.mutate({ taskId: task.id });
     const channelName =
       task.taskData?.type === "telegram" ? task.taskData.data.channelName : null;
+
+    console.log("channelName", channelName);
+
+    startTask
+      .mutateAsync({ taskId: task.id })
+      .then(() =>
+        queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() }),
+      );
+
     if (channelName) {
-      console.log(`Opening Telegram channel: ${channelName}`);
       openTelegramLink(`https://t.me/${channelName}`);
     }
   };
@@ -84,21 +91,25 @@ const StartTaskButton = ({ onGo }: { onGo: () => void }) => {
 
 const CheckButton = ({ id }: { id: number }) => {
   const { startVerification } = useTasks();
+  const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const queryClient = useQueryClient();
-
   const onClick = () => {
-    console.log(`Check button clicked for task ${id}`);
-    // Optimistically set status to "checking"
-    queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
-      if (!oldTasks) return oldTasks;
-      return oldTasks.map((t) => (t.id === id ? { ...t, status: "checking" } : t));
-    });
-    // Start server verification
-    startVerification({ taskId: id }).catch((error) =>
-      console.error(`Verification failed for task ${id}:`, error),
-    );
+    // optimistic
+    const old = queryClient.getQueryData(trpc.tasks.getTasks.queryKey());
+
+    try {
+      startVerification({ taskId: id });
+      queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
+        if (!oldTasks) return oldTasks;
+
+        return oldTasks.map((t) =>
+          t.id === id ? { ...t, status: "checking" as TaskStatus } : t,
+        );
+      });
+    } catch {
+      queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), old);
+    }
   };
 
   return (
@@ -114,7 +125,6 @@ const CheckButton = ({ id }: { id: number }) => {
 };
 
 const CompletedTask = () => {
-  console.log("Rendering completed task UI");
   return (
     <button className="flex h-9 w-14 items-center justify-center rounded-xl border border-white/10 p-2 text-white opacity-80">
       <CheckIcon className="size-4" />
@@ -123,15 +133,11 @@ const CompletedTask = () => {
 };
 
 const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => {
-  console.log(`Rendering status block for task ${id} with status: ${status}`);
-
   if (status === "started") {
-    console.log(`Task ${id} is started, showing check button`);
     return <CheckButton id={id} />;
   }
 
   if (status === "checking") {
-    console.log(`Task ${id} is checking, showing spinner`);
     return (
       <button className="flex h-9 w-14 items-center justify-end rounded-xl p-2 text-white opacity-80">
         <Spinner className="size-4" />
@@ -139,11 +145,13 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
     );
   }
 
+  if (status === "failed") {
+    return <CheckButton id={id} />;
+  }
+
   if (status === "completed") {
-    console.log(`Task ${id} is completed, showing completed UI`);
     return <CompletedTask />;
   }
 
-  // Note: "failed" is handled by polling setting it to "notStarted", so no case needed here
   return null;
 };

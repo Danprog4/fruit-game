@@ -58,7 +58,7 @@ export function useTaskStatusPolling() {
 
   const checkingTaskIds = tasks?.filter((t) => t.status === "checking").map((t) => t.id);
 
-  const enabled = Boolean(checkingTaskIds?.length);
+  console.log("checkingTaskIds", checkingTaskIds);
 
   const { data: statuses } = useQuery(
     trpc.tasks.getTasksStatuses.queryOptions(
@@ -66,8 +66,7 @@ export function useTaskStatusPolling() {
         tasksIds: checkingTaskIds ?? [],
       },
       {
-        enabled,
-        refetchInterval: enabled ? 5000 : false,
+        refetchInterval: 5000,
       },
     ),
   );
@@ -80,7 +79,7 @@ export function useTaskStatusPolling() {
     });
   };
 
-  console.log("statuses", statuses);
+  console.log("statuses polling", statuses);
 
   useEffect(() => {
     if (!statuses) {
