@@ -83,33 +83,17 @@ export const tasksRouter = {
         throw new Error("Task not found");
       }
 
-      // Check if task already exists for this user
-      const existingUserTask = await db
-        .select()
-        .from(userTasksTable)
-        .where(
-          and(
-            eq(userTasksTable.userId, ctx.userId),
-            eq(userTasksTable.taskId, input.taskId),
-          ),
-        )
-        .then((rows) => rows[0]);
-
-      if (existingUserTask) {
-        return {
-          id: input.taskId,
-          status: "checking" as TaskStatus,
-        };
-      }
-
       // create new task as checking in users table
-      await db.insert(userTasksTable).values({
-        userId: ctx.userId,
-        taskId: input.taskId,
-        status: "checking",
-      });
-
-      // Removed direct checking - will be handled by polling
+      await db
+        .insert(userTasksTable)
+        .values({
+          userId: ctx.userId,
+          taskId: input.taskId,
+          status: "checking",
+        })
+        .onConflictDoNothing({
+          target: [userTasksTable.userId, userTasksTable.taskId],
+        });
 
       return {
         id: input.taskId,
