@@ -104,6 +104,18 @@ export const tasksRouter = {
         });
 
         console.log("new task created");
+      } else {
+        await db
+          .update(userTasksTable)
+          .set({
+            status: "checking",
+          })
+          .where(
+            and(
+              eq(userTasksTable.userId, ctx.userId),
+              eq(userTasksTable.taskId, input.taskId),
+            ),
+          );
       }
 
       return {
