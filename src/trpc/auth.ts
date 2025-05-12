@@ -120,7 +120,7 @@ export const authRouter = {
             .set({
               balances: updatedReferrerBalances,
             })
-            .where(eq(usersTable.id, referrer.id));
+            .where(eq(usersTable.id, existingUser.id));
         }
       }
 
