@@ -6,7 +6,6 @@ import { SignJWT } from "jose";
 import { z } from "zod";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
-import { FARMS_CONFIG } from "~/lib/farms.config";
 import { updateBalances } from "~/lib/utils/updateBalances";
 import { publicProcedure } from "./init";
 
@@ -97,51 +96,6 @@ export const authRouter = {
       }
 
       await updateBalances(existingUser.id);
-
-      const allReferrals = await db.query.usersTable.findMany({
-        where: eq(usersTable.referrerId, existingUser.id),
-      });
-
-      if (allReferrals.length > 0) {
-        const existingUserBalances =
-          (existingUser.balances as Record<string, number>) || {};
-        const updatedExistingUserBalances = { ...existingUserBalances };
-
-        // Get elapsed time since user's last balance update
-        const nowMs = Date.now();
-        const lastDate = existingUser.lastUpdatedBalanceAt as unknown as Date | null;
-        const lastUpdatedMs = lastDate?.getTime() ?? nowMs;
-        const elapsedSeconds = (nowMs - lastUpdatedMs) / 1000;
-
-        for (const referral of allReferrals) {
-          const referralFarms = (referral.farms as Record<string, number>) || {};
-
-          Object.entries(referralFarms).forEach(([farmId, amount]) => {
-            const farm = FARMS_CONFIG.find((f) => f.id === farmId);
-            if (farm) {
-              // Calculate referral bonus based on the user's elapsed time
-              const ratePerSecond = farm.miningRate / 3600;
-              const bonus = amount * ratePerSecond * elapsedSeconds * 0.05;
-              updatedExistingUserBalances[farmId] =
-                (updatedExistingUserBalances[farmId] || 0) + bonus;
-            }
-          });
-        }
-
-        await db
-          .update(usersTable)
-          .set({
-            balances: updatedExistingUserBalances,
-            lastUpdatedBalanceAt: new Date(nowMs),
-          })
-          .where(eq(usersTable.id, existingUser.id));
-
-        const updatedUser = await db.query.usersTable.findFirst({
-          where: eq(usersTable.id, existingUser.id),
-        });
-
-        return updatedUser || existingUser;
-      }
 
       return existingUser;
     }),

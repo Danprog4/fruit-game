@@ -183,9 +183,7 @@ export const farmRouter = {
       await db
         .update(usersTable)
         .set({
-          balances: {
-            tokenBalance: newBalance,
-          },
+          tokenBalance: newBalance,
         })
         .where(eq(usersTable.id, userId));
 

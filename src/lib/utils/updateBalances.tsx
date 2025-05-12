@@ -60,6 +60,29 @@ export async function updateBalances(userId: string | number): Promise<void> {
     starBalance += dmIncome;
   }
 
+  // Check for referrals and add referral bonuses
+  const allReferrals = await db.query.usersTable.findMany({
+    where: eq(usersTable.referrerId, id),
+  });
+
+  if (allReferrals.length > 0) {
+    const existingUserBalances = updatedBalances;
+
+    for (const referral of allReferrals) {
+      const referralFarms = (referral.farms as Record<string, number>) || {};
+
+      Object.entries(referralFarms).forEach(([farmId, amount]) => {
+        const farm = FARMS_CONFIG.find((f) => f.id === farmId);
+        if (farm) {
+          // Calculate referral bonus based on the user's elapsed time
+          const ratePerSecond = farm.miningRate / 3600;
+          const bonus = amount * ratePerSecond * elapsedSeconds * 0.05;
+          existingUserBalances[farmId] = (existingUserBalances[farmId] || 0) + bonus;
+        }
+      });
+    }
+  }
+
   // Update user record with new balances and timestamp
   await db
     .update(usersTable)
