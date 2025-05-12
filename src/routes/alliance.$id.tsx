@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Drawer } from "vaul";
-import { AllianceMembList } from "~/components/AlianceMembList";
+import { AllianceMembList } from "~/components/AllianceMembList";
 import { BackButton } from "~/components/BackButton";
 import { NameInput } from "~/components/DynamicInput";
 import { AllianceMini } from "~/components/icons/AlianceMini";
