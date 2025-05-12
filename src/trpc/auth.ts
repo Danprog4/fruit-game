@@ -6,6 +6,7 @@ import { SignJWT } from "jose";
 import { z } from "zod";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import { updateBalances } from "~/lib/utils/updateBalances";
 import { publicProcedure } from "./init";
 
@@ -102,37 +103,23 @@ export const authRouter = {
       });
 
       if (allReferrals.length > 0) {
-        // Get existing user's balances
         const existingUserBalances =
           (existingUser.balances as Record<string, number>) || {};
         const updatedExistingUserBalances = { ...existingUserBalances };
 
-        // Process each referral
         for (const referral of allReferrals) {
-          // Update referral balances first
-          await updateBalances(referral.id);
+          const referralFarms = (referral.farms as Record<string, number>) || {};
 
-          // Get updated referral data
-          const updatedReferral = await db.query.usersTable.findFirst({
-            where: eq(usersTable.id, referral.id),
-          });
-
-          if (updatedReferral) {
-            const referralBalances =
-              (updatedReferral.balances as Record<string, number>) || {};
-
-            // Calculate 5% bonus from each referral's earnings
-            for (const [fruit, amount] of Object.entries(referralBalances)) {
-              const bonus = Math.floor(amount * 0.05);
-              if (bonus > 0) {
-                updatedExistingUserBalances[fruit] =
-                  (updatedExistingUserBalances[fruit] || 0) + bonus;
-              }
+          Object.entries(referralFarms).forEach(([farmId, amount]) => {
+            const farm = FARMS_CONFIG.find((f) => f.id === farmId);
+            if (farm) {
+              const bonus = Math.floor(amount * farm.miningRate * 0.05);
+              updatedExistingUserBalances[farmId] =
+                (updatedExistingUserBalances[farmId] || 0) + bonus;
             }
-          }
+          });
         }
 
-        // Update the existing user with all accumulated bonuses
         await db
           .update(usersTable)
           .set({
@@ -140,7 +127,6 @@ export const authRouter = {
           })
           .where(eq(usersTable.id, existingUser.id));
 
-        // Get the updated user data
         const updatedUser = await db.query.usersTable.findFirst({
           where: eq(usersTable.id, existingUser.id),
         });

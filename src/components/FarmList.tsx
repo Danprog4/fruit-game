@@ -105,7 +105,7 @@ export const FarmList = () => {
                         disabled={
                           buyFarmForTON.isPending && buyFarmForTON.variables === farm.id
                         }
-                        className="ont-light flex h-[44px] w-full items-center justify-center rounded-full bg-[#76AD10] text-sm text-white disabled:opacity-50"
+                        className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#76AD10] text-sm font-light text-white disabled:opacity-50"
                       >
                         {buyFarmForTON.isPending &&
                         buyFarmForTON.variables === farm.id ? (
