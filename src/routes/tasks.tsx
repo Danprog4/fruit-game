@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { BackButton } from "~/components/BackButton";
@@ -5,7 +6,7 @@ import { Flag } from "~/components/icons/Flag";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Input } from "~/components/Input";
 import { TasksList } from "~/components/Tasks";
-
+import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/tasks")({
   component: RouteComponent,
 });
@@ -13,6 +14,8 @@ export const Route = createFileRoute("/tasks")({
 function RouteComponent() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const trpc = useTRPC();
+  const { data: tasks } = useQuery(trpc.tasks.getTasks.queryOptions());
   return (
     <div className="flex w-full flex-col px-4 pt-12">
       <BackButton onClick={() => navigate({ to: "/" })} />
@@ -36,13 +39,15 @@ function RouteComponent() {
           Список квестов
         </div>
       </div>
-      <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
-        <div className="font-manrope text-sm text-white opacity-50">
-          К сожалению, квестов пока нет
+      {tasks?.length === 0 ? (
+        <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
+          <div className="font-manrope text-sm text-white opacity-50">
+            К сожалению, квестов пока нет
+          </div>
         </div>
-      </div>
-
-      <TasksList />
+      ) : (
+        <TasksList />
+      )}
     </div>
   );
 }

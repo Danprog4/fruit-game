@@ -113,7 +113,7 @@ export const authRouter = {
           Object.entries(referralFarms).forEach(([farmId, amount]) => {
             const farm = FARMS_CONFIG.find((f) => f.id === farmId);
             if (farm) {
-              const bonus = Math.floor(amount * farm.miningRate * 0.05);
+              const bonus = amount * farm.miningRate * 0.05;
               updatedExistingUserBalances[farmId] =
                 (updatedExistingUserBalances[farmId] || 0) + bonus;
             }
