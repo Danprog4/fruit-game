@@ -107,13 +107,21 @@ export const authRouter = {
           (existingUser.balances as Record<string, number>) || {};
         const updatedExistingUserBalances = { ...existingUserBalances };
 
+        // Get elapsed time since user's last balance update
+        const nowMs = Date.now();
+        const lastDate = existingUser.lastUpdatedBalanceAt as unknown as Date | null;
+        const lastUpdatedMs = lastDate?.getTime() ?? nowMs;
+        const elapsedSeconds = (nowMs - lastUpdatedMs) / 1000;
+
         for (const referral of allReferrals) {
           const referralFarms = (referral.farms as Record<string, number>) || {};
 
           Object.entries(referralFarms).forEach(([farmId, amount]) => {
             const farm = FARMS_CONFIG.find((f) => f.id === farmId);
             if (farm) {
-              const bonus = amount * farm.miningRate * 0.05;
+              // Calculate referral bonus based on the user's elapsed time
+              const ratePerSecond = farm.miningRate / 3600;
+              const bonus = amount * ratePerSecond * elapsedSeconds * 0.05;
               updatedExistingUserBalances[farmId] =
                 (updatedExistingUserBalances[farmId] || 0) + bonus;
             }
@@ -124,6 +132,7 @@ export const authRouter = {
           .update(usersTable)
           .set({
             balances: updatedExistingUserBalances,
+            lastUpdatedBalanceAt: new Date(nowMs),
           })
           .where(eq(usersTable.id, existingUser.id));
 

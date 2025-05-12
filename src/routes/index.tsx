@@ -46,6 +46,7 @@ function RouteComponent() {
 
   const alliancePath = allianceId ? `/alliance/${allianceId}` : "/alliances";
 
+  console.log(user?.tokenBalance);
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
       <div className="z-10 flex flex-col items-center justify-center gap-2 pt-12">
