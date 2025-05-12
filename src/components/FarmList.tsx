@@ -74,14 +74,14 @@ export const FarmList = () => {
                 className="fixed inset-0 bg-black/40"
                 onClick={() => setSelectedFarm(null)}
               />
-              <Drawer.Content className="fixed right-0 bottom-0 left-0 flex max-h-[82vh] flex-col rounded-t-[10px] bg-[#2A2A2A]">
+              <Drawer.Content className="fixed right-0 bottom-0 left-0 flex max-h-[82vh] flex-col rounded-t-4xl bg-[#2A2A2A]">
                 <div className="mx-auto w-full max-w-md overflow-auto rounded-t-[10px] p-4 text-white">
                   <Drawer.Handle onClick={() => setSelectedFarm(null)} />
-                  <Drawer.Title className="mt-4 text-xl font-medium">
+                  <Drawer.Title className="mt-4 flex items-center justify-center gap-2 text-lg font-medium">
+                    <div className="text-2xl">{farm.icon}</div>
                     {farm.name} ферма
                   </Drawer.Title>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="text-2xl">{farm.icon}</div>
+                  <div className="mt-2 flex items-center justify-center gap-2">
                     <div className="text-[#8F8F8F]">
                       Доходность:{" "}
                       {userFarms && userFarms[farm.id]
@@ -90,7 +90,7 @@ export const FarmList = () => {
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-lg bg-[#343D24] p-4">
+                  <div className="mt-4 rounded-lg bg-[#343D24] p-4 text-center">
                     <div className="mb-2 text-sm">
                       Купите ферму и начните получать {farm.tokenName} каждый час
                     </div>
@@ -105,7 +105,7 @@ export const FarmList = () => {
                         disabled={
                           buyFarmForTON.isPending && buyFarmForTON.variables === farm.id
                         }
-                        className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#76AD10] font-medium text-white disabled:opacity-50"
+                        className="ont-light flex h-[44px] w-full items-center justify-center rounded-full bg-[#76AD10] text-sm text-white disabled:opacity-50"
                       >
                         {buyFarmForTON.isPending &&
                         buyFarmForTON.variables === farm.id ? (
@@ -121,7 +121,7 @@ export const FarmList = () => {
                           buyFarmForFRU.isPending &&
                           buyFarmForFRU.variables?.farmId === farm.id
                         }
-                        className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#4A4A4A] font-medium text-white disabled:opacity-50"
+                        className="font-manrope flex h-[44px] w-full items-center justify-center rounded-full bg-[#4A4A4A] text-sm font-light text-white disabled:opacity-50"
                       >
                         {buyFarmForFRU.isPending &&
                         buyFarmForFRU.variables?.farmId === farm.id ? (

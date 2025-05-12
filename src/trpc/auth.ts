@@ -83,7 +83,6 @@ export const authRouter = {
           });
 
           if (referrer) {
-            // Give 100 stars to referrer
             await db
               .update(usersTable)
               .set({
@@ -98,21 +97,17 @@ export const authRouter = {
 
       await updateBalances(existingUser.id);
 
-      // If user has a referrer, give 5% of all balances to the referrer
-      if (existingUser.referrerId) {
-        const referrer = await db.query.usersTable.findFirst({
-          where: eq(usersTable.id, existingUser.referrerId),
-        });
+      const allReferrers = await db.query.usersTable.findMany({
+        where: eq(usersTable.referrerId, existingUser.id),
+      });
 
-        if (referrer) {
-          // Calculate 5% of each fruit in balances
-          const userBalances = existingUser.balances as Record<string, number>;
+      if (allReferrers.length > 0) {
+        for (const referrer of allReferrers) {
           const referrerBalances = referrer.balances as Record<string, number>;
 
           const updatedReferrerBalances = { ...referrerBalances };
 
-          // Add 5% of each fruit balance to referrer
-          for (const [fruit, amount] of Object.entries(userBalances)) {
+          for (const [fruit, amount] of Object.entries(referrerBalances)) {
             const bonus = Math.floor(amount * 0.05);
             if (bonus > 0) {
               updatedReferrerBalances[fruit] =
@@ -120,13 +115,12 @@ export const authRouter = {
             }
           }
 
-          // Update referrer with bonuses
           await db
             .update(usersTable)
             .set({
               balances: updatedReferrerBalances,
             })
-            .where(eq(usersTable.id, existingUser.referrerId));
+            .where(eq(usersTable.id, referrer.id));
         }
       }
 
