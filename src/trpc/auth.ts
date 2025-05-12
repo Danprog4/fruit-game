@@ -97,31 +97,55 @@ export const authRouter = {
 
       await updateBalances(existingUser.id);
 
-      const allReferrers = await db.query.usersTable.findMany({
+      const allReferrals = await db.query.usersTable.findMany({
         where: eq(usersTable.referrerId, existingUser.id),
       });
 
-      if (allReferrers.length > 0) {
-        for (const referrer of allReferrers) {
-          const referrerBalances = referrer.balances as Record<string, number>;
+      if (allReferrals.length > 0) {
+        // Get existing user's balances
+        const existingUserBalances =
+          (existingUser.balances as Record<string, number>) || {};
+        const updatedExistingUserBalances = { ...existingUserBalances };
 
-          const updatedReferrerBalances = { ...referrerBalances };
+        // Process each referral
+        for (const referral of allReferrals) {
+          // Update referral balances first
+          await updateBalances(referral.id);
 
-          for (const [fruit, amount] of Object.entries(referrerBalances)) {
-            const bonus = Math.floor(amount * 0.05);
-            if (bonus > 0) {
-              updatedReferrerBalances[fruit] =
-                (updatedReferrerBalances[fruit] || 0) + bonus;
+          // Get updated referral data
+          const updatedReferral = await db.query.usersTable.findFirst({
+            where: eq(usersTable.id, referral.id),
+          });
+
+          if (updatedReferral) {
+            const referralBalances =
+              (updatedReferral.balances as Record<string, number>) || {};
+
+            // Calculate 5% bonus from each referral's earnings
+            for (const [fruit, amount] of Object.entries(referralBalances)) {
+              const bonus = Math.floor(amount * 0.05);
+              if (bonus > 0) {
+                updatedExistingUserBalances[fruit] =
+                  (updatedExistingUserBalances[fruit] || 0) + bonus;
+              }
             }
           }
-
-          await db
-            .update(usersTable)
-            .set({
-              balances: updatedReferrerBalances,
-            })
-            .where(eq(usersTable.id, existingUser.id));
         }
+
+        // Update the existing user with all accumulated bonuses
+        await db
+          .update(usersTable)
+          .set({
+            balances: updatedExistingUserBalances,
+          })
+          .where(eq(usersTable.id, existingUser.id));
+
+        // Get the updated user data
+        const updatedUser = await db.query.usersTable.findFirst({
+          where: eq(usersTable.id, existingUser.id),
+        });
+
+        return updatedUser || existingUser;
       }
 
       return existingUser;
