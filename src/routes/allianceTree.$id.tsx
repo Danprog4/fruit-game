@@ -84,14 +84,6 @@ function RouteComponent() {
     return 301.6 - (301.6 * percentage) / 100;
   };
 
-  const getProgressColor = (percentage: number): string => {
-    if (percentage <= 20) return "#4CAF50";
-    if (percentage <= 40) return "#45a049";
-    if (percentage <= 60) return "#3d9142";
-    if (percentage <= 80) return "#34833a";
-    return "#2b7433";
-  };
-
   const allianceStats = [
     {
       type: "capacity" as AllianceLevelType,
@@ -117,7 +109,7 @@ function RouteComponent() {
           {getNextAllianceLevelPrice("capacity", alliance.levels.capacity || 0)
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-          {isTON ? "TON" : "FRU"}
+          FRU
           <span className="text-xs"></span>
         </div>
       ),
@@ -147,7 +139,7 @@ function RouteComponent() {
           {getNextAllianceLevelPrice("coefficient", alliance.levels.coefficient || 0)
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-          {isTON ? "TON" : "FRU"}
+          FRU
           <span className="text-xs"></span>
         </div>
       ),
@@ -176,7 +168,7 @@ function RouteComponent() {
           {getNextAllianceLevelPrice("profitability", alliance.levels.profitability || 0)
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-          TON
+          FRU
           <span className="text-xs"></span>
         </div>
       ),
@@ -190,7 +182,7 @@ function RouteComponent() {
   const TreeImage = getImageByLevel(allianceLevel || 1);
 
   return (
-    <div className="flex h-full flex-col items-center bg-[#3b390e] text-white">
+    <div className="flex h-screen flex-col items-center overflow-y-hidden bg-[#3b390e] text-white">
       <BackButton onClick={() => navigate({ to: "/alliances" })} />
 
       <div className="relative">
@@ -224,8 +216,8 @@ function RouteComponent() {
                         cy="50"
                         r="48"
                         fill="none"
-                        stroke={getProgressColor(stat.progress)}
-                        strokeWidth="4"
+                        stroke="#76AD10"
+                        strokeWidth="6"
                         strokeDasharray="301.6"
                         strokeDashoffset={getStrokeDashoffset(stat.progress)}
                         transform="rotate(-90 50 50)"
@@ -243,7 +235,11 @@ function RouteComponent() {
               <Drawer.Content className="fixed right-0 bottom-0 left-0 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#3b390e] outline-none">
                 <div className="flex flex-col p-6">
                   <div className="mb-4 ml-auto flex items-center gap-2">
-                    <div className="text-sm text-gray-300">Купить за TON</div>
+                    {isTON ? (
+                      <div className="text-sm text-gray-300">Купить за FRU (Баланс)</div>
+                    ) : (
+                      <div className="text-sm text-gray-300">Купить за FRU (TON)</div>
+                    )}
                     <Switch
                       checked={isTON}
                       onCheckedChange={(checked: boolean) => setIsTON(checked)}
@@ -272,8 +268,8 @@ function RouteComponent() {
                                 cy="50"
                                 r="48"
                                 fill="none"
-                                stroke={getProgressColor(stat.progress)}
-                                strokeWidth="4"
+                                stroke="#76AD10"
+                                strokeWidth="6"
                                 strokeDasharray="301.6"
                                 strokeDashoffset={getStrokeDashoffset(stat.progress)}
                                 transform="rotate(-90 50 50)"
@@ -289,7 +285,7 @@ function RouteComponent() {
                             onClick={() => handleUpgradeForTON(stat.type)}
                             disabled={upgradeWithTON.isPending}
                           >
-                            Улучшить за TON
+                            Улучшить за FRU
                           </button>
                         ) : (
                           <button
