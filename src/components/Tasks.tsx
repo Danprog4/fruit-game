@@ -132,7 +132,7 @@ const CheckButton = ({ id }: { id: number }) => {
 
 const CompletedTask = () => {
   return (
-    <button className="flex aspect-square items-center justify-center rounded-full bg-[#76AD10] p-2 text-white opacity-80">
+    <button className="flex aspect-square items-center justify-center rounded-full bg-[#76AD10] p-2 text-white">
       <CheckIcon className="size-4" />
     </button>
   );
@@ -145,7 +145,7 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
 
   if (status === "checking") {
     return (
-      <button className="flex aspect-square items-center justify-center rounded-full bg-[#76AD10] p-2 text-white opacity-80">
+      <button className="flex aspect-square items-center justify-center rounded-full bg-[#76AD10] p-2 text-white">
         <Spinner className="size-4 animate-spin" />
       </button>
     );

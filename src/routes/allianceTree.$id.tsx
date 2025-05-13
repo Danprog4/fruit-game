@@ -101,7 +101,8 @@ function RouteComponent() {
       ),
       valueDisplay: (
         <div className="flex items-center gap-1 text-sm text-nowrap text-gray-300">
-          {capacityLevel?.level} LVL | {capacityLevel?.value}
+          {capacityLevel?.level} <span className="text-[#76AD10]">LVL</span> |{" "}
+          {capacityLevel?.value}
           <div className="text-xs"></div>
         </div>
       ),
@@ -130,7 +131,7 @@ function RouteComponent() {
       ),
       valueDisplay: (
         <div className="text-sm text-gray-300">
-          {coefficientLevel?.level} LVL |{" "}
+          {coefficientLevel?.level} <span className="text-[#76AD10]">LVL</span> |{" "}
           {coefficientLevel?.value === 0 ? "1" : coefficientLevel?.value}X
           <span className="text-xs"></span>
         </div>
@@ -160,8 +161,8 @@ function RouteComponent() {
       ),
       valueDisplay: (
         <div className="text-sm text-gray-300">
-          {profitabilityLevel?.level} LVL | {profitabilityLevel?.value}%
-          <span className="text-xs"></span>
+          {profitabilityLevel?.level} <span className="text-[#76AD10]">LVL</span> |{" "}
+          {profitabilityLevel?.value}%<span className="text-xs"></span>
         </div>
       ),
       priceDisplay: (
