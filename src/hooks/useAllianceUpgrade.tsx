@@ -75,6 +75,7 @@ export const useAllianceUpgrade = () => {
   const upgradeWithFRU = useMutation({
     mutationFn: async ({ allianceId, type }: UpgradeParams) => {
       await upgradeAlliance.mutateAsync({ allianceId, type });
+      queryClient.invalidateQueries({ queryKey: trpc.alliances.getAlliances.queryKey() });
     },
     onSuccess: () => {
       toast.success("Уровень прокачен");

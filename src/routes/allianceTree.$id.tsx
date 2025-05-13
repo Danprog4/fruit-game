@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Loader2 as Spinner } from "lucide-react";
 import { useState } from "react";
 import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
@@ -177,9 +178,11 @@ function RouteComponent() {
 
   const allianceLevel = Object.keys(alliance.levels).reduce((acc, level) => {
     return acc + alliance.levels[level as keyof typeof alliance.levels];
-  }, 0);
+  }, 1);
 
-  const TreeImage = getImageByLevel(allianceLevel || 1);
+  const TreeImage = getImageByLevel(allianceLevel || 0);
+
+  console.log(allianceLevel);
 
   return (
     <div className="flex h-screen flex-col items-center overflow-y-hidden bg-[#3b390e] text-white">
@@ -193,8 +196,8 @@ function RouteComponent() {
       <div className="mb-4 text-2xl font-bold">Дерево прокачки</div>
       <div className="flex w-full justify-between gap-4 p-4">
         {allianceStats.map((stat, index) => (
-          <Drawer.Root>
-            <div key={index} className="flex flex-col items-center">
+          <Drawer.Root key={index}>
+            <div className="flex flex-col items-center">
               <Drawer.Trigger asChild>
                 <button type="button" className="relative mb-2">
                   <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-transparent">
@@ -281,20 +284,30 @@ function RouteComponent() {
                         {isTON ? (
                           <button
                             type="button"
-                            className="mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                            className="mt-2 flex h-12 min-w-[104px] items-center justify-center rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
                             onClick={() => handleUpgradeForTON(stat.type)}
                             disabled={upgradeWithTON.isPending}
                           >
-                            Улучшить за FRU
+                            {upgradeWithTON.isPending &&
+                            stat.type === upgradeWithTON.variables.type ? (
+                              <Spinner className="size-4 animate-spin" />
+                            ) : (
+                              "Улучшить за TON"
+                            )}
                           </button>
                         ) : (
                           <button
                             type="button"
-                            className="w- mt-2 rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
+                            className="mt-2 flex h-12 min-w-[104px] items-center justify-center rounded-3xl bg-[#7AB019] px-3 py-1 text-sm transition-colors hover:bg-[#7AB019]"
                             onClick={() => handleUpgradeForFRU(stat.type)}
                             disabled={upgradeWithFRU.isPending}
                           >
-                            Улучшить за FRU
+                            {upgradeWithFRU.isPending &&
+                            stat.type === upgradeWithFRU.variables.type ? (
+                              <Spinner className="size-4 animate-spin" />
+                            ) : (
+                              "Улучшить за FRU"
+                            )}
                           </button>
                         )}
 
@@ -302,7 +315,7 @@ function RouteComponent() {
                           {stat.title}
                         </div>
 
-                        {stat.priceDisplay}
+                        <div className="text-nowrap">{stat.priceDisplay}</div>
                       </div>
                     ))}
                   </div>
