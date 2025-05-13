@@ -186,7 +186,7 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen flex-col items-center overflow-y-hidden bg-[#3b390e] text-white">
-      <BackButton onClick={() => navigate({ to: "/alliances" })} />
+      <BackButton onClick={() => navigate({ to: "/alliance/$id", params: { id } })} />
 
       <div className="relative">
         <img src={TreeImage} alt="" className="object-cover" />
