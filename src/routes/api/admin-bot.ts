@@ -30,10 +30,8 @@ const redis = new Redis({
 const token = process.env.ADMIN_BOT_TOKEN;
 if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
 
-const bot = new Bot<ConversationFlavor<Context>>(token); // <-- put your bot token between the "" (https://t.me/BotFather)
+const bot = new Bot<ConversationFlavor<Context>>(token);
 bot.use(conversations());
-
-// Упрощенный подход для текстовой команды
 
 const availableFruits = FARMS_CONFIG.map((farm) => farm.name).join(", ");
 
@@ -200,3 +198,5 @@ export const APIRoute = createAPIFileRoute("/api/admin-bot")({
   GET: async ({ request }) => handleUpdate(request),
   POST: async ({ request }) => handleUpdate(request),
 });
+
+bot.start();
