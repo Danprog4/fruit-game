@@ -46,9 +46,9 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-await redis.set("text", []);
-
 async function setText(conversation: Conversation, ctx: Context) {
+  await redis.set("text", []);
+
   await ctx.reply("Set the text you want to set as 1 text");
 
   for (let i = 0; i < 3; i++) {
@@ -79,6 +79,12 @@ bot.command("text", async (ctx) => {
 async function setSeason(conversation: Conversation, ctx: Context) {
   await ctx.reply(`Enter the season fruit. Available fruits: ${availableFruits}`);
   const { message } = await conversation.waitFor("message:text");
+
+  if (!availableFruits.includes(message.text.toLowerCase())) {
+    await ctx.reply("Invalid fruit");
+    return;
+  }
+
   await db.update(allianceSessionTable).set({
     seasonCurr: message.text,
     seasonStart: dayjs().toDate(),
