@@ -125,6 +125,10 @@ bot.command("topTokens", async (ctx) => {
   });
 
   const topUsers = users.sort((a, b) => b.tokenBalance - a.tokenBalance).slice(0, 10);
+
+  await ctx.reply(
+    `Top 10 users with most tokens:\n${topUsers.map((user) => `${user.name}: ${user.tokenBalance}`).join("\n")}`,
+  );
 });
 
 async function setText(conversation: Conversation, ctx: Context) {
