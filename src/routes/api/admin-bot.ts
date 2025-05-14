@@ -75,17 +75,32 @@ bot.command("reffs", async (ctx) => {
     }
   }
 
-  const topReferrerIds = Object.entries(referrerCounts)
-    .sort(([, countA], [, countB]) => countA - countB)
-    .slice(0, 10)
-    .map(([id]) => Number(id));
+  const topReferrers = Object.entries(referrerCounts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 10);
 
-  const top10Referrers = await db.query.usersTable.findMany({
+  const topReferrerIds = topReferrers.map(([id]) => Number(id));
+
+  const top10ReferrerUsers = await db.query.usersTable.findMany({
     where: (users) => inArray(users.id, topReferrerIds),
   });
 
-  const responseText = top10Referrers
-    .map((user) => `${user.name}: ${referrerCounts[user.id.toString()]} referrals`)
+  // Create a map of user id to user object for easier lookup
+  const userMap = top10ReferrerUsers.reduce(
+    (map, user) => {
+      map[user.id] = user;
+      return map;
+    },
+    {} as Record<number, (typeof top10ReferrerUsers)[0]>,
+  );
+
+  // Format the response with proper sorting
+  const responseText = topReferrers
+    .map(([id, count]) => {
+      const user = userMap[Number(id)];
+      return user ? `${user.name}: ${count} referrals` : null;
+    })
+    .filter(Boolean)
     .join("\n");
 
   await ctx.reply(`Top 10 users with most referrals:\n${responseText}`);
