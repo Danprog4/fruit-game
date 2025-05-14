@@ -198,5 +198,3 @@ export const APIRoute = createAPIFileRoute("/api/admin-bot")({
   GET: async ({ request }) => handleUpdate(request),
   POST: async ({ request }) => handleUpdate(request),
 });
-
-bot.start();
