@@ -22,34 +22,70 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-bot.command("set-text", async (ctx) => {
+bot.command("text", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
   }
 
-  const text: string[] = [];
+  // Use a simple conversation approach
+  try {
+    // Ask for all three texts one after another
+    const texts = [];
 
-  for (let i = 0; i < 3; i++) {
-    await ctx.reply(`Enter the text you want to set as ${i + 1} text`);
-    bot.on("message", async (ctx) => {
-      if (!isAdmin(ctx)) {
-        return;
+    for (let i = 1; i <= 3; i++) {
+      await ctx.reply(`Enter the text you want to set as ${i} text`);
+
+      // Wait for an admin response with 60-second timeout
+      const text = await Promise.race([
+        new Promise<string | null>((resolve) => {
+          // Create a temporary handler that will be used just once
+          const handler = bot.hears(/.*/, (msgCtx) => {
+            // Only process if from the same admin user
+            if (msgCtx.from?.id !== ctx.from?.id || !isAdmin(msgCtx)) {
+              return;
+            }
+
+            const messageText = msgCtx.message?.text;
+            if (!messageText) {
+              msgCtx.reply(
+                "Please send a valid text message. Try the /set-text command again.",
+              );
+              resolve(null);
+              return;
+            }
+
+            resolve(messageText);
+
+            // This handler will be automatically removed after first match
+            return true;
+          });
+        }),
+        new Promise<null>((resolve) =>
+          setTimeout(() => {
+            ctx.reply(
+              "Timeout waiting for response. Please try the /set-text command again.",
+            );
+            resolve(null);
+          }, 60000),
+        ),
+      ]);
+
+      if (text === null) {
+        return; // Exit if any text is invalid or timeout
       }
 
-      const userText = ctx.message.text;
-      if (!userText) {
-        await ctx.reply("Please enter the text you want to set");
-        return;
-      }
+      texts.push(text);
+    }
 
-      text.push(userText);
-    });
+    // Update database with collected texts
+    await db.delete(adminBotTable);
+    await db.insert(adminBotTable).values({ text: texts });
+    await ctx.reply("All texts have been successfully set!");
+  } catch (error) {
+    console.error("Error during text collection:", error);
+    await ctx.reply("Failed to set texts. Please try again with /set-text command.");
   }
-
-  await db.update(adminBotTable).set({ text: [] });
-
-  await db.insert(adminBotTable).values({ text });
 });
 
 bot.on("callback_query:data", async (ctx) => {
