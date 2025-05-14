@@ -5,7 +5,7 @@ import { Bot, webhookCallback } from "grammy";
 import { isAdmin } from "~/lib/admin";
 import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { adminBotTable, usersTable, withdrawalsTable } from "~/lib/db/schema";
+import { usersTable, withdrawalsTable } from "~/lib/db/schema";
 import { transferJetton } from "~/lib/web3/send-withdraw";
 
 const token = process.env.ADMIN_BOT_TOKEN;
@@ -22,71 +22,71 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-bot.command("text", async (ctx) => {
-  if (!isAdmin(ctx)) {
-    await ctx.reply("Hello, you're not an admin");
-    return;
-  }
+// bot.command("text", async (ctx) => {
+//   if (!isAdmin(ctx)) {
+//     await ctx.reply("Hello, you're not an admin");
+//     return;
+//   }
 
-  // Use a simple conversation approach
-  try {
-    // Ask for all three texts one after another
-    const texts = [];
+//   // Use a simple conversation approach
+//   try {
+//     // Ask for all three texts one after another
+//     const texts = [];
 
-    for (let i = 1; i <= 3; i++) {
-      await ctx.reply(`Enter the text you want to set as ${i} text`);
+//     for (let i = 1; i <= 3; i++) {
+//       await ctx.reply(`Enter the text you want to set as ${i} text`);
 
-      // Wait for an admin response with 60-second timeout
-      const text = await Promise.race([
-        new Promise<string | null>((resolve) => {
-          // Create a temporary handler that will be used just once
-          const handler = bot.hears(/.*/, (msgCtx) => {
-            // Only process if from the same admin user
-            if (msgCtx.from?.id !== ctx.from?.id || !isAdmin(msgCtx)) {
-              return;
-            }
+//       // Wait for an admin response with 60-second timeout
+//       const text = await Promise.race([
+//         new Promise<string | null>((resolve) => {
+//           // Create a temporary handler that will be used just once
+//           const handler = bot.hears(/.*/, (msgCtx) => {
+//             // Only process if from the same admin user
+//             if (msgCtx.from?.id !== ctx.from?.id || !isAdmin(msgCtx)) {
+//               return;
+//             }
 
-            const messageText = msgCtx.message?.text;
-            if (!messageText) {
-              msgCtx.reply(
-                "Please send a valid text message. Try the /set-text command again.",
-              );
-              resolve(null);
-              return;
-            }
+//             const messageText = msgCtx.message?.text;
+//             if (!messageText) {
+//               msgCtx.reply(
+//                 "Please send a valid text message. Try the /set-text command again.",
+//               );
+//               resolve(null);
+//               return;
+//             }
 
-            resolve(messageText);
+//             resolve(messageText);
 
-            // This handler will be automatically removed after first match
-            return true;
-          });
-        }),
-        new Promise<null>((resolve) =>
-          setTimeout(() => {
-            ctx.reply(
-              "Timeout waiting for response. Please try the /set-text command again.",
-            );
-            resolve(null);
-          }, 60000),
-        ),
-      ]);
+//             // This handler will be automatically removed after first match
+//             return true;
+//           });
+//         }),
+//         new Promise<null>((resolve) =>
+//           setTimeout(() => {
+//             ctx.reply(
+//               "Timeout waiting for response. Please try the /set-text command again.",
+//             );
+//             resolve(null);
+//           }, 60000),
+//         ),
+//       ]);
 
-      if (text === null) {
-        return; // Exit if any text is invalid or timeout
-      }
+//       if (text === null) {
+//         return; // Exit if any text is invalid or timeout
+//       }
 
-      texts.push(text);
-    }
+//       texts.push(text);
+//     }
 
-    // Update database with collected texts
-    await db.delete(adminBotTable);
-    await db.insert(adminBotTable).values({ text: texts });
-    await ctx.reply("All texts have been successfully set!");
-  } catch (error) {
-    console.error("Error during text collection:", error);
-    await ctx.reply("Failed to set texts. Please try again with /set-text command.");
-  }
-});
+//     // Update database with collected texts
+//     await db.delete(adminBotTable);
+//     await db.insert(adminBotTable).values({ text: texts });
+//     await ctx.reply("All texts have been successfully set!");
+//   } catch (error) {
+//     console.error("Error during text collection:", error);
+//     await ctx.reply("Failed to set texts. Please try again with /set-text command.");
+//   }
+// });
 
 bot.on("callback_query:data", async (ctx) => {
   const data = ctx.callbackQuery.data;
