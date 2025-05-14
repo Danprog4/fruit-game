@@ -33,7 +33,7 @@ if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
 const bot = new Bot<ConversationFlavor<Context>>(token);
 bot.use(conversations());
 
-const availableFruits = FARMS_CONFIG.map((farm) => farm.name).join(", ");
+const availableFruits = FARMS_CONFIG.map((farm) => farm.id).join(", ");
 
 bot.command("start", async (ctx) => {
   if (!isAdmin(ctx)) {
