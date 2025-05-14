@@ -5,7 +5,7 @@ import { Bot, webhookCallback } from "grammy";
 import { isAdmin } from "~/lib/admin";
 import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { usersTable, withdrawalsTable } from "~/lib/db/schema";
+import { adminBotTable, usersTable, withdrawalsTable } from "~/lib/db/schema";
 import { transferJetton } from "~/lib/web3/send-withdraw";
 
 const token = process.env.ADMIN_BOT_TOKEN;
@@ -20,6 +20,36 @@ bot.command("start", async (ctx) => {
   }
 
   await ctx.reply("Hello, admin");
+});
+
+bot.command("set-text", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const text: string[] = [];
+
+  for (let i = 0; i < 3; i++) {
+    await ctx.reply(`Enter the text you want to set as ${i + 1} text`);
+    bot.on("message", async (ctx) => {
+      if (!isAdmin(ctx)) {
+        return;
+      }
+
+      const userText = ctx.message.text;
+      if (!userText) {
+        await ctx.reply("Please enter the text you want to set");
+        return;
+      }
+
+      text.push(userText);
+    });
+  }
+
+  await db.update(adminBotTable).set({ text: [] });
+
+  await db.insert(adminBotTable).values({ text });
 });
 
 bot.on("callback_query:data", async (ctx) => {

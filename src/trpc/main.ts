@@ -6,7 +6,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 import { WITHDRAW_CHAT_ID, WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { usersTable, withdrawalsTable } from "~/lib/db/schema";
+import { adminBotTable, usersTable, withdrawalsTable } from "~/lib/db/schema";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import calculateExchangeAmount from "~/lib/utils/converter/calculateExchangeAmount";
 import { updateBalances } from "~/lib/utils/updateBalances";
@@ -18,6 +18,19 @@ export const router = {
       hello: "world",
     };
   }),
+  getText: procedure.query(async () => {
+    const text = await db.query.adminBotTable.findMany();
+    return text;
+  }),
+  setText: procedure
+    .input(
+      z.object({
+        text: z.string().array(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await db.insert(adminBotTable).values({ text: input.text });
+    }),
   getBrother: procedure.query(({ ctx }) => {
     return {
       brother: `macan ${ctx.userId}`,
