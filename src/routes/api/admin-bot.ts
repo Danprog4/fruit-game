@@ -13,15 +13,9 @@ if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
 
 const bot = new Bot(token);
 
-// Структура для хранения состояния диалога
-interface TextDialogState {
-  step: number; // Текущий шаг сбора (1-3)
-  texts: string[]; // Собранные тексты
-  timeoutId: ReturnType<typeof setTimeout> | null; // ID таймера, чтобы его можно было отменить
-}
-
-// Map для отслеживания состояния диалогов по ID пользователя
-const textDialogs = new Map<number, TextDialogState>();
+// Упрощенный подход для текстовой команды
+let waitingTextFromUserId: number | null = null;
+let collectedTexts: string[] = [];
 
 bot.command("start", async (ctx) => {
   if (!isAdmin(ctx)) {
@@ -32,7 +26,7 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-// Обработчик команды text
+// Упрощенный обработчик команды text
 bot.command("text", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
@@ -45,73 +39,45 @@ bot.command("text", async (ctx) => {
     return;
   }
 
-  // Если уже есть активный диалог - очищаем его
-  if (textDialogs.has(userId)) {
-    const oldDialog = textDialogs.get(userId);
-    if (oldDialog?.timeoutId) {
-      clearTimeout(oldDialog.timeoutId);
-    }
-  }
+  // Сбрасываем предыдущий сбор текста
+  waitingTextFromUserId = userId;
+  collectedTexts = [];
 
-  // Инициализируем новый диалог
-  textDialogs.set(userId, {
-    step: 1,
-    texts: [],
-    timeoutId: setTimeout(() => {
-      if (textDialogs.has(userId)) {
-        ctx.reply("Timeout waiting for response. Please try the /text command again.");
-        textDialogs.delete(userId);
-      }
-    }, 60000), // 1 минута на ответ
-  });
-
-  await ctx.reply(`Enter the text you want to set as 1 text`);
+  await ctx.reply("Enter the text you want to set as 1 text");
 });
 
-// Обработчик текстовых сообщений для диалога
+// Простой обработчик текстовых сообщений
 bot.on("message:text", async (ctx) => {
   const userId = ctx.from?.id;
-  if (!userId || !isAdmin(ctx)) return;
 
-  // Проверяем, есть ли активный диалог
-  const dialogState = textDialogs.get(userId);
-  if (!dialogState) return;
-
-  // Отменяем существующий таймер
-  if (dialogState.timeoutId) {
-    clearTimeout(dialogState.timeoutId);
+  // Только если ожидаем текст и от правильного пользователя
+  if (!userId || userId !== waitingTextFromUserId || !isAdmin(ctx)) {
+    return;
   }
 
-  // Добавляем текст
-  dialogState.texts.push(ctx.message.text);
-  dialogState.step++;
+  // Добавляем текст в коллекцию
+  collectedTexts.push(ctx.message.text);
 
-  // Если собрали все тексты
-  if (dialogState.step > 3) {
-    textDialogs.delete(userId);
+  // Проверяем, собрали ли все тексты
+  if (collectedTexts.length >= 3) {
+    // Сбрасываем состояние
+    waitingTextFromUserId = null;
 
     try {
       // Обновляем базу данных
       await db.delete(adminBotTable);
-      await db.insert(adminBotTable).values({ text: dialogState.texts });
+      await db.insert(adminBotTable).values({ text: collectedTexts });
       await ctx.reply("All texts have been successfully set!");
     } catch (error) {
       console.error("Error updating texts:", error);
       await ctx.reply("Failed to set texts. Please try again with /text command.");
     }
-    return;
+  } else {
+    // Запрашиваем следующий текст
+    await ctx.reply(
+      `Enter the text you want to set as ${collectedTexts.length + 1} text`,
+    );
   }
-
-  // Иначе запрашиваем следующий текст
-  await ctx.reply(`Enter the text you want to set as ${dialogState.step} text`);
-
-  // Устанавливаем новый таймер
-  dialogState.timeoutId = setTimeout(() => {
-    if (textDialogs.has(userId)) {
-      ctx.reply("Timeout waiting for response. Please try the /text command again.");
-      textDialogs.delete(userId);
-    }
-  }, 60000);
 });
 
 bot.on("callback_query:data", async (ctx) => {
