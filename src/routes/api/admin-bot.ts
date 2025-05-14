@@ -1,21 +1,41 @@
+import {
+  conversations,
+  createConversation,
+  type Conversation,
+  type ConversationFlavor,
+} from "@grammyjs/conversations";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { fromNano, toNano } from "@ton/core";
 import { eq } from "drizzle-orm";
-import { Bot, webhookCallback } from "grammy";
+import { Bot, webhookCallback, type Context } from "grammy";
 import { isAdmin } from "~/lib/admin";
 import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
-import { adminBotTable, usersTable, withdrawalsTable } from "~/lib/db/schema";
+import {
+  adminBotTable,
+  allianceSessionTable,
+  usersTable,
+  withdrawalsTable,
+} from "~/lib/db/schema";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import { transferJetton } from "~/lib/web3/send-withdraw";
+
+import { Redis } from "@upstash/redis";
+import dayjs from "dayjs";
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 const token = process.env.ADMIN_BOT_TOKEN;
 if (!token) throw new Error("ADMIN_BOT_TOKEN is unset");
 
-const bot = new Bot(token);
+const bot = new Bot<ConversationFlavor<Context>>(token); // <-- put your bot token between the "" (https://t.me/BotFather)
+bot.use(conversations());
 
 // Упрощенный подход для текстовой команды
-let waitingTextFromUserId: number | null = null;
-let collectedTexts: string[] = [];
+
+const availableFruits = FARMS_CONFIG.map((farm) => farm.name).join(", ");
 
 bot.command("start", async (ctx) => {
   if (!isAdmin(ctx)) {
@@ -26,58 +46,53 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-// Упрощенный обработчик команды text
+await redis.set("text", []);
+
+async function setText(conversation: Conversation, ctx: Context) {
+  await ctx.reply("Set the text you want to set as 1 text");
+
+  for (let i = 0; i < 3; i++) {
+    const { message } = await conversation.waitFor("message:text");
+
+    const currentTexts = (await redis.get("text")) as string[];
+
+    await redis.set("text", [...currentTexts, message.text]);
+
+    if (i === 2) {
+      await db.delete(adminBotTable);
+      await db.insert(adminBotTable).values({ text: currentTexts });
+    }
+
+    if (i < 2) {
+      await ctx.reply(`Set the text you want to set as ${i + 2} text`);
+    }
+  }
+
+  await ctx.reply(`All texts have been successfully set!`);
+}
+bot.use(createConversation(setText));
+
 bot.command("text", async (ctx) => {
-  if (!isAdmin(ctx)) {
-    await ctx.reply("Hello, you're not an admin");
-    return;
-  }
-
-  const userId = ctx.from?.id;
-  if (!userId) {
-    await ctx.reply("Error identifying user");
-    return;
-  }
-
-  // Сбрасываем предыдущий сбор текста
-  waitingTextFromUserId = userId;
-  collectedTexts = [];
-
-  await ctx.reply("Enter the text you want to set as 1 text");
+  await ctx.conversation.enter("setText");
 });
 
-// Простой обработчик текстовых сообщений
-bot.on("message:text", async (ctx) => {
-  const userId = ctx.from?.id;
+async function setSeason(conversation: Conversation, ctx: Context) {
+  await ctx.reply(`Enter the season fruit. Available fruits: ${availableFruits}`);
+  const { message } = await conversation.waitFor("message:text");
+  await db.update(allianceSessionTable).set({
+    seasonCurr: message.text,
+    seasonStart: dayjs().toDate(),
+    seasonEnd: dayjs().add(1, "month").toDate(),
+  });
 
-  // Только если ожидаем текст и от правильного пользователя
-  if (!userId || userId !== waitingTextFromUserId || !isAdmin(ctx)) {
-    return;
-  }
+  await ctx.reply(
+    `Season fruit has been successfully set! The season will start now and end after month`,
+  );
+}
+bot.use(createConversation(setSeason));
 
-  // Добавляем текст в коллекцию
-  collectedTexts.push(ctx.message.text);
-
-  // Проверяем, собрали ли все тексты
-  if (collectedTexts.length >= 3) {
-    // Сбрасываем состояние
-    waitingTextFromUserId = null;
-
-    try {
-      // Обновляем базу данных
-      await db.delete(adminBotTable);
-      await db.insert(adminBotTable).values({ text: collectedTexts });
-      await ctx.reply("All texts have been successfully set!");
-    } catch (error) {
-      console.error("Error updating texts:", error);
-      await ctx.reply("Failed to set texts. Please try again with /text command.");
-    }
-  } else {
-    // Запрашиваем следующий текст
-    await ctx.reply(
-      `Enter the text you want to set as ${collectedTexts.length + 1} text`,
-    );
-  }
+bot.command("season", async (ctx) => {
+  await ctx.conversation.enter("setSeason");
 });
 
 bot.on("callback_query:data", async (ctx) => {
