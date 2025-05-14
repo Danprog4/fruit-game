@@ -6,7 +6,7 @@ import {
 } from "@grammyjs/conversations";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { fromNano, toNano } from "@ton/core";
-import { eq } from "drizzle-orm";
+import { eq, inArray, isNotNull } from "drizzle-orm";
 import { Bot, webhookCallback, type Context } from "grammy";
 import { isAdmin } from "~/lib/admin";
 import { WITHDRAWAL_FEE } from "~/lib/constants";
@@ -42,6 +42,89 @@ bot.command("start", async (ctx) => {
   }
 
   await ctx.reply("Hello, admin");
+});
+
+bot.command("countOfRewards", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const count = await db.query.userTasksTable.findMany({
+    where: (userTasks) => eq(userTasks.status, "completed"),
+  });
+
+  await ctx.reply(`Count of rewards: ${count.length}`);
+});
+
+bot.command("topReffs", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const referrers = await db.query.usersTable.findMany({
+    where: (users) => isNotNull(users.referrerId),
+  });
+
+  const referrerCounts: Record<string, number> = {};
+
+  for (const user of referrers) {
+    if (user.referrerId) {
+      referrerCounts[user.referrerId] = (referrerCounts[user.referrerId] || 0) + 1;
+    }
+  }
+
+  const topReferrerIds = Object.entries(referrerCounts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 10)
+    .map(([id]) => Number(id));
+
+  const top10Referrers = await db.query.usersTable.findMany({
+    where: (users) => inArray(users.id, topReferrerIds),
+  });
+
+  await ctx.reply(`Top 10 reffs: ${top10Referrers.map((user) => user.name).join("\n")}`);
+});
+
+bot.command("topFarms", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const users = await db.query.usersTable.findMany({
+    where: (users) => isNotNull(users.farms),
+  });
+
+  const usersFarmCounts = users.map((user) => ({
+    userId: user.id,
+    name: user.name,
+    farmCount: user.farms.length,
+  }));
+
+  const topFarmUsers = usersFarmCounts
+    .sort((a, b) => b.farmCount - a.farmCount)
+    .slice(0, 10);
+
+  const responseText = topFarmUsers
+    .map((user) => `${user.name}: ${user.farmCount} farms`)
+    .join("\n");
+
+  await ctx.reply(`Top 10 users with most farms:\n${responseText}`);
+});
+
+bot.command("topTokens", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const users = await db.query.usersTable.findMany({
+    where: (users) => isNotNull(users.tokenBalance),
+  });
+
+  const topUsers = users.sort((a, b) => b.tokenBalance - a.tokenBalance).slice(0, 10);
 });
 
 async function setText(conversation: Conversation, ctx: Context) {
