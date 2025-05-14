@@ -76,7 +76,7 @@ bot.command("reffs", async (ctx) => {
   }
 
   const topReferrerIds = Object.entries(referrerCounts)
-    .sort(([, countA], [, countB]) => countB - countA)
+    .sort(([, countA], [, countB]) => countA - countB)
     .slice(0, 10)
     .map(([id]) => Number(id));
 
