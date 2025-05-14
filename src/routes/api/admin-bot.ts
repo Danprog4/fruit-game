@@ -68,7 +68,7 @@ async function setText(conversation: Conversation, ctx: Context) {
 
   await ctx.reply(`All texts have been successfully set!`);
 }
-bot.use(createConversation(setText));
+bot.use(createConversation(setText, "setText"));
 
 bot.command("text", async (ctx) => {
   await ctx.conversation.enter("setText");
@@ -93,7 +93,7 @@ async function setSeason(conversation: Conversation, ctx: Context) {
     `Season fruit has been successfully set! The season will start now and end after month`,
   );
 }
-bot.use(createConversation(setSeason));
+bot.use(createConversation(setSeason, "setSeason"));
 
 bot.command("season", async (ctx) => {
   await ctx.conversation.enter("setSeason");
