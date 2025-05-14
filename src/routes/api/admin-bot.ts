@@ -44,7 +44,7 @@ bot.command("start", async (ctx) => {
   await ctx.reply("Hello, admin");
 });
 
-bot.command("countOfRewards", async (ctx) => {
+bot.command("rewards", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
@@ -57,7 +57,7 @@ bot.command("countOfRewards", async (ctx) => {
   await ctx.reply(`Count of rewards: ${count.length}`);
 });
 
-bot.command("topReffs", async (ctx) => {
+bot.command("reffs", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
@@ -87,7 +87,7 @@ bot.command("topReffs", async (ctx) => {
   await ctx.reply(`Top 10 reffs: ${top10Referrers.map((user) => user.name).join("\n")}`);
 });
 
-bot.command("topFarms", async (ctx) => {
+bot.command("farms", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
@@ -114,7 +114,7 @@ bot.command("topFarms", async (ctx) => {
   await ctx.reply(`Top 10 users with most farms:\n${responseText}`);
 });
 
-bot.command("topTokens", async (ctx) => {
+bot.command("tokens", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
     return;
