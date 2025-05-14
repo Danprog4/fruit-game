@@ -84,7 +84,11 @@ bot.command("reffs", async (ctx) => {
     where: (users) => inArray(users.id, topReferrerIds),
   });
 
-  await ctx.reply(`Top 10 reffs: ${top10Referrers.map((user) => user.name).join("\n")}`);
+  const responseText = top10Referrers
+    .map((user) => `${user.name}: ${referrerCounts[user.id.toString()]} referrals`)
+    .join("\n");
+
+  await ctx.reply(`Top 10 users with most referrals:\n${responseText}`);
 });
 
 bot.command("farms", async (ctx) => {
