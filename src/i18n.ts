@@ -30,6 +30,7 @@ i18next.init({
 export const activateLocale = (locale: string) => {
   const lang = supportedLocales.includes(locale) ? locale : defaultLocale;
   i18next.changeLanguage(lang);
+  console.log(locale);
   console.log(`Activated locale: ${lang}`);
 };
 
