@@ -151,7 +151,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    console.log(user?.language);
+    console.log(user?.language, "user?.language");
     activateLocale(user?.language || defaultLocale);
   }, [user?.language]);
 

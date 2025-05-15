@@ -26,6 +26,7 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   const trpc = useTRPC();
+  const t = useT();
   const navigate = useNavigate();
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
@@ -44,7 +45,7 @@ function RouteComponent() {
     : user?.allianceId;
 
   const alliancePath = allianceId ? `/alliance/${allianceId}` : "/alliances";
-  const t = useT();
+
   console.log(user?.tokenBalance);
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
