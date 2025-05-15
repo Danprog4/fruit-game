@@ -25,7 +25,7 @@ import { TRPCRouter } from "~/trpc/init/router";
 import { Buffer } from "buffer";
 import { ImagePreload } from "~/components/ImagePreload";
 import { useTaskStatusPolling } from "~/hooks/useTasks";
-import { activateLocale } from "~/i18n";
+import { activateLocale, defaultLocale } from "~/i18n";
 
 if (typeof window !== "undefined" && !window.Buffer) {
   window.Buffer = Buffer;
@@ -151,7 +151,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    activateLocale(user!.language);
+    activateLocale(user?.language || defaultLocale);
   }, [user]);
 
   return (
