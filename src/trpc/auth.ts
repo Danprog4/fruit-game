@@ -1,9 +1,11 @@
 import { getEvent, setCookie } from "@tanstack/react-start/server";
 import { parse, validate } from "@telegram-apps/init-data-node";
 import { TRPCError, TRPCRouterRecord } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import dayjs from "dayjs";
+import { eq, isNotNull } from "drizzle-orm";
 import { SignJWT } from "jose";
 import { z } from "zod";
+import { CHAMP_CONFIG } from "~/lib/champ.config";
 import { db } from "~/lib/db";
 import { usersTable } from "~/lib/db/schema";
 import { updateBalances } from "~/lib/utils/updateBalances";
@@ -96,6 +98,85 @@ export const authRouter = {
       }
 
       await updateBalances(existingUser.id);
+
+      const season = await db.query.allianceSessionTable.findFirst({});
+
+      if (!season) {
+        return existingUser;
+      }
+
+      if (!existingUser.walletAddress) {
+        return existingUser;
+      }
+
+      const dateNow = dayjs();
+
+      if (dateNow.isBefore(season.seasonEnd)) {
+        return existingUser;
+      }
+
+      const users = await db.query.usersTable.findMany({
+        where: (users) => isNotNull(users.allianceId),
+      });
+
+      const alliances = await db.query.alliancesTable.findMany({});
+
+      const topAlliances = alliances
+        ?.map((alliance) => {
+          const allianceMembers =
+            users?.filter((user) => user.allianceId === alliance.id) || [];
+          let totalFruits = 0;
+          allianceMembers.forEach((member) => {
+            totalFruits += (member.balances as any)[season.seasonCurr] || 0;
+          });
+
+          return {
+            ...alliance,
+            totalFruits,
+          };
+        })
+        .sort((a, b) => b.totalFruits - a.totalFruits)
+        .slice(0, 5);
+
+      const topAlliancesMembers = topAlliances.map((alliance) =>
+        users?.filter((user) => user.allianceId === alliance.id),
+      );
+
+      const isMember = topAlliancesMembers.some((member) =>
+        member.some((user) => user.id === existingUser.id),
+      );
+
+      if (!isMember) {
+        return existingUser;
+      }
+
+      const userMember = await db.query.usersTable.findFirst({
+        where: eq(usersTable.id, existingUser.id),
+      });
+      if (!userMember) {
+        return existingUser;
+      }
+
+      const countOfMembers = topAlliancesMembers.length;
+
+      const position =
+        topAlliances.findIndex((alliance) => alliance.ownerId === userMember.id) + 1;
+
+      const rewardAmount =
+        ((CHAMP_CONFIG[position as keyof typeof CHAMP_CONFIG] || 0) * 0.5) /
+        countOfMembers;
+
+      if (userMember.isRewarded) {
+        return existingUser;
+      }
+
+      await db
+        .update(usersTable)
+        .set({
+          isRewarded: true,
+          tokenBalance: userMember.tokenBalance + rewardAmount,
+        })
+        .where(eq(usersTable.id, existingUser.id));
 
       return existingUser;
     }),

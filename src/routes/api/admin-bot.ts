@@ -190,7 +190,9 @@ bot.command("withdraw", async (ctx) => {
     where: (users) => inArray(users.id, topOwners),
   });
 
-  const rewards = topOwnersUsers.map((user) => {
+  const filteredTopOwnersUsers = topOwnersUsers.filter((user) => !user.isRewarded);
+
+  const rewards = filteredTopOwnersUsers.map((user) => {
     const alliance = topAlliances.find((alliance) => alliance.ownerId === user.id);
     const position =
       topAlliances.findIndex((alliance) => alliance.ownerId === user.id) + 1;
@@ -206,13 +208,14 @@ bot.command("withdraw", async (ctx) => {
 
   for (const reward of rewards) {
     const withdrawId = nanoid();
-    const nanoFru = toNano(reward.reward);
+    const fruAmount = reward.reward * 0.5;
+    const nanoFru = toNano(fruAmount);
     const userId = topOwners[reward.position - 1];
 
     await db.insert(adminWithdrawalsTable).values({
       id: withdrawId,
       userId: userId,
-      amount: BigInt(reward.reward),
+      amount: BigInt(fruAmount),
       status: "waiting_for_approve",
       createdAt: new Date(),
     });
@@ -375,8 +378,8 @@ bot.on("callback_query:data", async (ctx) => {
       .where(eq(adminWithdrawalsTable.id, id));
 
     await bot.api.editMessageText(
-      chatId!,
-      messageId!,
+      chatId,
+      messageId,
       `<b>${statusText}</b> <code>${id}</code>\n\n${user.name} <code>${userId}</code> ${Number(Number(formattedAmount) * (1 - WITHDRAWAL_FEE)).toFixed(2)} FRU`,
       { parse_mode: "HTML" },
     );
@@ -390,6 +393,11 @@ bot.on("callback_query:data", async (ctx) => {
         .update(adminWithdrawalsTable)
         .set({ status: "completed", completedAt: new Date() })
         .where(eq(adminWithdrawalsTable.id, id));
+
+      await db
+        .update(usersTable)
+        .set({ isRewarded: true })
+        .where(eq(usersTable.id, Number(userId)));
     } catch (error) {
       await db
         .update(adminWithdrawalsTable)
@@ -398,6 +406,8 @@ bot.on("callback_query:data", async (ctx) => {
 
       console.error("Error sending withdraw", error);
     }
+
+    return;
   }
 
   const tx = await db.query.withdrawalsTable.findFirst({

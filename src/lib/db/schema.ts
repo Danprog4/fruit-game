@@ -26,6 +26,7 @@ export const usersTable = pgTable("users", {
   starBalance: bigint("starBalance", { mode: "number" }).default(0).notNull(),
   walletAddress: varchar("walletAddress", { length: 255 }),
   dmFarmLevel: bigint("dmFarmLevel", { mode: "number" }).default(1).notNull(),
+  isRewarded: boolean("isRewarded").default(false).notNull(),
 });
 
 export const alliancesTable = pgTable("alliances", {
