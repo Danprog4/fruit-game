@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-
 import { useWindowSize } from "usehooks-ts";
 import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ChampIcon } from "~/components/icons/ChampIcon";
@@ -18,9 +17,9 @@ import { Circle } from "~/components/images/Circle";
 import { Farmer } from "~/components/images/Farmer";
 import { Lights } from "~/components/images/Lights";
 import { Platform } from "~/components/images/Platfrom";
+import { useT } from "~/i18n";
 import { useTRPC } from "~/trpc/init/react";
 import { InfiniteMovingCards } from "../components/InfiniteMovingCards";
-
 export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
@@ -45,7 +44,7 @@ function RouteComponent() {
     : user?.allianceId;
 
   const alliancePath = allianceId ? `/alliance/${allianceId}` : "/alliances";
-
+  const t = useT();
   console.log(user?.tokenBalance);
   return (
     <div className="fixed h-screen w-full overflow-hidden text-white">
@@ -67,7 +66,7 @@ function RouteComponent() {
                 content: (
                   <div className="z-10 flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
                     <span className="font-manrope text-xs leading-none font-medium">
-                      Скидка 10% на пополнение баланса до 22.03
+                      {t("Start game")}
                     </span>
                   </div>
                 ),

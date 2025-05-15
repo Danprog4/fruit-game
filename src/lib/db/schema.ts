@@ -27,6 +27,7 @@ export const usersTable = pgTable("users", {
   walletAddress: varchar("walletAddress", { length: 255 }),
   dmFarmLevel: bigint("dmFarmLevel", { mode: "number" }).default(1).notNull(),
   isRewarded: boolean("isRewarded").default(false).notNull(),
+  language: varchar("language", { length: 255 }).default("en").notNull(),
 });
 
 export const alliancesTable = pgTable("alliances", {

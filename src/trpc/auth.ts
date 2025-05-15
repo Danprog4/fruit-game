@@ -74,6 +74,7 @@ export const authRouter = {
             tokenBalance: 0,
             name,
             photoUrl: telegramUser.photo_url || null,
+            language: telegramUser.language_code,
           })
           .returning();
 

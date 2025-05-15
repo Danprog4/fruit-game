@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -25,10 +25,9 @@ import { TRPCRouter } from "~/trpc/init/router";
 import { Buffer } from "buffer";
 import { ImagePreload } from "~/components/ImagePreload";
 import { useTaskStatusPolling } from "~/hooks/useTasks";
+import { activateLocale, defaultLocale } from "~/i18n";
 
-// @ts-expect-error
 if (typeof window !== "undefined" && !window.Buffer) {
-  // @ts-expect-error
   window.Buffer = Buffer;
 }
 
@@ -131,6 +130,7 @@ const isErudaEnabled = import.meta.env.VITE_ERUDA_ENABLED === "true";
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const { data: user } = useQuery(trpc.main.getUser.queryOptions());
   const prefetch = async () => {
     // await queryClient.prefetchQuery(trpc.main.getFriends.queryOptions());
     await queryClient.prefetchQuery(trpc.main.getUser.queryOptions());
@@ -148,6 +148,10 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 
   useEffect(() => {
     prefetch();
+  }, []);
+
+  useEffect(() => {
+    activateLocale(user?.language || defaultLocale);
   }, []);
 
   return (
