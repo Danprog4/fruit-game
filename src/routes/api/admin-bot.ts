@@ -119,15 +119,21 @@ bot.command("farms", async (ctx) => {
   const usersFarmCounts = users.map((user) => ({
     userId: user.id,
     name: user.name,
-    farmCount: user.farms.length,
+    farmCount: user.farms,
   }));
 
-  const topFarmUsers = usersFarmCounts
-    .sort((a, b) => b.farmCount - a.farmCount)
-    .slice(0, 10);
+  if (usersFarmCounts.length === 0) {
+    await ctx.reply("No users with farms");
+    return;
+  }
+
+  const topFarmUsers = Object.entries(usersFarmCounts)
+    .sort(([, countA], [, countB]) => Number(countB) - Number(countA))
+    .slice(0, 10)
+    .map(([id, count]) => ({ id, count: count.farmCount }));
 
   const responseText = topFarmUsers
-    .map((user) => `${user.name}: ${user.farmCount} farms`)
+    .map(({ id, count }) => `${id}: ${count} farms`)
     .join("\n");
 
   await ctx.reply(`Top 10 users with most farms:\n${responseText}`);
