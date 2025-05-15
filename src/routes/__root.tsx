@@ -151,8 +151,9 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    console.log(user?.language);
     activateLocale(user?.language || defaultLocale);
-  }, [user]);
+  }, [user?.language]);
 
   return (
     <html className="dark" suppressHydrationWarning>
