@@ -14,7 +14,7 @@ export const AlliancesList = ({
 }: {
   searchQuery?: string;
   limit?: number;
-  isOwner: boolean;
+  isOwner?: boolean;
 }) => {
   const trpc = useTRPC();
   const navigate = useNavigate();

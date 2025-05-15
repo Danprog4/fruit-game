@@ -13,6 +13,7 @@ import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { db } from "~/lib/db";
 import {
   adminBotTable,
+  adminWithdrawalsTable,
   allianceSessionTable,
   usersTable,
   withdrawalsTable,
@@ -22,6 +23,8 @@ import { transferJetton } from "~/lib/web3/send-withdraw";
 
 import { Redis } from "@upstash/redis";
 import dayjs from "dayjs";
+import { nanoid } from "nanoid";
+import { CHAMP_CONFIG } from "~/lib/champ.config";
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -138,6 +141,108 @@ bot.command("farms", async (ctx) => {
   await ctx.reply(`Top 10 users with most farms:\n${responseText}`);
 });
 
+bot.command("withdraw", async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply("Hello, you're not an admin");
+    return;
+  }
+
+  const season = await db.query.allianceSessionTable.findFirst({});
+
+  if (!season) {
+    await ctx.reply("No season");
+    return;
+  }
+
+  const dateNow = dayjs();
+
+  if (dateNow.isBefore(season.seasonEnd)) {
+    await ctx.reply("Season is not over yet");
+    return;
+  }
+
+  const users = await db.query.usersTable.findMany({
+    where: (users) => isNotNull(users.allianceId),
+  });
+
+  const alliances = await db.query.alliancesTable.findMany({});
+
+  const topAlliances = alliances
+    ?.map((alliance) => {
+      const allianceMembers =
+        users?.filter((user) => user.allianceId === alliance.id) || [];
+      let totalFruits = 0;
+      allianceMembers.forEach((member) => {
+        totalFruits += (member.balances as any)[season.seasonCurr] || 0;
+      });
+
+      return {
+        ...alliance,
+        totalFruits,
+      };
+    })
+    .sort((a, b) => b.totalFruits - a.totalFruits)
+    .slice(0, 5);
+
+  const topOwners = topAlliances.map((alliance) => alliance.ownerId);
+
+  const topOwnersUsers = await db.query.usersTable.findMany({
+    where: (users) => inArray(users.id, topOwners),
+  });
+
+  const rewards = topOwnersUsers.map((user) => {
+    const alliance = topAlliances.find((alliance) => alliance.ownerId === user.id);
+    const position =
+      topAlliances.findIndex((alliance) => alliance.ownerId === user.id) + 1;
+    const rewardAmount = CHAMP_CONFIG[position as keyof typeof CHAMP_CONFIG] || 0;
+
+    return {
+      name: user.name,
+      allianceName: alliance?.name,
+      position,
+      reward: rewardAmount,
+    };
+  });
+
+  for (const reward of rewards) {
+    const withdrawId = nanoid();
+    const nanoFru = toNano(reward.reward);
+    const userId = topOwners[reward.position - 1];
+
+    await db.insert(adminWithdrawalsTable).values({
+      id: withdrawId,
+      userId: userId,
+      amount: BigInt(reward.reward),
+      status: "waiting_for_approve",
+      createdAt: new Date(),
+    });
+
+    await ctx.reply(
+      `Alliance Reward for Season ${season.seasonCurr}
+<b>${reward.position} place</b>
+<b>${reward.name}</b> - Alliance: <b>${reward.allianceName}</b>
+Reward: <b>${reward.reward.toFixed(2)}</b> FRU`,
+      {
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Reject ❌",
+                callback_data: `reject:${withdrawId}:${userId}:${nanoFru}:admin`,
+              },
+              {
+                text: "Ok ✅",
+                callback_data: `approve:${withdrawId}:${userId}:${nanoFru}:admin`,
+              },
+            ],
+          ],
+        },
+      },
+    );
+  }
+});
+
 bot.command("tokens", async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply("Hello, you're not an admin");
@@ -212,19 +317,14 @@ bot.command("season", async (ctx) => {
 
 bot.on("callback_query:data", async (ctx) => {
   const data = ctx.callbackQuery.data;
-  const [action, id, userId, amount] = data.split(":");
-
+  const [action, id, userId, amount, source] = data.split(":");
+  const isAdmin = source === "admin";
   const chatId = ctx.callbackQuery.message?.chat.id;
   const messageId = ctx.callbackQuery.message?.message_id;
   const amountNumber = BigInt(amount);
   const formattedAmount = fromNano(amountNumber);
   const amountWithFee = Number(formattedAmount) * (1 - WITHDRAWAL_FEE);
   const amountWithFeeNano = toNano(amountWithFee);
-
-  if (!chatId || !messageId) {
-    console.error("Invalid chatId or messageId", chatId, messageId);
-    return;
-  }
 
   const user = await db.query.usersTable.findFirst({
     where: (users) => eq(users.id, Number(userId)),
@@ -238,6 +338,66 @@ bot.on("callback_query:data", async (ctx) => {
   if (!user.walletAddress) {
     console.error("User has no wallet", userId);
     return;
+  }
+
+  if (!chatId || !messageId) {
+    console.error("Invalid chatId or messageId", chatId, messageId);
+    return;
+  }
+
+  if (isAdmin) {
+    const tx = await db.query.adminWithdrawalsTable.findFirst({
+      where: (withdrawals) => eq(withdrawals.id, id),
+    });
+
+    if (!tx) {
+      console.error("Withdrawal not found", id);
+      return;
+    }
+
+    if (tx.status === "completed" || tx.status === "failed") {
+      console.error("Withdrawal is already completed or failed", id);
+      return;
+    }
+
+    if (action !== "approve" && action !== "reject") {
+      console.error("Unknown action", action);
+      return;
+    }
+
+    const isApprove = action === "approve";
+    const status = isApprove ? "approved" : "failed";
+    const statusText = isApprove ? "APPROVED ✅" : "REJECTED ❌";
+
+    await db
+      .update(adminWithdrawalsTable)
+      .set({ status })
+      .where(eq(adminWithdrawalsTable.id, id));
+
+    await bot.api.editMessageText(
+      chatId!,
+      messageId!,
+      `<b>${statusText}</b> <code>${id}</code>\n\n${user.name} <code>${userId}</code> ${Number(Number(formattedAmount) * (1 - WITHDRAWAL_FEE)).toFixed(2)} FRU`,
+      { parse_mode: "HTML" },
+    );
+
+    if (!isApprove) return;
+
+    try {
+      await transferJetton(id, user.walletAddress, amountWithFeeNano);
+
+      await db
+        .update(adminWithdrawalsTable)
+        .set({ status: "completed", completedAt: new Date() })
+        .where(eq(adminWithdrawalsTable.id, id));
+    } catch (error) {
+      await db
+        .update(adminWithdrawalsTable)
+        .set({ status: "failed" })
+        .where(eq(adminWithdrawalsTable.id, id));
+
+      console.error("Error sending withdraw", error);
+    }
   }
 
   const tx = await db.query.withdrawalsTable.findFirst({

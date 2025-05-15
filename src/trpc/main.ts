@@ -314,11 +314,11 @@ Farms: ${userFarmsSum.toFixed(0)}`,
               [
                 {
                   text: "Reject ❌",
-                  callback_data: `reject:${withdrawId}:${userId}:${nanoFru}`,
+                  callback_data: `reject:${withdrawId}:${userId}:${nanoFru}:user`,
                 },
                 {
                   text: "Ok ✅",
-                  callback_data: `approve:${withdrawId}:${userId}:${nanoFru}`,
+                  callback_data: `approve:${withdrawId}:${userId}:${nanoFru}:user`,
                 },
               ],
             ],

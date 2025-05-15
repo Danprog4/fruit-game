@@ -45,6 +45,21 @@ export const adminBotTable = pgTable("admin_bot", {
   text: varchar("text", { length: 255 }).array().default([]).notNull(),
 });
 
+export const adminWithdrawalsTable = pgTable("admin_withdrawals", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: bigint("user_id", { mode: "number" })
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .notNull(),
+  amount: bigint("amount", { mode: "bigint" }).notNull(),
+  status: varchar("status", { length: 255 })
+    .$type<
+      "waiting_for_approve" | "approved" | "sending_to_wallet" | "completed" | "failed"
+    >()
+    .notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+});
+
 export const allianceSessionTable = pgTable("allianceSession", {
   id: serial("id").primaryKey(),
   seasonCurr: varchar("seasonCurr", { length: 255 }).notNull(),
