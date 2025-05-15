@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { useTranslation } from "react-i18next";
+import { initReactI18next, useTranslation } from "react-i18next";
 
 export const translations = {
   en: {
@@ -20,7 +20,7 @@ const resources = {
   ru: { translation: translations.ru },
 };
 
-i18next.init({
+i18next.use(initReactI18next).init({
   resources,
   lng: defaultLocale,
   fallbackLng: defaultLocale,
