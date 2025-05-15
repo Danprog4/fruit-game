@@ -200,11 +200,17 @@ bot.command("withdraw", async (ctx) => {
 
     return {
       name: user.name,
+      walletAddress: user.walletAddress,
       allianceName: alliance?.name,
       position,
       reward: rewardAmount,
     };
   });
+
+  if (rewards.length === 0) {
+    await ctx.reply("No available allainces that have not been rewarded yet");
+    return;
+  }
 
   for (const reward of rewards) {
     const withdrawId = nanoid();
@@ -224,7 +230,8 @@ bot.command("withdraw", async (ctx) => {
       `Alliance Reward for Season ${season.seasonCurr}
 <b>${reward.position} place</b>
 <b>${reward.name}</b> - Alliance: <b>${reward.allianceName}</b>
-Reward: <b>${reward.reward.toFixed(2)}</b> FRU`,
+Reward: <b>${reward.reward.toFixed(2)}</b> FRU
+<b>Wallet Address:</b> <code>${reward.walletAddress}</code>`,
       {
         parse_mode: "HTML",
         reply_markup: {
