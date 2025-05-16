@@ -1,7 +1,8 @@
 export const FARMS_CONFIG = [
   {
     id: "strawberry",
-    name: "Клубничная",
+    name: "Strawberry",
+    rusName: "Клубничная",
     tokenName: "STR",
     allianceName: "клубники",
     priceInFRU: 100000,
@@ -13,7 +14,8 @@ export const FARMS_CONFIG = [
   },
   {
     id: "cherry",
-    name: "Вишневая",
+    name: "Cherry",
+    rusName: "Вишневая",
     tokenName: "CHE",
     allianceName: "вишни",
     priceInFRU: 50000,
@@ -25,7 +27,8 @@ export const FARMS_CONFIG = [
   },
   {
     id: "coconut",
-    name: "Кокосовая",
+    name: "Coconut",
+    rusName: "Кокосовая",
     tokenName: "COC",
     allianceName: "кокосов",
     priceInFRU: 50000,

@@ -1,3 +1,5 @@
+import { useT } from "~/i18n";
+
 type InputProps = {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
@@ -6,6 +8,7 @@ type InputProps = {
 };
 
 export const Input = ({ searchQuery, setSearchQuery, placeholder, icon }: InputProps) => {
+  const t = useT();
   return (
     <div className="relative w-full max-w-md">
       <div className="relative mt-[21px] w-full">
@@ -29,7 +32,7 @@ export const Input = ({ searchQuery, setSearchQuery, placeholder, icon }: InputP
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
           <button className="text-white hover:text-white">
             <div className="flex h-[29px] w-[82px] items-center justify-center rounded-full bg-[#76AD10]">
-              <div className="font-manrope text-xs font-medium">Искать</div>
+              <div className="font-manrope text-xs font-medium">{t("Search")}</div>
             </div>
           </button>
         </div>

@@ -6,6 +6,7 @@ import { BackButton } from "~/components/BackButton";
 import { AllianceMini } from "~/components/icons/AlianceMini";
 import { Alliance } from "~/components/icons/Alliance";
 import { Input } from "~/components/Input";
+import { useT } from "~/i18n";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/alliances")({
@@ -23,18 +24,19 @@ function RouteComponent() {
   const isPending = lastTxs.data?.some(
     (tx) => tx.status === "pending" && tx.txType === "alliance",
   );
+  const t = useT();
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
       <div className="mt-12 mb-[43px] flex flex-col items-center justify-center gap-2">
         <Alliance />
         <div className="font-manrope text-2xl leading-none font-semibold">
-          Список альянсов
+          {t("Alliance list")}
         </div>
         <Input
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Поиск альянса..."
+          placeholder={t("Search alliance...")}
           icon={<AllianceMini />}
         />
       </div>
@@ -45,7 +47,7 @@ function RouteComponent() {
           onClick={() => navigate({ to: "/create-alliance" })}
           className="font-manrope fixed right-4 bottom-[21px] left-4 flex h-[52px] w-auto items-center justify-center rounded-full bg-[#76AD10] px-6 text-sm font-medium text-white"
         >
-          Создать свой альянс
+          {t("Create your alliance")}
         </button>
       )}
     </div>

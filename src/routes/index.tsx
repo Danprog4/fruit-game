@@ -103,7 +103,7 @@ function RouteComponent() {
           >
             <div className="flex flex-col items-center gap-1">
               <Friends />
-              <div className="font-manrope text-xs font-medium">Друзья</div>
+              <div className="font-manrope text-xs font-medium">{t("Friends")}</div>
             </div>
           </div>
           <div
@@ -112,7 +112,7 @@ function RouteComponent() {
           >
             <div className="flex flex-col items-center gap-1">
               <AllianceGroupMini width={45} height={45} viewBox="0 0 35 20" />
-              <div className="font-manrope text-xs font-medium">Альянс</div>
+              <div className="font-manrope text-xs font-medium">{t("Alliance")}</div>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ function RouteComponent() {
           >
             <div className="flex flex-col items-center gap-1">
               <TasksIcon />
-              <div className="font-manrope text-xs font-medium">Квесты</div>
+              <div className="font-manrope text-xs font-medium">{t("Quests")}</div>
             </div>
           </div>
           <div
@@ -132,7 +132,7 @@ function RouteComponent() {
           >
             <div className="flex flex-col items-center">
               <ChampIcon />
-              <div className="font-manrope text-xs font-medium">Лиги</div>
+              <div className="font-manrope text-xs font-medium">{t("Leagues")}</div>
             </div>
           </div>
         </div>
@@ -191,13 +191,13 @@ function RouteComponent() {
             className="flex w-[105px] flex-col items-center justify-center gap-1"
           >
             <Farm />
-            <div className="font-manrope text-xs font-medium">Ферма</div>
+            <div className="font-manrope text-xs font-medium">{t("Farm")}</div>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-1">
           <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-gradient-to-b from-[#A2D448] to-[#A2D448]">
             <Main />
-            <div className="font-manrope text-xs font-medium">Главная</div>
+            <div className="font-manrope text-xs font-medium">{t("Main")}</div>
           </div>
         </div>
         <div
@@ -205,7 +205,7 @@ function RouteComponent() {
           onClick={() => navigate({ to: "/wallet" })}
         >
           <Wallet />
-          <div className="font-manrope text-xs font-medium">Кошелек</div>
+          <div className="font-manrope text-xs font-medium">{t("Wallet")}</div>
         </div>
       </div>
     </div>

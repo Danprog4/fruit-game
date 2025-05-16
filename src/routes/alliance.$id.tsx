@@ -11,6 +11,7 @@ import { AllianceGroupMini } from "~/components/icons/AllianceGropMini";
 import { ClockIcon } from "~/components/icons/ClockIcon";
 import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
+import { useT } from "~/i18n";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
@@ -26,6 +27,7 @@ function RouteComponent() {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const { id } = Route.useParams();
+  const t = useT();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [channelUrl, setChannelUrl] = useState("");
@@ -157,7 +159,7 @@ function RouteComponent() {
           <Drawer.Trigger asChild>
             <div className="absolute top-20 right-[16px] flex -translate-y-1/2 items-center justify-center gap-2 rounded-full bg-red-600 p-3">
               <div className="font-manrope text-xs leading-none font-medium">
-                Расформировать
+                {t("Disband")}
               </div>
             </div>
           </Drawer.Trigger>
@@ -167,21 +169,22 @@ function RouteComponent() {
               <div className="flex flex-col p-6">
                 <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-[#575757]" />
                 <div className="font-manrope mb-4 text-center text-2xl font-bold text-white">
-                  Расформировать альянс
+                  {t("Disband alliance")}
                 </div>
                 <div className="font-manrope mb-8 text-center text-base text-white opacity-90">
-                  Вы действительно хотите расформировать ваш альянс? Это действие нельзя
-                  будет отменить.
+                  {t(
+                    "Are you sure you want to disband your alliance? This action cannot be undone.",
+                  )}
                 </div>
                 <div className="flex w-full gap-4">
                   <button className="font-manrope h-[52px] w-full rounded-full border border-[#575757] text-base font-medium text-white transition-all hover:bg-[#3A3A3A]">
-                    Отмена
+                    {t("Cancel")}
                   </button>
                   <button
                     className="font-manrope flex h-[52px] w-full items-center justify-center rounded-full bg-red-600 text-base font-medium text-white transition-all hover:bg-[#B01F31]"
                     onClick={handleDisbandAlliance}
                   >
-                    Расформировать
+                    {t("Disband")}
                   </button>
                 </div>
               </div>
@@ -270,7 +273,7 @@ function RouteComponent() {
           <div className="relative w-full">
             <input
               type="text"
-              placeholder="Ссылка на ваш канал"
+              placeholder={t("Channel link")}
               className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] pr-[50px] pl-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
               size={500}
               value={channelUrl}
@@ -292,26 +295,26 @@ function RouteComponent() {
         <div>
           <div className="mt-4 mb-[17px] flex h-[60px] w-full items-center justify-center rounded-2xl bg-[#222221]">
             <div className="font-manrope text-[] text-sm font-medium opacity-50">
-              Здесь будет информация о канале
+              {t("Channel info")}
             </div>
           </div>
 
           <div className="mb-[15px] flex items-center justify-between">
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
               <div className="text-lg">{fruitIcon}</div>
-              Добыча: <span className="text-[#85BF1A]">{fruitRussianName}</span>
+              {t("Production")}:{" "}
+              <span className="text-[#85BF1A]">{fruitRussianName}</span>
             </div>
             <div className="font-manrope flex items-center gap-[7px] text-xs leading-none font-medium">
               <ClockIcon />
               <div>
-                {" "}
-                Осталось {daysRemaining} д. {hoursRemaining} ч.
+                {t("Remaining")} {daysRemaining} {t("d.")} {hoursRemaining} {t("h.")}.
               </div>
             </div>
           </div>
           <div className="flex h-[32px] w-full items-center justify-center rounded-full bg-[#F7FFEB0F]">
             <div className="font-manrope text-xs font-bold">
-              {countOfFruits.toLocaleString()} собрано
+              {countOfFruits.toLocaleString()} {t("Collected")}
             </div>
           </div>
         </div>
@@ -321,7 +324,7 @@ function RouteComponent() {
         <Input
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Поиск участника"
+          placeholder={t("Search members...")}
           icon={<AllianceMini />}
         />
       )}
@@ -329,7 +332,7 @@ function RouteComponent() {
         className="my-4 flex items-center justify-center rounded-full bg-[#76AD10] p-3"
         onClick={() => navigate({ to: "/allianceTree/$id", params: { id: String(id) } })}
       >
-        <div className="font-manrope text-xs font-medium">Дерево прокачки</div>
+        <div className="font-manrope text-xs font-medium">{t("Alliance tree")}</div>
       </div>
       <div className="mt-[24px] mb-[24px] flex items-center gap-[10px]">
         <img
@@ -338,7 +341,7 @@ function RouteComponent() {
           className="h-[26px] w-[26px] rounded-full object-cover"
         />
         <div className="font-manrope text-base font-semibold">
-          {isOwner ? "Участники альянса" : "Добытые альянсом фрукты"}
+          {isOwner ? t("Alliance members") : t("Fruits collected by the alliance")}
         </div>
       </div>
       <AllianceMembList

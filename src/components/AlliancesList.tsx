@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Drawer } from "vaul";
+import { useT } from "~/i18n";
 import { ruPeople } from "~/lib/intl";
 import { getImageUrl } from "~/lib/utils/images";
 import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 import { AllianceMini } from "./icons/AlianceMini";
-
 export const AlliancesList = ({
   searchQuery = "",
   limit,
@@ -62,6 +62,8 @@ export const AlliancesList = ({
     (alliance) => alliance.ownerId !== user?.id,
   );
 
+  const t = useT();
+
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
@@ -86,7 +88,7 @@ export const AlliancesList = ({
               )}
               <div className="flex flex-col items-start justify-center gap-[8px]">
                 <div className="font-manrope text-xs leading-none font-medium">
-                  {userAlliance.name} (Ваш альянс)
+                  {userAlliance.name} ({t("Your alliance")})
                 </div>
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
                   <div>{pluralizeRuIntl(userAlliance.members || 1, ruPeople)}</div>
@@ -131,7 +133,7 @@ export const AlliancesList = ({
                     className="font-manrope h-[36px] rounded-full bg-[#76AD10] px-4 text-xs font-medium text-white"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Вступить
+                    {t("Join")}
                   </button>
                 </Drawer.Trigger>
               )}
@@ -160,7 +162,7 @@ export const AlliancesList = ({
                     </div>
 
                     <div className="font-manrope w-full rounded-xl bg-[#3A3A3A] p-4 text-sm">
-                      <div className="mb-2 text-[#8F8F8F]">Участники:</div>
+                      <div className="mb-2 text-[#8F8F8F]">{t("Members")}:</div>
                       <div className="text-white">
                         {pluralizeRuIntl(alliance.members || 1, ruPeople)}
                       </div>
@@ -168,7 +170,9 @@ export const AlliancesList = ({
 
                     {alliance.telegramChannelUrl && (
                       <div className="font-manrope w-full rounded-xl bg-[#3A3A3A] p-4 text-sm">
-                        <div className="mb-2 text-[#8F8F8F]">Канал альянса:</div>
+                        <div className="mb-2 text-[#8F8F8F]">
+                          {t("Alliance channel")}:
+                        </div>
                         <a
                           href={alliance.telegramChannelUrl}
                           target="_blank"
@@ -186,7 +190,7 @@ export const AlliancesList = ({
                       className="font-manrope mt-8 h-[52px] w-full rounded-full bg-[#76AD10] text-base font-medium text-white"
                       onClick={() => joinAlliance.mutate({ allianceId: alliance.id })}
                     >
-                      {joinAlliance.isPending ? "Вступаем..." : "Вступить в альянс"}
+                      {joinAlliance.isPending ? t("Joining...") : t("Join")}
                     </button>
                   )}
                 </div>

@@ -6,6 +6,7 @@ import { Flag } from "~/components/icons/Flag";
 import { TasksIcon } from "~/components/icons/Tasks";
 import { Input } from "~/components/Input";
 import { TasksList } from "~/components/Tasks";
+import { useT } from "~/i18n";
 import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/tasks")({
   component: RouteComponent,
@@ -16,6 +17,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const trpc = useTRPC();
   const { data: tasks } = useQuery(trpc.tasks.getTasks.queryOptions());
+  const t = useT();
   return (
     <div className="flex w-full flex-col px-4 pt-12">
       <BackButton onClick={() => navigate({ to: "/" })} />
@@ -23,10 +25,12 @@ function RouteComponent() {
         <div className="ml-1">
           <TasksIcon width={90} height={80} />
         </div>
-        <div className="font-manrope text-2xl font-semibold text-white">Квесты</div>
+        <div className="font-manrope text-2xl font-semibold text-white">
+          {t("Quests")}
+        </div>
       </div>
       <Input
-        placeholder="Искать"
+        placeholder={t("Search")}
         setSearchQuery={setSearchQuery}
         searchQuery={searchQuery}
         icon={<Flag />}
@@ -36,13 +40,13 @@ function RouteComponent() {
           <TasksIcon width={26} height={26} />
         </div>
         <div className="font-manrope text-base font-semibold text-white">
-          Список квестов
+          {t("Quests list")}
         </div>
       </div>
       {tasks?.length === 0 ? (
         <div className="flex h-[100px] w-full items-center justify-center rounded-xl bg-[#F7FFEB0F] text-center">
           <div className="font-manrope text-sm text-white opacity-50">
-            К сожалению, квестов пока нет
+            {t("No quests yet")}
           </div>
         </div>
       ) : (

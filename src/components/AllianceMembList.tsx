@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useT } from "~/i18n";
 import { User } from "~/lib/db/schema";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { useTRPC } from "~/trpc/init/react";
@@ -33,6 +34,7 @@ export const AllianceMembList = ({
 }: AllianceMembListProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+  const t = useT();
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: currentUser } = useQuery(trpc.main.getUser.queryOptions());
   const { data: season } = useQuery(trpc.alliances.getSeason.queryOptions());
@@ -89,7 +91,7 @@ export const AllianceMembList = ({
               </div>
 
               <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                Создал {formattedDate}
+                {t("Created")} {formattedDate}
               </div>
             </div>
           </div>
@@ -121,7 +123,7 @@ export const AllianceMembList = ({
                   </div>
                 ) : (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    В альянсе с {formattedDate}
+                    {t("Joined")} {formattedDate}
                   </div>
                 )}
               </div>
@@ -133,7 +135,7 @@ export const AllianceMembList = ({
                 onClick={() => kickMember.mutate({ userId: member.id })}
                 disabled={kickMember.isPending}
               >
-                {kickMember.isPending ? "..." : "Выгнать"}
+                {kickMember.isPending ? "..." : t("Kick")}
               </button>
             )}
           </div>

@@ -14,6 +14,7 @@ import Wallet from "~/components/icons/navbar/Wallet";
 import { Token } from "~/components/icons/Token";
 import { Wallet as WalletIcon } from "~/components/icons/Wallet";
 import { Transaction } from "~/components/Transaction";
+import { useT } from "~/i18n";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { getShortAddress } from "~/lib/utils/address";
 import { useTRPC } from "~/trpc/init/react";
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/wallet")({
 function RouteComponent() {
   const wallet = useTonWallet();
   const [tonConnectUI, setOptions] = useTonConnectUI();
+  const t = useT();
   const navigate = useNavigate();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -167,12 +169,12 @@ function RouteComponent() {
           // Transaction was pending before and is now completed
           toast.success(
             <div>
-              Вы успешно приобрели ферму!{" "}
+              {t("You have successfully purchased a farm!")}{" "}
               <a
                 onClick={() => navigate({ to: "/farms" })}
                 className="cursor-pointer underline"
               >
-                Перейти
+                {t("Go to farms")}
               </a>
             </div>,
           );
@@ -223,10 +225,10 @@ function RouteComponent() {
         status: tx.status,
         statusText:
           tx.status === "completed"
-            ? "Завершено"
+            ? t("Completed")
             : tx.status === "pending"
-              ? "В обработке"
-              : "Ошибка",
+              ? t("In processing")
+              : t("Error"),
       })) || [];
 
     const withdrawalTransactions =
@@ -234,19 +236,19 @@ function RouteComponent() {
         id: withdrawal.id,
         createdAt: withdrawal.createdAt,
         amount: Number(fromNano(withdrawal.amount)),
-        label: "Вывод",
+        label: t("Withdrawal"),
         status:
           withdrawal.status === "completed"
-            ? "completed"
+            ? t("Completed")
             : withdrawal.status === "failed"
-              ? "failed"
-              : "pending",
+              ? t("Failed")
+              : t("Pending"),
         statusText:
           withdrawal.status === "completed"
-            ? "Завершено"
+            ? t("Completed")
             : withdrawal.status === "failed"
-              ? "Ошибка"
-              : "Ожидает подтверждения",
+              ? t("Error")
+              : t("Waiting for confirmation"),
       })) || [];
 
     const txs = [...farmTransactions, ...withdrawalTransactions];
@@ -275,14 +277,14 @@ function RouteComponent() {
               onClick={() => setIsWalletPage(true)}
             >
               <Wallet />
-              <div>Кошелек</div>
+              <div>{t("Wallet")}</div>
             </div>
             <div
               className={`relative z-10 flex cursor-pointer items-center justify-center gap-2 p-2 transition-all duration-300`}
               onClick={() => setIsWalletPage(false)}
             >
               <Farm />
-              <div>Ферма</div>
+              <div>{t("Farm")}</div>
             </div>
           </div>
           {isWalletPage && (
@@ -315,7 +317,7 @@ function RouteComponent() {
                 </div>
                 <div className="flex flex-col items-start gap-1">
                   <div className="font-manrope text-base font-semibold">
-                    {wallet ? "Подключено" : "Подключить кошелек"}
+                    {wallet ? t("Connected") : t("Connect wallet")}
                   </div>
                   <div className="font-manrope text-xs font-medium text-[#93A179]">
                     {wallet ? getShortAddress(wallet.account.address) : "TON Connect"}
@@ -342,27 +344,27 @@ function RouteComponent() {
           </div>
 
           {!isWalletPage && (
-            <div className="mt-4 mb-8 flex items-center justify-center gap-4">
+            <div className="mt-4 mb-8 flex items-center justify-center gap-2">
               <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <div
                     onClick={() => navigate({ to: "/exchange" })}
                     className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
                   >
                     <Dollar />
                   </div>
-                  <div>Обмен</div>
+                  <div>{t("Exchange")}</div>
                 </div>
               </div>
               <div className="flex h-[76px] w-full items-center justify-start rounded-full bg-[#2A2A2A] pl-[13px]">
-                <div className="flex items-center justify-start gap-4">
+                <div className="flex items-center justify-start gap-2">
                   <div
                     onClick={() => navigate({ to: "/withdrawal" })}
                     className="flex h-[54px] w-[54px] cursor-pointer items-center justify-center rounded-full bg-[#404040]"
                   >
                     <ArrowUp />
                   </div>
-                  <div>Вывод</div>
+                  <div>{t("Withdrawal")}</div>
                 </div>
               </div>
             </div>
@@ -371,7 +373,7 @@ function RouteComponent() {
           {isWalletPage && (
             <div className="flex flex-col items-center justify-center">
               <div className="font-manrope text-base font-semibold">
-                Последние транзакции
+                {t("Last transactions")}
               </div>
               <div className="mt-4 flex w-full flex-col gap-3">
                 {allTransactions.length > 0 ? (
@@ -387,7 +389,7 @@ function RouteComponent() {
                   ))
                 ) : (
                   <div className="py-4 text-center text-[#93A179]">
-                    Транзакций пока нет
+                    {t("No transactions yet")}
                   </div>
                 )}
               </div>
@@ -399,7 +401,7 @@ function RouteComponent() {
               <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#76AD10]">
                 <GreenDollar />
               </div>
-              <div>Баланс фруктов</div>
+              <div>{t("Fruits balance")}</div>
             </div>
           )}
         </div>
@@ -434,7 +436,7 @@ function RouteComponent() {
               </div>
             ))
           ) : (
-            <div className="text-center text-gray-400">Нет доступных фруктов</div>
+            <div className="text-center text-gray-400">{t("No available fruits")}</div>
           )}
         </div>
       )}
@@ -445,7 +447,7 @@ function RouteComponent() {
             onClick={() => navigate({ to: "/farms" })}
           >
             <Farm />
-            <div className="font-manrope text-xs font-medium">Ферма</div>
+            <div className="font-manrope text-xs font-medium">{t("Farm")}</div>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-1">
@@ -454,12 +456,12 @@ function RouteComponent() {
             onClick={() => navigate({ to: "/" })}
           >
             <Main />
-            <div className="font-manrope text-xs font-medium">Главная</div>
+            <div className="font-manrope text-xs font-medium">{t("Main")}</div>
           </div>
         </div>
         <div className="flex h-[63px] w-[105px] flex-col items-center justify-center gap-1 rounded-full border-1 border-[#97C73F] bg-gradient-to-b from-[#A2D448] to-[#A2D448]">
           <Wallet />
-          <div className="font-manrope text-xs font-medium">Кошелек</div>
+          <div className="font-manrope text-xs font-medium">{t("Wallet")}</div>
         </div>
       </div>
     </div>
