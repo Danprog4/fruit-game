@@ -24,9 +24,9 @@ import { TRPCRouter } from "~/trpc/init/router";
 
 import { Buffer } from "buffer";
 import { ImagePreload } from "~/components/ImagePreload";
+import { Navbar } from "~/components/Navbar";
 import { useTaskStatusPolling } from "~/hooks/useTasks";
 import { activateLocale, defaultLocale } from "~/i18n";
-
 if (typeof window !== "undefined" && !window.Buffer) {
   window.Buffer = Buffer;
 }
@@ -162,6 +162,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Navbar />
         <Toaster
           position="top-center"
           toastOptions={{
