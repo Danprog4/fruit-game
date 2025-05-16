@@ -271,13 +271,12 @@ bot.command("tokens", async (ctx) => {
 });
 
 async function setText(conversation: Conversation, ctx: Context) {
+  // Initialize with an empty object
   await redis.set("text", {});
 
   await ctx.reply(
     "Set the text you want to set as 1 text in 2 languages. The format is: Your text:Твой текст",
   );
-
-  let allTexts: Record<string, string> = {};
 
   for (let i = 0; i < 3; i++) {
     const { message } = await conversation.waitFor("message:text");
@@ -289,15 +288,19 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     const [text, translation] = message.text.split(":");
 
-    allTexts[text.trim()] = translation.trim();
-    await redis.set("text", allTexts);
+    const currentTexts = (await redis.get("text")) as Record<string, string>;
+
+    await redis.set("text", { ...currentTexts, [text.trim()]: translation.trim() });
 
     if (i === 2) {
       await db.delete(adminBotTable);
 
-      // Insert directly with the object rather than fetching from Redis
+      const finalTexts = await redis.get("text");
+
+      const textData = JSON.parse(JSON.stringify(finalTexts));
+
       await db.insert(adminBotTable).values({
-        text: allTexts,
+        text: textData,
       });
     }
 
