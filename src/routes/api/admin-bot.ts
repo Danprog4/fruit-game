@@ -288,18 +288,18 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     const [text, translation] = message.text.split(":");
 
-    const currentTexts = (await redis.get("text")) as Record<string, string>[];
+    const currentTexts = (await redis.get("text")) as Record<string, string>;
 
-    await redis.set("text", [...currentTexts, { [text.trim()]: translation.trim() }]);
+    await redis.set("text", { ...currentTexts, [text.trim()]: translation.trim() });
 
     if (i === 2) {
       await db.delete(adminBotTable);
 
-      const finalTexts = (await redis.get("text")) as Record<string, string>;
+      const finalTexts = await redis.get("text");
 
-      // Insert to database without JSON.parse/stringify which causes the array format issue
+      // Insert to database
       await db.insert(adminBotTable).values({
-        text: [...currentTexts, finalTexts],
+        text: finalTexts as Record<string, string>,
       });
     }
 
