@@ -290,7 +290,7 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     const currentTexts = (await redis.get("text")) as Record<string, string>;
 
-    await redis.set("text", { ...currentTexts, [text.trim()]: translation.trim() });
+    await redis.set("text", { ...currentTexts, text: translation });
 
     if (i === 2) {
       await db.delete(adminBotTable);
