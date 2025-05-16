@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { User } from "~/lib/db/schema";
+import { FARMS_CONFIG } from "~/lib/farms.config";
 import { useTRPC } from "~/trpc/init/react";
-import { Token } from "./icons/Token";
 import { UserPhoto } from "./icons/UserPhoto";
 
 type AllianceMembListProps = {
@@ -34,6 +35,8 @@ export const AllianceMembList = ({
   const queryClient = useQueryClient();
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: currentUser } = useQuery(trpc.main.getUser.queryOptions());
+  const { data: season } = useQuery(trpc.alliances.getSeason.queryOptions());
+  const seasonFruit = FARMS_CONFIG.find((f) => f.id === season?.seasonCurr)?.icon;
 
   const kickMember = useMutation({
     ...trpc.alliances.kickFromAlliance.mutationOptions(),
@@ -55,6 +58,13 @@ export const AllianceMembList = ({
     month: "2-digit",
     year: "numeric",
   });
+
+  const getMembFruits = (member: User) => {
+    return (member.balances[season?.seasonCurr || 0] || 0)
+      .toFixed(0)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
 
   return (
     <div className="w-full">
@@ -107,8 +117,7 @@ export const AllianceMembList = ({
 
                 {isOwner ? (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    <Token width={20} height={20} viewBox="0 0 30 30" />
-                    40 000
+                    {seasonFruit} {getMembFruits(member)}
                   </div>
                 ) : (
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
@@ -127,10 +136,6 @@ export const AllianceMembList = ({
                 {kickMember.isPending ? "..." : "Выгнать"}
               </button>
             )}
-            <div className="flex items-center justify-center gap-1">
-              <Token width={26} height={26} viewBox="0 0 30 30" />
-              <div className="font-manrope text-[17px] font-[800]"> 0</div>
-            </div>
           </div>
         ))}
       </div>
