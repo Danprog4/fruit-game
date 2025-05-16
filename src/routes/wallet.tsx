@@ -273,14 +273,14 @@ function RouteComponent() {
               }}
             />
             <div
-              className={`relative z-10 flex cursor-pointer items-center justify-center gap-2 p-2 transition-all duration-300`}
+              className={`relative z-10 flex h-[45px] w-[118px] cursor-pointer items-center justify-center gap-2 rounded-full p-5 transition-all duration-300`}
               onClick={() => setIsWalletPage(true)}
             >
               <Wallet />
               <div>{t("Wallet")}</div>
             </div>
             <div
-              className={`relative z-10 flex cursor-pointer items-center justify-center gap-2 p-2 transition-all duration-300`}
+              className={`relative z-10 flex w-[118px] cursor-pointer items-center justify-center gap-2 p-2 transition-all duration-300`}
               onClick={() => setIsWalletPage(false)}
             >
               <Farm />
