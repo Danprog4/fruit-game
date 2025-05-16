@@ -295,12 +295,11 @@ async function setText(conversation: Conversation, ctx: Context) {
     if (i === 2) {
       await db.delete(adminBotTable);
 
-      const finalTexts = await redis.get("text");
+      const finalTexts = (await redis.get("text")) as Record<string, string>;
 
-      const textData = JSON.parse(JSON.stringify(finalTexts));
-
+      // Insert to database without JSON.parse/stringify which causes the array format issue
       await db.insert(adminBotTable).values({
-        text: textData,
+        text: finalTexts,
       });
     }
 
