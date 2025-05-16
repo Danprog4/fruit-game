@@ -282,7 +282,8 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     if (!message.text.includes(":")) {
       await ctx.reply("Invalid format. The format is: Your text:Твой текст");
-      return;
+      i -= 1;
+      continue;
     }
 
     const [text, translation] = message.text.split(":");
