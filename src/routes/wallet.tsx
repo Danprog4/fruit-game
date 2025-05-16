@@ -11,7 +11,6 @@ import { GreenDollar } from "~/components/icons/GreenDollar";
 import Farm from "~/components/icons/navbar/Farm";
 import Main from "~/components/icons/navbar/Main";
 import Wallet from "~/components/icons/navbar/Wallet";
-import { Refresh } from "~/components/icons/Refresh";
 import { Token } from "~/components/icons/Token";
 import { Wallet as WalletIcon } from "~/components/icons/Wallet";
 import { Transaction } from "~/components/Transaction";
@@ -33,29 +32,80 @@ function RouteComponent() {
   const [isWalletPage, setIsWalletPage] = useState(true);
 
   const pendingTxsRef = useRef<Record<string, boolean>>({});
-
+  const balanceIntervalRef = useRef<number | null>(null);
+  const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
-  const invalidateBalances = useMutation(
-    trpc.main.invalidateBalances.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: trpc.main.getUser.queryKey() });
+  const calculateCurrentBalances = () => {
+    if (!user) return {};
 
-        console.log("Balances invalidated");
-        console.log(user?.balances);
-        console.log(user?.lastUpdatedBalanceAt);
+    const updatedBalances: Record<string, number> = {
+      ...(user.balances as Record<string, number>),
+    };
 
-        // Stop the refresh animation after a short delay
-        setTimeout(() => {
-          setIsRefreshing(false);
-        }, 500);
-      },
-      onError: (error) => {
-        console.error("Error invalidating balances:", error);
-        setIsRefreshing(false);
-      },
-    }),
-  );
+    for (const farmId in user.farms) {
+      const count = (user.farms as Record<string, number>)[farmId];
+      const farmConfig = FARMS_CONFIG.find((f) => f.id === farmId);
+      if (!farmConfig) continue;
+
+      const ratePerSecond = farmConfig.miningRate / 3600;
+      const prev = (user.balances as Record<string, number>)[farmId] ?? 0;
+      updatedBalances[farmId] = prev + count * ratePerSecond;
+    }
+
+    const userReffals = users?.filter((referral) => referral.referrerId === user.id);
+
+    if (!userReffals) {
+      return updatedBalances;
+    }
+
+    for (const reffal of userReffals) {
+      for (const farmId in reffal.farms) {
+        const count = (reffal.farms as Record<string, number>)[farmId];
+        const farmConfig = FARMS_CONFIG.find((f) => f.id === farmId);
+        if (!farmConfig) continue;
+
+        const ratePerSecond = farmConfig.miningRate / 3600;
+        const prev = (user.balances as Record<string, number>)[farmId] ?? 0;
+        const bonus = count * ratePerSecond * 0.05;
+        updatedBalances[farmId] = prev + bonus;
+      }
+    }
+    return updatedBalances;
+  };
+
+  const invalidateBalancesData = () => {
+    queryClient.setQueryData(trpc.main.getUser.queryKey(), (oldData) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        balances: calculateCurrentBalances(),
+      };
+    });
+  };
+
+  const updateBalances = () => {
+    // Clear any existing interval first
+    if (balanceIntervalRef.current) {
+      clearInterval(balanceIntervalRef.current);
+    }
+
+    // Set a new interval
+    balanceIntervalRef.current = window.setInterval(() => {
+      invalidateBalancesData();
+    }, 1000);
+  };
+
+  useEffect(() => {
+    updateBalances();
+
+    return () => {
+      if (balanceIntervalRef.current) {
+        clearInterval(balanceIntervalRef.current);
+        balanceIntervalRef.current = null;
+      }
+    };
+  }, [user]);
 
   const connectWallet = useMutation(
     trpc.main.connectWallet.mutationOptions({
@@ -89,11 +139,6 @@ function RouteComponent() {
     // eslint-disable-next-line @tanstack/query/no-unstable-deps
     [tonConnectUI, connectWallet],
   );
-
-  const refreshBalances = () => {
-    setIsRefreshing(true);
-    invalidateBalances.mutate();
-  };
 
   useEffect(() => {
     if (tonConnectUI) {
@@ -355,13 +400,6 @@ function RouteComponent() {
                 <GreenDollar />
               </div>
               <div>Баланс фруктов</div>
-              <div
-                onClick={refreshBalances}
-                className={`cursor-pointer ${isRefreshing ? "animate-spin" : ""}`}
-                style={{ animationDuration: isRefreshing ? "0.5s" : "0s" }}
-              >
-                <Refresh />
-              </div>
             </div>
           )}
         </div>
