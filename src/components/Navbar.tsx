@@ -10,12 +10,15 @@ export const Navbar = () => {
   const routerState = useRouterState();
   const currentRoute = routerState.location.pathname;
 
-  // Calculate the position of the active indicator based on the current route
+  if (currentRoute !== "/" && currentRoute !== "/wallet" && currentRoute !== "/farms") {
+    return null;
+  }
+
   const getActivePosition = () => {
     if (currentRoute === "/farms") return "left-[5%]";
     if (currentRoute === "/") return "left-[calc(50%-52.5px)]"; // Center position
     if (currentRoute === "/wallet") return "left-[calc(95%-105px)]"; // Right position
-    return "left-[0%]"; // Default position
+    return "left-[calc(50%-52.5px)]"; // Default position
   };
 
   return (
