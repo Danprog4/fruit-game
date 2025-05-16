@@ -286,11 +286,12 @@ async function setText(conversation: Conversation, ctx: Context) {
       return;
     }
 
-    const [text, translation] = message.text.split(":");
+    const [englishText, russianTranslation] = message.text.split(":");
 
     const currentTexts = (await redis.get("text")) as Record<string, string>;
 
-    await redis.set("text", { ...currentTexts, text: translation });
+    // Use the English text as the key for the translation
+    await redis.set("text", { ...currentTexts, [englishText]: russianTranslation });
 
     if (i === 2) {
       await db.delete(adminBotTable);
