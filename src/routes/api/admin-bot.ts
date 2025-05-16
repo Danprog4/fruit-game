@@ -271,7 +271,7 @@ bot.command("tokens", async (ctx) => {
 });
 
 async function setText(conversation: Conversation, ctx: Context) {
-  await redis.set("text", []);
+  await redis.set("text", {});
 
   await ctx.reply(
     "Set the text you want to set as 1 text in 2 languages. The format is: Your text:Твой текст",
@@ -281,7 +281,7 @@ async function setText(conversation: Conversation, ctx: Context) {
     const { message } = await conversation.waitFor("message:text");
 
     if (!message.text.includes(":")) {
-      await ctx.reply("Invalid format");
+      await ctx.reply("Invalid format. The format is: Your text:Твой текст");
       return;
     }
 
@@ -293,7 +293,9 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     if (i === 2) {
       await db.delete(adminBotTable);
-      await db.insert(adminBotTable).values({ text: currentTexts });
+      await db.insert(adminBotTable).values({
+        text: (await redis.get("text")) as Record<string, string>,
+      });
     }
 
     if (i < 2) {
