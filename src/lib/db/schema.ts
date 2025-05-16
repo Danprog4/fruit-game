@@ -42,6 +42,7 @@ export const alliancesTable = pgTable("alliances", {
   createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
   levels: jsonb("levels").default({}).$type<Record<string, number>>().notNull(),
 });
+
 export const adminBotTable = pgTable("admin_bot", {
   id: serial("id").primaryKey(),
   text: jsonb("text").default({}).$type<Record<string, string>>().notNull(),
