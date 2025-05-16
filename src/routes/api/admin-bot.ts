@@ -277,25 +277,27 @@ async function setText(conversation: Conversation, ctx: Context) {
     "Set the text you want to set as 1 text in 2 languages. The format is: Your text:Твой текст",
   );
 
+  let allTexts: Record<string, string> = {};
+
   for (let i = 0; i < 3; i++) {
     const { message } = await conversation.waitFor("message:text");
 
     if (!message.text.includes(":")) {
-      await ctx.reply("Invalid format. The format is: Your text:Твой текст");
-      i -= 1;
-      continue;
+      await ctx.reply("Invalid format. The format is: Your text:Твой текст. Try again.");
+      return;
     }
 
     const [text, translation] = message.text.split(":");
 
-    const currentTexts = (await redis.get("text")) as Record<string, string>;
-
-    await redis.set("text", { ...currentTexts, [text]: translation });
+    allTexts[text.trim()] = translation.trim();
+    await redis.set("text", allTexts);
 
     if (i === 2) {
       await db.delete(adminBotTable);
+
+      // Insert directly with the object rather than fetching from Redis
       await db.insert(adminBotTable).values({
-        text: (await redis.get("text")) as Record<string, string>,
+        text: allTexts,
       });
     }
 
