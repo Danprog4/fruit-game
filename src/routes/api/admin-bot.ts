@@ -272,35 +272,44 @@ bot.command("tokens", async (ctx) => {
 
 async function setText(conversation: Conversation, ctx: Context) {
   // Initialize with an empty object
-  await redis.set("text", {});
+  await redis.set("text", JSON.stringify({}));
 
   await ctx.reply(
-    "Set the text you want to set as 1 text in 2 languages. The format is: Your text:Твой текст",
+    "Set the text you want to set as 1 text in 2 languages. \nThe format is - Your text:Твой текст",
   );
 
   for (let i = 0; i < 3; i++) {
     const { message } = await conversation.waitFor("message:text");
 
     if (!message.text.includes(":")) {
-      await ctx.reply("Invalid format. The format is: Your text:Твой текст. Try again.");
+      await ctx.reply(
+        "Invalid format. The format is - Your text:Твой текст. \nTry again.",
+      );
       return;
     }
 
     const [englishText, russianTranslation] = message.text.split(":");
 
-    const currentTexts = (await redis.get("text")) as Record<string, string>;
+    const raw = await redis.get("text");
+    const currentTexts = raw ? (JSON.parse(raw as string) as Record<string, string>) : {};
 
     // Use the English text as the key for the translation
-    await redis.set("text", { ...currentTexts, [englishText]: russianTranslation });
+    await redis.set(
+      "text",
+      JSON.stringify({ ...currentTexts, [englishText]: russianTranslation }),
+    );
 
     if (i === 2) {
       await db.delete(adminBotTable);
 
-      const finalTexts = await redis.get("text");
+      const finalRaw = await redis.get("text");
+      const finalTexts = finalRaw
+        ? (JSON.parse(finalRaw as string) as Record<string, string>)
+        : {};
 
       // Insert to database
       await db.insert(adminBotTable).values({
-        text: finalTexts as Record<string, string>,
+        text: finalTexts,
       });
     }
 
