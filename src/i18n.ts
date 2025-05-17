@@ -98,6 +98,11 @@ export const translations = {
     "Waiting for confirmation": "Waiting for confirmation",
     "Buy for": "Buy for",
     Balance: "Balance",
+    "Upgrade for TON": "Upgrade for TON",
+    "Upgrade for FRU": "Upgrade for FRU",
+    Capacity: "Capacity",
+    Coefficient: "Coefficient",
+    Profitability: "Profitability",
   },
   ru: {
     "Start game": "Начать игру",
@@ -194,6 +199,11 @@ export const translations = {
     "Waiting for confirmation": "Ожидание подтверждения",
     "Buy for": "Купить за",
     Balance: "Баланс",
+    "Upgrade for TON": "Улучшить за TON",
+    "Upgrade for FRU": "Улучшить за FRU",
+    Capacity: "Вместимость",
+    Coefficient: "Коэффициент",
+    Profitability: "Доходность",
   },
 } as const;
 

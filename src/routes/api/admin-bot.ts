@@ -271,8 +271,7 @@ bot.command("tokens", async (ctx) => {
 });
 
 async function setText(conversation: Conversation, ctx: Context) {
-  // Initialize with an empty object
-  await redis.set("text", JSON.stringify({}));
+  await redis.set("text", {});
 
   await ctx.reply(
     "Set the text you want to set as 1 text in 2 languages. \nThe format is - Your text:Твой текст",
@@ -290,26 +289,19 @@ async function setText(conversation: Conversation, ctx: Context) {
 
     const [englishText, russianTranslation] = message.text.split(":");
 
-    const raw = await redis.get("text");
-    const currentTexts = raw ? (JSON.parse(raw as string) as Record<string, string>) : {};
+    const currentTexts = (await redis.get("text")) as Record<string, string>;
 
     // Use the English text as the key for the translation
-    await redis.set(
-      "text",
-      JSON.stringify({ ...currentTexts, [englishText]: russianTranslation }),
-    );
+    await redis.set("text", { ...currentTexts, [englishText]: russianTranslation });
 
     if (i === 2) {
       await db.delete(adminBotTable);
 
-      const finalRaw = await redis.get("text");
-      const finalTexts = finalRaw
-        ? (JSON.parse(finalRaw as string) as Record<string, string>)
-        : {};
+      const finalTexts = await redis.get("text");
 
       // Insert to database
       await db.insert(adminBotTable).values({
-        text: finalTexts,
+        text: finalTexts as Record<string, string>,
       });
     }
 

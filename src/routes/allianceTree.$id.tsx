@@ -6,6 +6,7 @@ import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
 import { Switch } from "~/components/ui/switch";
 import { useAllianceUpgrade } from "~/hooks/useAllianceUpgrade";
+import { useT } from "~/i18n";
 import {
   ALLIANCE_LEVELS,
   AllianceLevelType,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/allianceTree/$id")({
 function RouteComponent() {
   const trpc = useTRPC();
   const { id } = Route.useParams();
+  const t = useT();
   const { data: alliances } = useQuery(trpc.alliances.getAlliances.queryOptions());
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
@@ -88,7 +90,7 @@ function RouteComponent() {
   const allianceStats = [
     {
       type: "capacity" as AllianceLevelType,
-      title: "Вместимость",
+      title: t("Capacity"),
       level: capacityLevel,
       progress: capacityProgress,
       icon: (
@@ -118,7 +120,7 @@ function RouteComponent() {
     },
     {
       type: "coefficient" as AllianceLevelType,
-      title: "Коэффициент",
+      title: t("Coefficient"),
       level: coefficientLevel,
       progress: coefficientProgress,
       icon: (
@@ -148,7 +150,7 @@ function RouteComponent() {
     },
     {
       type: "profitability" as AllianceLevelType,
-      title: "Доходность",
+      title: t("Profitability"),
       level: profitabilityLevel,
       progress: profitabilityProgress,
       icon: (
@@ -194,7 +196,7 @@ function RouteComponent() {
         <div className="absolute bottom-0 h-20 w-full bg-gradient-to-t from-[#3b390e] to-transparent"></div>
       </div>
 
-      <div className="mb-4 text-2xl font-bold">Дерево прокачки</div>
+      <div className="mb-4 text-2xl font-bold">{t("Alliance tree")}</div>
       <div className="flex w-full justify-between gap-4 p-4">
         {allianceStats.map((stat, index) => (
           <Drawer.Root key={index}>
@@ -240,9 +242,13 @@ function RouteComponent() {
                 <div className="flex flex-col p-6">
                   <div className="mb-4 ml-auto flex items-center gap-2">
                     {isTON ? (
-                      <div className="text-sm text-gray-300">Купить за FRU (Баланс)</div>
+                      <div className="text-sm text-gray-300">
+                        {t("Buy for")} FRU ({t("Balance")})
+                      </div>
                     ) : (
-                      <div className="text-sm text-gray-300">Купить за FRU (TON)</div>
+                      <div className="text-sm text-gray-300">
+                        {t("Buy for")} FRU (TON)
+                      </div>
                     )}
                     <Switch
                       checked={isTON}
@@ -293,7 +299,7 @@ function RouteComponent() {
                             stat.type === upgradeWithTON.variables.type ? (
                               <Spinner className="size-4 animate-spin" />
                             ) : (
-                              "Улучшить за TON"
+                              t("Upgrade for TON")
                             )}
                           </button>
                         ) : (
@@ -307,7 +313,7 @@ function RouteComponent() {
                             stat.type === upgradeWithFRU.variables.type ? (
                               <Spinner className="size-4 animate-spin" />
                             ) : (
-                              "Улучшить за FRU"
+                              t("Upgrade for FRU")
                             )}
                           </button>
                         )}
