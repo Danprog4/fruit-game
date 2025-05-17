@@ -65,7 +65,7 @@ export const TasksList = () => {
               </div>
             </div>
 
-            {task.status === "notStarted" ? (
+            {task.status === "notStarted" || task.status === "failed" ? (
               <StartTaskButton onGo={() => onGo(task)} />
             ) : (
               <TaskStatusBlock id={task.id} status={task.status} />
@@ -149,10 +149,6 @@ const TaskStatusBlock = ({ id, status }: { id: number; status: TaskStatus }) => 
         <Spinner className="size-4 animate-spin" />
       </button>
     );
-  }
-
-  if (status === "failed") {
-    return <CheckButton id={id} />;
   }
 
   if (status === "completed") {

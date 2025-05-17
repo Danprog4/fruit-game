@@ -131,6 +131,31 @@ export const tasksRouter = {
         throw new Error("Task not found");
       }
 
+      const userTask = await db
+        .select()
+        .from(userTasksTable)
+        .where(
+          and(
+            eq(userTasksTable.userId, ctx.userId),
+            eq(userTasksTable.taskId, input.taskId),
+          ),
+        );
+
+      if (userTask.length !== 0) {
+        await db
+          .update(userTasksTable)
+          .set({
+            status: "started",
+          })
+          .where(
+            and(
+              eq(userTasksTable.userId, ctx.userId),
+              eq(userTasksTable.taskId, input.taskId),
+            ),
+          );
+        return;
+      }
+
       await db.insert(userTasksTable).values({
         userId: ctx.userId,
         taskId: input.taskId,
