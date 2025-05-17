@@ -9,7 +9,7 @@ import { Share } from "~/components/icons/Share";
 import { Token } from "~/components/icons/Token";
 import { User } from "~/components/icons/User";
 import { useT } from "~/i18n";
-import { ruFriends } from "~/lib/intl";
+import { enFriends, ruFriends } from "~/lib/intl";
 import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
 export const Route = createFileRoute("/friends")({
@@ -23,6 +23,10 @@ function RouteComponent() {
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
 
   const t = useT();
+
+  const isRu = useMemo(() => {
+    return user?.language === "ru";
+  }, [user?.language]);
 
   const link = useMemo((): string => {
     return `https://t.me/FruitUtopia_bot?startapp=ref_${user?.id || ""}`;
@@ -67,7 +71,7 @@ function RouteComponent() {
           <div className="font-manrope mr-[39px] text-xs leading-none font-medium text-nowrap">
             {t("You have")}{" "}
             <span className="text-[#85BF1A]">
-              {pluralizeRuIntl(friends?.length || 0, ruFriends)}
+              {pluralizeRuIntl(friends?.length || 0, isRu ? ruFriends : enFriends)}
             </span>
           </div>
         </div>

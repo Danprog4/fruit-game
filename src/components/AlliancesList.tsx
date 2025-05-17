@@ -1,8 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { Drawer } from "vaul";
 import { useT } from "~/i18n";
-import { ruPeople } from "~/lib/intl";
+import { enPeople, ruPeople } from "~/lib/intl";
 import { getImageUrl } from "~/lib/utils/images";
 import { pluralizeRuIntl } from "~/lib/utils/plural";
 import { useTRPC } from "~/trpc/init/react";
@@ -64,6 +65,10 @@ export const AlliancesList = ({
 
   const t = useT();
 
+  const isRu = useMemo(() => {
+    return user?.language === "ru";
+  }, [user?.language]);
+
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-[15px]">
@@ -91,7 +96,12 @@ export const AlliancesList = ({
                   {userAlliance.name} ({t("Your alliance")})
                 </div>
                 <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                  <div>{pluralizeRuIntl(userAlliance.members || 1, ruPeople)}</div>
+                  <div>
+                    {pluralizeRuIntl(
+                      userAlliance.members || 1,
+                      isRu ? ruPeople : enPeople,
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -123,7 +133,9 @@ export const AlliancesList = ({
                     {alliance.name}
                   </div>
                   <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium text-[#8F8F8F]">
-                    <div>{pluralizeRuIntl(alliance.members || 1, ruPeople)}</div>
+                    <div>
+                      {pluralizeRuIntl(alliance.members || 1, isRu ? ruPeople : enPeople)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -164,7 +176,10 @@ export const AlliancesList = ({
                     <div className="font-manrope w-full rounded-xl bg-[#3A3A3A] p-4 text-sm">
                       <div className="mb-2 text-[#8F8F8F]">{t("Members")}:</div>
                       <div className="text-white">
-                        {pluralizeRuIntl(alliance.members || 1, ruPeople)}
+                        {pluralizeRuIntl(
+                          alliance.members || 1,
+                          isRu ? ruPeople : enPeople,
+                        )}
                       </div>
                     </div>
 

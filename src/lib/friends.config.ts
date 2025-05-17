@@ -1,8 +1,3 @@
-export const friendsConfig = [
-  {
-    level: 1,
-  },
-];
 export const FRIENDS_CONFIG = [
   {
     level: 1,
@@ -52,12 +47,11 @@ export const FRIENDS_CONFIG = [
 ];
 
 export type FriendLevel = (typeof FRIENDS_CONFIG)[number];
-
-export const getFriendLevel = (farmCount: number): FriendLevel => {
-  for (let i = FRIENDS_CONFIG.length - 1; i >= 0; i--) {
+export const getFriendLevel = (farmCount: number): number => {
+  for (let i = 0; i < FRIENDS_CONFIG.length; i++) {
     if (farmCount < FRIENDS_CONFIG[i].maxFarms) {
-      return FRIENDS_CONFIG[i];
+      return FRIENDS_CONFIG[i].level;
     }
   }
-  return FRIENDS_CONFIG[0];
+  return FRIENDS_CONFIG[0].level;
 };

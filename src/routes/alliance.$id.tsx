@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Drawer } from "vaul";
 import { AllianceMembList } from "~/components/AllianceMembList";
@@ -13,6 +13,7 @@ import { PencilIcon } from "~/components/icons/pencilIcon";
 import { Input } from "~/components/Input";
 import { useT } from "~/i18n";
 import { FARMS_CONFIG } from "~/lib/farms.config";
+import { enAllianceMember, ruAllianceMember } from "~/lib/intl";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
 import { getImageUrl } from "~/lib/utils/images";
@@ -75,6 +76,10 @@ function RouteComponent() {
   if (isUserLoading || isAlliancesLoading) {
     return <div>Loading...</div>;
   }
+
+  const isRu = useMemo(() => {
+    return user?.language === "ru";
+  }, [user?.language]);
 
   const userAlliance = alliances?.find((alliance) => alliance.id === Number(id));
   const isOwner = userAlliance?.ownerId === user?.id;
@@ -257,11 +262,10 @@ function RouteComponent() {
               </div>
             )}
             <div className="font-manrope text-xs font-medium text-[#93A179]">
-              {pluralizeRuIntl(userAlliance?.members || 0, {
-                one: "участник",
-                few: "участника",
-                many: "участников",
-              })}
+              {pluralizeRuIntl(
+                userAlliance?.members || 0,
+                isRu ? ruAllianceMember : enAllianceMember,
+              )}
             </div>
           </div>
           <AllianceGroupMini />
