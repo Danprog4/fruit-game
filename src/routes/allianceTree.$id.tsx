@@ -239,7 +239,7 @@ function RouteComponent() {
               <Drawer.Overlay className="fixed inset-0 bg-black/40" />
 
               <Drawer.Content className="fixed right-0 bottom-0 left-0 h-fit max-h-[80vh] overflow-y-auto rounded-t-[20px] bg-[#3b390e] outline-none">
-                <div className="flex flex-col p-6">
+                <div className="flex flex-col p-4">
                   <div className="mb-4 ml-auto flex items-center gap-2">
                     {isTON ? (
                       <div className="text-sm text-gray-300">
