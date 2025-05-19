@@ -26,9 +26,6 @@ const getPoolPrice = async (poolAddress: string) => {
 };
 
 const poolAddress = "EQAMWMphHm4kkjX3Jnm8ZZr_e99OL2y0QQRJUtFnp2ZNKqIE";
-const result = getPoolPrice(poolAddress);
-
-// console.log("HOW MANY TOKENS YOU GET FOR 1 TON:", result.price);
 
 const getTONPrice = async () => {
   const response = await ky
@@ -42,10 +39,15 @@ const getTONPrice = async () => {
   return (response as any).data[0].last;
 };
 
-const tonPrice = getTONPrice();
+export const getTokenPriceInUSD = async () => {
+  const result = await getPoolPrice(poolAddress);
+  const tonPrice = await getTONPrice();
 
-console.log("TON PRICE:", tonPrice);
+  console.log("HOW MANY TOKENS YOU GET FOR 1 TON:", result.price);
+  console.log("TON PRICE:", tonPrice);
 
-// export const tokenPriceInUSD = (1 / result.price) * tonPrice;
+  const tokenPrice = (1 / result.price) * tonPrice;
+  console.log("TOKEN PRICE IN USD:", tokenPrice);
 
-// console.log("TOKEN PRICE IN USD:", tokenPriceInUSD);
+  return tokenPrice;
+};

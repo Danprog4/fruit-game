@@ -18,7 +18,7 @@ import { useJettonBalance } from "~/hooks/useJettonBalance";
 import { useT } from "~/i18n";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { getShortAddress } from "~/lib/utils/address";
-import { tokenPriceInUSD } from "~/lib/web3/token-price-stonfi";
+import { getTokenPriceInUSD } from "~/lib/web3/token-price-stonfi";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/wallet")({
@@ -262,15 +262,22 @@ function RouteComponent() {
 
   const jettonBalance = useJettonBalance(user?.walletAddress ?? "");
 
+  const { data: tokenPriceData } = useQuery({
+    queryKey: ["tokenPrice"],
+    queryFn: getTokenPriceInUSD,
+  });
+
   const tokenPrice = useMemo(() => {
-    return jettonBalance ? tokenPriceInUSD * Number(jettonBalance) : 0;
-  }, [jettonBalance]);
+    return jettonBalance && tokenPriceData ? tokenPriceData * Number(jettonBalance) : 0;
+  }, [jettonBalance, tokenPriceData]);
 
   const balanceFruitsInUSD = (farmId: string) => {
     const farmConfig = FARMS_CONFIG.find((f) => f.id === farmId);
-    if (!farmConfig) return 0;
-    if (balances === undefined) return 0;
-    const balance = ((balances[farmId] / farmConfig.rateFru / 1) * tokenPriceInUSD)
+    if (!farmConfig) return "0";
+    if (balances === undefined) return "0";
+    if (!tokenPriceData) return "0";
+
+    const balance = ((balances[farmId] / farmConfig.rateFru / 1) * tokenPriceData)
       .toFixed(3)
       .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     console.log(balance);
