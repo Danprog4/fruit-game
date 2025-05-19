@@ -133,12 +133,12 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
-  const prefetch = async () => {
-    // await queryClient.prefetchQuery(trpc.main.getFriends.queryOptions());
-    await queryClient.prefetchQuery(trpc.main.getUser.queryOptions());
-    await queryClient.prefetchQuery(trpc.alliances.getAlliances.queryOptions());
-    await queryClient.prefetchQuery(trpc.alliances.getSeason.queryOptions());
-  };
+  // const prefetch = async () => {
+  //   // await queryClient.prefetchQuery(trpc.main.getFriends.queryOptions());
+  //   await queryClient.prefetchQuery(trpc.main.getUser.queryOptions());
+  //   await queryClient.prefetchQuery(trpc.alliances.getAlliances.queryOptions());
+  //   await queryClient.prefetchQuery(trpc.alliances.getSeason.queryOptions());
+  // };
 
   useEffect(() => {
     if (isDev && isErudaEnabled) {
@@ -148,9 +148,9 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    prefetch();
-  }, []);
+  // useEffect(() => {
+  //   prefetch();
+  // }, []);
 
   useEffect(() => {
     console.log(user?.language, "user?.language");
