@@ -129,20 +129,18 @@ function RouteComponent() {
 
   const getLastWithdrawals = useQuery(trpc.main.getLastWithdrawals.queryOptions());
 
-  useEffect(
-    () =>
-      tonConnectUI.onStatusChange((wallet) => {
-        if (!wallet) {
-          disconnectWallet.mutate();
-          return;
-        }
+  useEffect(() => {
+    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
+      if (!wallet) {
+        disconnectWallet.mutate();
+        return;
+      }
 
-        connectWallet.mutate({ walletAddress: wallet.account.address });
-      }),
+      connectWallet.mutate({ walletAddress: wallet.account.address });
+    });
 
-    // eslint-disable-next-line @tanstack/query/no-unstable-deps
-    [tonConnectUI, connectWallet],
-  );
+    return unsubscribe;
+  }, [tonConnectUI, connectWallet, disconnectWallet]);
 
   useEffect(() => {
     if (tonConnectUI) {
@@ -188,7 +186,7 @@ function RouteComponent() {
         }
       });
     }
-  }, [lastTxs.data]);
+  }, [lastTxs.data, navigate, t]);
 
   useEffect(() => {
     const somethingIsPending = isPending || isWithdrawPending;
@@ -258,7 +256,7 @@ function RouteComponent() {
     return txs.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-  }, [lastTxs.data, getLastWithdrawals.data]);
+  }, [lastTxs.data, getLastWithdrawals.data, t]);
 
   const jettonBalance = useJettonBalance(user?.walletAddress ?? "");
 
