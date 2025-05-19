@@ -39,7 +39,6 @@ function RouteComponent() {
   const balanceIntervalRef = useRef<number | null>(null);
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
-  const jettonBalance = useJettonBalance(user?.walletAddress ?? "");
 
   const calculateCurrentBalances = () => {
     if (!user) return {};
@@ -260,6 +259,8 @@ function RouteComponent() {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }, [lastTxs.data, getLastWithdrawals.data]);
+
+  const jettonBalance = useJettonBalance(user?.walletAddress ?? "");
 
   const tokenPrice = useMemo(() => {
     return jettonBalance ? tokenPriceInUSD * Number(jettonBalance) : 0;
