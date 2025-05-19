@@ -5,7 +5,6 @@ import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   vite: {
-    build: { target: "es2022" },
     plugins: [
       tsConfigPaths({
         projects: ["./tsconfig.json"],
@@ -15,6 +14,12 @@ export default defineConfig({
         buffer: true,
       }),
     ],
+    esbuild: {
+      target: "esnext", // Set higher target to support top-level await
+    },
+    build: {
+      target: "esnext",
+    },
   },
 
   // https://react.dev/learn/react-compiler
