@@ -103,6 +103,7 @@ export const translations = {
     Capacity: "Capacity",
     Coefficient: "Coefficient",
     Profitability: "Profitability",
+    "Will open upon capitalization in": "Will open upon capitalization in",
   },
   ru: {
     "Start game": "Начать игру",
@@ -204,6 +205,7 @@ export const translations = {
     Capacity: "Вместимость",
     Coefficient: "Коэффициент",
     Profitability: "Доходность",
+    "Will open upon capitalization in": "Откроется при капитализации в",
   },
 } as const;
 

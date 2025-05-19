@@ -11,6 +11,7 @@ export const FARMS_CONFIG = [
     enabled: true,
     icon: "🍓",
     txType: "Straberry Farm",
+    capEnabled: 100000,
   },
   {
     id: "cherry",
@@ -24,6 +25,7 @@ export const FARMS_CONFIG = [
     enabled: true,
     icon: "🍒",
     txType: "Cherry Farm",
+    capEnabled: 100000,
   },
   {
     id: "coconut",
@@ -35,6 +37,7 @@ export const FARMS_CONFIG = [
     miningRate: 2,
     rateFru: 0.7584,
     enabled: false,
+    capEnabled: 200000,
     icon: "🥥",
     txType: "Coconut Farm",
   },

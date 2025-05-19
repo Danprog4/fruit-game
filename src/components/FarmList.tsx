@@ -6,7 +6,7 @@ import { useFarmPayment } from "~/hooks/useFarmPayment";
 import { useT } from "~/i18n";
 import { Farm, FARMS_CONFIG } from "~/lib/farms.config";
 import { useTRPC } from "~/trpc/init/react";
-
+import { Lock } from "./icons/Lock";
 export const FarmList = () => {
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
   const trpc = useTRPC();
@@ -37,8 +37,18 @@ export const FarmList = () => {
       {FARMS_CONFIG.map((farm) => (
         <div
           key={farm.id}
-          className={`flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px] ${!farm.enabled ? "" : ""}`}
+          className={`relative flex h-[76px] w-full items-center rounded-full border border-[#575757] bg-[#2A2A2A] px-3 pr-[20px] ${!farm.enabled ? "" : ""}`}
         >
+          {!farm.enabled && (
+            <div className="absolute top-0 right-0 left-0 z-10 flex h-[76px] w-full items-center justify-center rounded-full bg-black/40">
+              <div className="font-manrope flex items-center gap-2 text-xs font-medium text-white">
+                <Lock />
+                {t(
+                  "Will open upon capitalization in",
+                )} {farm.capEnabled.toLocaleString()} FRU
+              </div>
+            </div>
+          )}
           <div className="relative mr-5 flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[#76AD10] bg-[#2A2A2A]">
             <div className="text-2xl">{farm.icon}</div>
             {userFarms && userFarms[farm.id] && (
@@ -47,10 +57,13 @@ export const FarmList = () => {
               </div>
             )}
           </div>
+
           <div className="mr-auto flex w-[116px] flex-col items-start justify-center gap-2">
-            <div className="font-manrope text-xs font-medium">
-              {isEn ? farm.name : farm.rusName} {t("farm")}
-            </div>
+            {farm.enabled && (
+              <div className="font-manrope text-xs font-medium">
+                {isEn ? farm.name : farm.rusName} {t("farm")}
+              </div>
+            )}
             <div className="font-manrope text-xs font-medium text-nowrap text-[#8F8F8F]">
               {userFarms && userFarms[farm.id]
                 ? `${(farm.miningRate * userFarms[farm.id]).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${farm.tokenName}/час`
@@ -58,24 +71,26 @@ export const FarmList = () => {
             </div>
           </div>
           <Drawer.Root open={selectedFarm?.id === farm.id}>
-            <button
-              type="button"
-              onClick={() =>
-                farm.enabled
-                  ? setSelectedFarm(farm)
-                  : toast.error(t("Unfortunately, the farm is not available"))
-              }
-              className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
-              disabled={buyFarmForTON.isPending && buyFarmForTON.variables === farm.id}
-            >
-              {buyFarmForTON.isPending && buyFarmForTON.variables === farm.id ? (
-                <span className="text-xs text-white">{t("Please wait...")}</span>
-              ) : farm.enabled ? (
-                `${farm.priceInFRU.toLocaleString()} FRU`
-              ) : (
-                t("Not available")
-              )}
-            </button>
+            {farm.enabled && (
+              <button
+                type="button"
+                onClick={() =>
+                  farm.enabled
+                    ? setSelectedFarm(farm)
+                    : toast.error(t("Unfortunately, the farm is not available"))
+                }
+                className={`font-manrope flex h-[36px] w-[92px] items-center justify-center rounded-full text-nowrap disabled:opacity-50 ${farm.enabled ? "bg-[#76AD10]" : "bg-[#4A4A4A]"} px-4 text-xs font-medium text-white`}
+                disabled={buyFarmForTON.isPending && buyFarmForTON.variables === farm.id}
+              >
+                {buyFarmForTON.isPending && buyFarmForTON.variables === farm.id ? (
+                  <span className="text-xs text-white">{t("Please wait...")}</span>
+                ) : farm.enabled ? (
+                  `${farm.priceInFRU.toLocaleString()} FRU`
+                ) : (
+                  t("Not available")
+                )}
+              </button>
+            )}
             <Drawer.Portal>
               <Drawer.Overlay
                 className="fixed inset-0 bg-black/40"
