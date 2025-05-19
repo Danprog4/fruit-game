@@ -15,7 +15,7 @@ import {
 } from "@telegram-apps/sdk-react";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { AuthProvider } from "~/components/AuthProvider";
 import appCss from "~/lib/styles/app.css?url";
@@ -105,6 +105,29 @@ function RootComponent() {
     }
   }, []);
 
+  const [isPortrait, setIsPortrait] = useState(true);
+
+  useEffect(() => {
+    // Function to update the state based on current orientation
+    const handleOrientationChange = () => {
+      // Check if the orientation type starts with 'portrait'
+      setIsPortrait(screen.orientation.type.startsWith("portrait"));
+    };
+
+    // **Initial check when the component mounts**
+    // This is important in case the user starts in landscape
+    handleOrientationChange();
+
+    // **Add an event listener for orientation changes**
+    // This function will be called whenever the user rotates their device
+    screen.orientation.addEventListener("change", handleOrientationChange);
+
+    // **Clean up the event listener when the component unmounts**
+    // Prevents memory leaks
+    return () => {
+      screen.orientation.removeEventListener("change", handleOrientationChange);
+    };
+  }, []); // T
   useTaskStatusPolling();
 
   return (
