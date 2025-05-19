@@ -4,6 +4,30 @@ import { db } from "../db";
 import { tasksTable } from "../db/schema";
 import { makeTaskCompleted, makeTaskFailed } from "./db-repo";
 
+export async function checkTelegramMembership(args: {
+  userId: number;
+  chatId: string;
+}): Promise<boolean> {
+  const { userId, chatId } = args;
+  const response = await axios.get<{ result: { status: string } }>(
+    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/getChatMember`,
+    {
+      params: {
+        chat_id: chatId.toString().startsWith("-") ? chatId : "@" + chatId,
+        user_id: userId,
+      },
+    },
+  );
+
+  console.log("check membership response", response.data.result.status);
+
+  return (
+    response.data.result.status === "member" ||
+    response.data.result.status === "administrator" ||
+    response.data.result.status === "creator"
+  );
+}
+
 export async function checkMembership({
   userId,
   taskId,
@@ -45,28 +69,4 @@ export async function checkMembership({
     console.log("error", (e as Error).message);
     await makeTaskFailed(userId, taskId);
   }
-}
-
-async function checkTelegramMembership(args: {
-  userId: number;
-  chatId: string;
-}): Promise<boolean> {
-  const { userId, chatId } = args;
-  const response = await axios.get<{ result: { status: string } }>(
-    `https://api.telegram.org/bot${process.env.BOT_TOKEN}/getChatMember`,
-    {
-      params: {
-        chat_id: chatId.toString().startsWith("-") ? chatId : "@" + chatId,
-        user_id: userId,
-      },
-    },
-  );
-
-  console.log("check membership response", response.data.result.status);
-
-  return (
-    response.data.result.status === "member" ||
-    response.data.result.status === "administrator" ||
-    response.data.result.status === "creator"
-  );
 }

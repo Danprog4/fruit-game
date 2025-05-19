@@ -120,14 +120,13 @@ export type TaskData = TaskDataTelegram | TaskDataLink;
 export const tasksTable = pgTable("tasks", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 200 }).notNull(),
-  imageUrl: varchar("image_url", { length: 300 }),
   reward: integer("reward").notNull().default(100),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   completed: integer("completed").notNull().default(0),
-  limit: integer("limit"),
   active: boolean("active").notNull().default(true),
   type: varchar("type", { length: 50 }).notNull().default("join"), // telegram, fake, twitter, external
   data: jsonb("data").$type<TaskData>(),
+  imageUrl: varchar("image_url", { length: 300 }),
 });
 
 export type Task = typeof tasksTable.$inferSelect;
@@ -136,10 +135,10 @@ export type TaskInsert = typeof tasksTable.$inferInsert;
 export type FrontendTask = {
   id: number;
   name: string;
-  imageUrl: string | null;
   reward: number;
   status: TaskStatus;
   taskData: TaskData;
+  imageUrl: string | null;
 };
 
 /**
@@ -150,7 +149,7 @@ export const userTasksTable = pgTable(
   {
     userId: bigint("user_id", { mode: "number" }).notNull(),
     taskId: integer("task_id").notNull(),
-    status: varchar("task_status", { length: 32 }).notNull().default("checking"),
+    status: varchar("task_status", { length: 32 }).notNull().default("notStarted"),
   },
   (table) => {
     return [

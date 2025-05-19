@@ -8,10 +8,10 @@ import {
   TaskStatus,
   userTasksTable,
 } from "~/lib/db/schema";
+import { checkMembership } from "~/lib/tasks/check-task";
 import { procedure } from "./init";
-
 export const tasksRouter = {
-  getTasks: procedure.query<FrontendTask[]>(async ({ ctx }) => {
+  getTasks: procedure.query(async ({ ctx }) => {
     const tasks = await db.select().from(tasksTable);
 
     const userTasks = await db
@@ -30,8 +30,8 @@ export const tasksRouter = {
           name: task.name,
           status: (userTaskMap.get(task.id) || "notStarted") satisfies TaskStatus,
           reward: task.reward,
-          imageUrl: task.imageUrl || "",
           taskData: task.data as TaskData,
+          imageUrl: task.imageUrl,
         }) satisfies FrontendTask,
     );
   }),
@@ -77,45 +77,10 @@ export const tasksRouter = {
         throw new Error("Task not found");
       }
 
-      const existingTask = await db
-        .select()
-        .from(userTasksTable)
-        .where(
-          and(
-            eq(userTasksTable.userId, ctx.userId),
-            eq(userTasksTable.taskId, input.taskId),
-          ),
-        );
-
-      console.log("existingTask", existingTask);
-
-      if (existingTask.length === 0) {
-        // create new task as checking in users table
-        await db.insert(userTasksTable).values({
-          userId: ctx.userId,
-          taskId: input.taskId,
-          status: "checking",
-        });
-
-        console.log("new task created");
-      } else {
-        await db
-          .update(userTasksTable)
-          .set({
-            status: "checking",
-          })
-          .where(
-            and(
-              eq(userTasksTable.userId, ctx.userId),
-              eq(userTasksTable.taskId, input.taskId),
-            ),
-          );
-      }
-
-      return {
-        id: input.taskId,
-        status: "checking" as TaskStatus,
-      };
+      await checkMembership({
+        userId: ctx.userId,
+        taskId: input.taskId,
+      });
     }),
 
   startTask: procedure
@@ -129,6 +94,31 @@ export const tasksRouter = {
 
       if (!task) {
         throw new Error("Task not found");
+      }
+
+      const userTask = await db
+        .select()
+        .from(userTasksTable)
+        .where(
+          and(
+            eq(userTasksTable.userId, ctx.userId),
+            eq(userTasksTable.taskId, input.taskId),
+          ),
+        );
+
+      if (userTask.length !== 0) {
+        await db
+          .update(userTasksTable)
+          .set({
+            status: "started",
+          })
+          .where(
+            and(
+              eq(userTasksTable.userId, ctx.userId),
+              eq(userTasksTable.taskId, input.taskId),
+            ),
+          );
+        return;
       }
 
       await db.insert(userTasksTable).values({

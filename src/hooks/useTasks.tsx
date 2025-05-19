@@ -17,17 +17,7 @@ export const useTasks = () => {
   const queryClient = useQueryClient();
 
   const { mutateAsync: startVerification } = useMutation(
-    trpc.tasks.startVerification.mutationOptions({
-      onSuccess: (_, { taskId }) => {
-        queryClient.setQueryData(trpc.tasks.getTasks.queryKey(), (oldTasks) => {
-          if (!oldTasks) return oldTasks;
-
-          return oldTasks.map((t) =>
-            t.id === taskId ? { ...t, status: "checking" as TaskStatus } : t,
-          );
-        });
-      },
-    }),
+    trpc.tasks.startVerification.mutationOptions({}),
   );
 
   const startTask = useMutation(
@@ -56,7 +46,12 @@ export function useTaskStatusPolling() {
   const { data: tasks } = useQuery(trpc.tasks.getTasks.queryOptions());
   const queryClient = useQueryClient();
 
-  const checkingTaskIds = tasks?.filter((t) => t.status === "checking").map((t) => t.id);
+  const checkingTaskIds = tasks
+    ?.filter(
+      (t) =>
+        t.status !== "notStarted" && t.status !== "completed" && t.status !== "failed",
+    )
+    .map((t) => t.id);
 
   console.log("checkingTaskIds", checkingTaskIds);
 
@@ -82,21 +77,30 @@ export function useTaskStatusPolling() {
   console.log("statuses polling", statuses);
 
   useEffect(() => {
-    if (!statuses) {
-      return;
-    }
+    if (!statuses) return;
 
     statuses.forEach(({ taskId, status }) => {
       if (status === "completed") {
         updateTaskStatus(taskId, "completed");
         queryClient.invalidateQueries({ queryKey: trpc.tasks.getTasks.queryKey() });
-        toast.success(`Task is completed`, { id: "task-completed" });
+        queryClient.setQueryData(trpc.main.getUser.queryKey(), (oldUser) => {
+          if (!oldUser) return oldUser;
+
+          return { ...oldUser, tokenBalance: oldUser.tokenBalance + 100 };
+        });
+        toast.success(`Задание выполнено`, { id: `task-completed-${taskId}` });
       } else if (status === "failed") {
-        updateTaskStatus(taskId, "notStarted");
-        toast.error(`Task is not completed, try again`, { id: "task-failed" });
+        const prevTasks = queryClient.getQueryData(trpc.tasks.getTasks.queryKey());
+        const prevStatus = prevTasks?.find((t) => t.id === taskId)?.status;
+        if (prevStatus === "checking") {
+          updateTaskStatus(taskId, "notStarted");
+          toast.error(`Задание не выполнено, попробуйте снова`, {
+            id: `task-failed-${taskId}`,
+          });
+        }
       }
     });
-  }, [queryClient, statuses, trpc.tasks.getTasks, updateTaskStatus]);
+  }, [statuses]);
 
   return null;
 }
