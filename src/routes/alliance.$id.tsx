@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { openTelegramLink } from "@telegram-apps/sdk-react";
+import { ArrowLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Drawer } from "vaul";
@@ -159,6 +161,10 @@ function RouteComponent() {
   return (
     <div className="relative h-screen overflow-y-auto pr-4 pb-20 pl-[29px] text-white">
       <BackButton onClick={() => navigate({ to: "/alliances" })} />
+
+      <div className="absolute top-4 left-4">
+        <ArrowLeft onClick={() => navigate({ to: "/alliances" })} />
+      </div>
       {isOwner && (
         <Drawer.Root>
           <Drawer.Trigger asChild>
@@ -170,7 +176,7 @@ function RouteComponent() {
           </Drawer.Trigger>
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
-            <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 z-[1000] h-fit overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] shadow-lg outline-none">
+            <Drawer.Content className="fixed right-0 bottom-0 left-0 z-[1000] h-fit overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] shadow-lg outline-none">
               <div className="flex flex-col p-6">
                 <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-[#575757]" />
                 <div className="font-manrope mb-4 text-center text-2xl font-bold text-white">
@@ -297,9 +303,16 @@ function RouteComponent() {
         </div>
       ) : (
         <div>
-          <div className="mt-4 mb-[17px] flex h-[60px] w-full items-center justify-center rounded-2xl bg-[#222221]">
-            <div className="font-manrope text-[] text-sm font-medium opacity-50">
-              {t("Channel info")}
+          <div className="mt-4 mb-[17px] flex h-[32px] w-full items-center justify-center rounded-full bg-[#222221]">
+            <div className="font-manrope text-sm font-medium text-[#85BF1A] opacity-50">
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openTelegramLink(`https://t.me/${userAlliance?.telegramChannelUrl}`);
+                }}
+              >
+                {userAlliance?.telegramChannelUrl || "@example"}
+              </div>
             </div>
           </div>
 

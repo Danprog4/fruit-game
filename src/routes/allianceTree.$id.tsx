@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Loader2 as Spinner } from "lucide-react";
+import { ArrowLeft, Loader2 as Spinner } from "lucide-react";
 import { useState } from "react";
 import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
@@ -189,6 +189,9 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen flex-col items-center overflow-y-hidden bg-[#3b390e] text-white">
+      <div className="absolute top-4 left-4 z-[1000]">
+        <ArrowLeft onClick={() => navigate({ to: "/alliance/$id", params: { id } })} />
+      </div>
       <BackButton onClick={() => navigate({ to: "/alliance/$id", params: { id } })} />
 
       <div className="relative">

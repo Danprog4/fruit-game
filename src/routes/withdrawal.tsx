@@ -1,11 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Drawer } from "vaul";
 import { BackButton } from "~/components/BackButton";
-import { About } from "~/components/icons/About";
-import { History } from "~/components/icons/History";
 import { Swap } from "~/components/icons/Swap";
 import { WITHDRAWAL_FEE } from "~/lib/constants";
 import { useTRPC } from "~/trpc/init/react";
@@ -84,15 +82,18 @@ function RouteComponent() {
       className="flex h-screen w-full flex-col overflow-hidden px-4 pt-12 text-white"
       style={{ height: window.innerHeight }}
     >
+      <div className="absolute top-4 left-4">
+        <ArrowLeft onClick={() => navigate({ to: "/wallet" })} />
+      </div>
       <BackButton onClick={() => window.history.back()} />
-      <div className="mb-9 flex items-center justify-between">
-        <div className="invisible flex items-center justify-center gap-2">
+      <div className="mb-9 flex items-center justify-center">
+        {/* <div className="invisible flex items-center justify-center gap-2">
           <About />
           <History />
-        </div>
+        </div> */}
         <div className="font-manrope text-center text-2xl font-semibold">Вывод</div>
         <div className="flex items-center justify-center gap-2">
-          <Drawer.Root>
+          {/* <Drawer.Root>
             <Drawer.Trigger asChild>
               <button className="cursor-pointer">
                 <About />
@@ -133,7 +134,7 @@ function RouteComponent() {
                 </div>
               </Drawer.Content>
             </Drawer.Portal>
-          </Drawer.Root>
+          </Drawer.Root> */}
         </div>
       </div>
       <div className="relative z-10"></div>

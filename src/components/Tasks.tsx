@@ -86,7 +86,10 @@ export const TasksList = () => {
 const StartTaskButton = ({ onGo }: { onGo: () => void }) => {
   return (
     <button
-      onClick={onGo}
+      onClick={(e) => {
+        e.stopPropagation();
+        onGo();
+      }}
       className="flex h-[30px] w-[90px] items-center justify-center rounded-full bg-[#76AD10] text-xs text-white"
     >
       Перейти

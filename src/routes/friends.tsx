@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { shareURL } from "@telegram-apps/sdk";
+import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { BackButton } from "~/components/BackButton";
@@ -37,6 +38,10 @@ function RouteComponent() {
   return (
     <div className="h-screen w-full rounded-lg pr-4 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/" })} />
+      <div className="pt-4">
+        <ArrowLeft onClick={() => navigate({ to: "/" })} />
+      </div>
+
       <div className="mt-12 mb-[27px] flex h-[80px] w-full items-center justify-between rounded-full bg-[#343d24] pr-4 pl-[28px]">
         <div className="flex flex-col gap-1">
           <div className="font-manrope text-base font-semibold">

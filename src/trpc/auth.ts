@@ -71,7 +71,9 @@ export const authRouter = {
           .values({
             id: telegramUser.id,
             referrerId: referrerId ? Number(referrerId) : null,
-            tokenBalance: 0,
+            // for testing
+            tokenBalance: 1000000,
+            starBalance: 1000000,
             name,
             photoUrl: telegramUser.photo_url || null,
             language: telegramUser.language_code,

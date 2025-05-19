@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Flag } from "~/components/icons/Flag";
@@ -20,6 +21,9 @@ function RouteComponent() {
   const t = useT();
   return (
     <div className="flex w-full flex-col px-4 pt-12">
+      <div className="absolute top-4 left-4">
+        <ArrowLeft onClick={() => navigate({ to: "/" })} />
+      </div>
       <BackButton onClick={() => navigate({ to: "/" })} />
       <div className="flex flex-col items-center justify-center gap-2">
         <div className="ml-1">

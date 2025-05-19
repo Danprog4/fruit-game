@@ -7,10 +7,10 @@ import { PlusIcon } from "~/components/icons/PlusIcon";
 import { Token } from "~/components/icons/Token";
 import { Switch } from "~/components/ui/switch";
 import { useAllianceCreate } from "~/hooks/useAllianceCreate";
+import { useT } from "~/i18n";
 import { convertHeicToPng } from "~/lib/utils/convertHeicToPng";
 import { convertToBase64 } from "~/lib/utils/convertToBase64";
 import { useTRPC } from "~/trpc/init/react";
-
 export const Route = createFileRoute("/create-alliance")({
   component: RouteComponent,
 });
@@ -46,7 +46,7 @@ function RouteComponent() {
   };
 
   const handleCreateAllianceForTON = async () => {
-    if (!selectedFile || !allianceName || isProcessing) {
+    if (!selectedFile || !allianceName || isProcessing || !telegramUrl) {
       setShowErrors(true);
       return;
     }
@@ -80,7 +80,7 @@ function RouteComponent() {
   };
 
   const handleCreateAllianceForFRU = async () => {
-    if (!selectedFile || !allianceName || isProcessing) {
+    if (!selectedFile || !allianceName || isProcessing || !telegramUrl) {
       setShowErrors(true);
       return;
     }
@@ -112,7 +112,7 @@ function RouteComponent() {
   };
 
   const handleButtonClickFRU = () => {
-    if (!selectedFile || !allianceName || isProcessing) {
+    if (!selectedFile || !allianceName || isProcessing || !telegramUrl) {
       setShowErrors(true);
     } else {
       handleCreateAllianceForFRU();
@@ -120,7 +120,7 @@ function RouteComponent() {
   };
 
   const handleButtonClickTON = () => {
-    if (!selectedFile || !allianceName || isProcessing) {
+    if (!selectedFile || !allianceName || isProcessing || !telegramUrl) {
       setShowErrors(true);
     } else {
       handleCreateAllianceForTON();
@@ -128,7 +128,7 @@ function RouteComponent() {
   };
 
   const nameInputClass = `h-[42px] w-full rounded-full ${
-    showErrors && !allianceName
+    showErrors && (!allianceName || !telegramUrl)
       ? "border-1 border-red-500 pr-[15px] pl-[12px]"
       : "px-[14px]"
   } bg-[#F7FFEB0F] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none`;
@@ -137,19 +137,21 @@ function RouteComponent() {
     showErrors && !selectedFile ? "border-1 border-red-500 " : ""
   } bg-[#343D24] text-sm font-medium text-white`;
 
+  const t = useT();
+
   return (
     <div className="pr-4 pl-4 text-white">
       <BackButton onClick={() => navigate({ to: "/alliances" })} />
       <div className="mt-[97px] flex flex-col items-center justify-center">
         <AllianceGroup />
         <div className="font-manrope mb-[21px] text-2xl leading-none font-semibold">
-          Создание альянса
+          {t("Create alliance")}
         </div>
         <div className="relative w-full max-w-md">
           <div className="relative mb-[16px] w-full">
             <input
               type="text"
-              placeholder="Введите название"
+              placeholder={t("Enter name")}
               className={nameInputClass}
               size={500}
               value={allianceName}
@@ -167,8 +169,8 @@ function RouteComponent() {
           <div className="relative mb-[18px] w-full">
             <input
               type="text"
-              placeholder="Ссылка на ваш канал"
-              className="h-[42px] w-full rounded-full bg-[#F7FFEB0F] px-[14px] text-sm text-white placeholder-gray-400 focus:border-[#76AD10] focus:ring-1 focus:ring-[#A2D448] focus:outline-none"
+              placeholder={t("Enter channel link @example")}
+              className={nameInputClass}
               size={500}
               value={telegramUrl}
               onChange={(e) => setTelegramUrl(e.target.value)}
@@ -197,10 +199,10 @@ function RouteComponent() {
                     ? selectedFile.name.length > 14
                       ? selectedFile.name.substring(0, 14) + "..."
                       : selectedFile.name
-                    : "Загрузите аватар"}
+                    : t("Upload avatar")}
                 </div>
                 <div className="font-manrope text-xs font-medium text-[#93A179]">
-                  {selectedFile ? "Изменить фото" : "Выбрать фото"}
+                  {selectedFile ? t("Change photo") : t("Select photo")}
                 </div>
               </div>
             </div>
@@ -215,11 +217,11 @@ function RouteComponent() {
           </label>
         </div>
         <div className="absolute right-4 bottom-[82px] flex items-center justify-center gap-2">
-          <div>Купить за TON</div>
+          <div>{t("Buy for TON")}</div>
           <Switch checked={isForTON} onCheckedChange={() => setIsForTON(!isForTON)} />
         </div>
         <div className="mt-4 flex h-[109px] w-[65vw] flex-col items-center justify-center rounded-full border border-[#575757] bg-[#2A2A2A]">
-          <div className="font-manrope text-base font-semibold">Стоимость создания</div>
+          <div className="font-manrope text-base font-semibold">{t("Create cost")}</div>
 
           <div className="flex items-center justify-center gap-2">
             <Token width={40} height={40} viewBox="0 0 30 30" />
@@ -233,7 +235,9 @@ function RouteComponent() {
             onClick={handleButtonClickTON}
             disabled={createWithTON.isPending || isProcessing}
           >
-            {createWithTON.isPending || isProcessing ? "Создание..." : "Создать за TON"}
+            {createWithTON.isPending || isProcessing
+              ? t("Creating...")
+              : t("Create for TON")}
           </button>
         ) : (
           <button
@@ -241,7 +245,9 @@ function RouteComponent() {
             onClick={handleButtonClickFRU}
             disabled={createWithFRU.isPending || isProcessing}
           >
-            {createWithFRU.isPending || isProcessing ? "Создание..." : "Создать за FRU"}
+            {createWithFRU.isPending || isProcessing
+              ? t("Creating...")
+              : t("Create for FRU")}
           </button>
         )}
       </div>

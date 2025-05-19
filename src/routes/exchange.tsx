@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { BackButton } from "~/components/BackButton";
 import { Graphic } from "~/components/images/Graphic";
@@ -8,6 +8,7 @@ import getExchangeRateDisplay from "~/lib/utils/converter/getExchangeRateDisplay
 import getPercentageChange from "~/lib/utils/converter/getPercentageChange";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Token } from "~/components/icons/Token";
 import { getTokenBalance } from "~/lib/utils/getTokenBalance";
@@ -98,8 +99,13 @@ function RouteComponent() {
 
   const percentChange = getPercentageChange();
 
+  const navigate = useNavigate();
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-20 text-white">
+      <div className="absolute top-4 left-4">
+        <ArrowLeft onClick={() => navigate({ to: "/wallet" })} />
+      </div>
       <BackButton onClick={() => window.history.back()} />
       <div className="font-manrope mx-auto mb-[33px] text-center text-2xl font-semibold">
         Обмен
