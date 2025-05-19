@@ -5,7 +5,7 @@ import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   vite: {
-    build: { target: "esnext" },
+    build: { target: "es2022" },
     plugins: [
       tsConfigPaths({
         projects: ["./tsconfig.json"],
