@@ -7,7 +7,7 @@ const client = new TonClient({
   endpoint: "https://toncenter.com/api/v2/jsonRPC",
 });
 
-const JETTON_MASTER_ADDRESS = import.meta.env.VITE_JETTON_ADDRESS;
+const JETTON_MASTER_ADDRESS = import.meta.env.JETTON_MASTER_ADDRESS;
 const OUR_ADDRESS = import.meta.env.VITE_OUR_ADDRESS;
 
 console.log("JETTON_MASTER_ADDRESS:", JETTON_MASTER_ADDRESS);

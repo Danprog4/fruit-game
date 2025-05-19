@@ -81,7 +81,7 @@ export const FarmList = () => {
                 className="fixed inset-0 bg-black/40"
                 onClick={() => setSelectedFarm(null)}
               />
-              <Drawer.Content className="fixed right-0 bottom-0 left-0 flex max-h-[82vh] flex-col rounded-t-4xl bg-[#2A2A2A]">
+              <Drawer.Content className="fixed right-0 bottom-0 left-0 z-[1000] flex max-h-[82vh] flex-col rounded-t-4xl bg-[#2A2A2A]">
                 <div className="mx-auto w-full max-w-md overflow-auto rounded-t-[10px] p-4 text-white">
                   <Drawer.Handle onClick={() => setSelectedFarm(null)} />
                   <Drawer.Title className="mt-4 flex items-center justify-center gap-2 text-lg font-medium">

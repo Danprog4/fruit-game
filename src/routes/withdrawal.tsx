@@ -100,7 +100,7 @@ function RouteComponent() {
             </Drawer.Trigger>
             <Drawer.Portal>
               <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-              <Drawer.Content className="fixed right-0 bottom-0 left-0 mt-24 flex h-[80vh] flex-col rounded-t-[10px] bg-[#1A1A1A] p-4">
+              <Drawer.Content className="fixed right-0 bottom-0 left-0 z-[1000] mt-24 flex h-[80vh] flex-col rounded-t-[10px] bg-[#1A1A1A] p-4">
                 <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-400" />
                 <div className="p-4">
                   <h2 className="mb-4 text-xl font-semibold text-white">О выводе</h2>

@@ -170,7 +170,7 @@ function RouteComponent() {
           </Drawer.Trigger>
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
-            <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 h-fit overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] shadow-lg outline-none">
+            <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 z-[1000] h-fit overflow-y-auto rounded-t-[20px] bg-[#2A2A2A] shadow-lg outline-none">
               <div className="flex flex-col p-6">
                 <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-[#575757]" />
                 <div className="font-manrope mb-4 text-center text-2xl font-bold text-white">

@@ -7,7 +7,7 @@ const client = new TonClient({
   apiKey: process.env.TON_CENTER_API_KEY,
 });
 
-const JETTON_MASTER_ADDRESS = process.env.VITE_JETTON_ADDRESS as string;
+const JETTON_MASTER_ADDRESS = process.env.JETTON_MASTER_ADDRESS as string;
 const FORWARD_TON_AMOUNT = toNano("0.02");
 const TRANSACTION_GAS_FEE = toNano("0.1");
 
