@@ -14,9 +14,11 @@ import Wallet from "~/components/icons/navbar/Wallet";
 import { Token } from "~/components/icons/Token";
 import { Wallet as WalletIcon } from "~/components/icons/Wallet";
 import { Transaction } from "~/components/Transaction";
+import { useJettonBalance } from "~/hooks/useJettonBalance";
 import { useT } from "~/i18n";
 import { FARMS_CONFIG } from "~/lib/farms.config";
 import { getShortAddress } from "~/lib/utils/address";
+import { tokenPriceInUSD } from "~/lib/web3/token-price-stonfi";
 import { useTRPC } from "~/trpc/init/react";
 
 export const Route = createFileRoute("/wallet")({
@@ -37,6 +39,7 @@ function RouteComponent() {
   const balanceIntervalRef = useRef<number | null>(null);
   const { data: users } = useQuery(trpc.main.getUsers.queryOptions());
   const { data: user } = useQuery(trpc.main.getUser.queryOptions());
+  const jettonBalance = useJettonBalance(user?.walletAddress ?? "");
 
   const calculateCurrentBalances = () => {
     if (!user) return {};
@@ -258,6 +261,21 @@ function RouteComponent() {
     );
   }, [lastTxs.data, getLastWithdrawals.data]);
 
+  const tokenPrice = useMemo(() => {
+    return jettonBalance ? tokenPriceInUSD * Number(jettonBalance) : 0;
+  }, [jettonBalance]);
+
+  const balanceFruitsInUSD = (farmId: string) => {
+    const farmConfig = FARMS_CONFIG.find((f) => f.id === farmId);
+    if (!farmConfig) return 0;
+    if (balances === undefined) return 0;
+    const balance = ((balances[farmId] / farmConfig.rateFru / 1) * tokenPriceInUSD)
+      .toFixed(3)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    console.log(balance);
+    return balance;
+  };
+
   return (
     <div className="flex h-screen w-full flex-col overflow-y-auto px-4 pt-12 pb-28 text-white">
       <BackButton onClick={() => window.history.back()} />
@@ -335,12 +353,14 @@ function RouteComponent() {
               <div className="flex flex-col items-start gap-1">
                 <div className="font-manrope text-base font-semibold">FRU</div>
                 <div className="font-manrope text-xs font-medium text-[#93A179]">
-                  {user?.tokenBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
+                  {jettonBalance?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") ?? 0}{" "}
                   FRU
                 </div>
               </div>
             </div>
-            <div className="font-manrope pr-4 text-lg font-semibold">8.30$</div>
+            <div className="font-manrope pr-4 text-lg font-semibold">
+              {tokenPrice.toFixed(2)} $
+            </div>
           </div>
 
           {!isWalletPage && (
@@ -429,9 +449,7 @@ function RouteComponent() {
                   </div>
                 </div>
                 <div className="font-manrope pr-4 text-lg font-semibold">
-                  {farm.rateFru
-                    ? `${(balances[farm.id] / farm.rateFru / 1).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}$`
-                    : "0$"}
+                  {balanceFruitsInUSD(farm.id) + " $"}
                 </div>
               </div>
             ))
