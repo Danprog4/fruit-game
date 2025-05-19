@@ -67,7 +67,7 @@ function RouteComponent() {
                 content: (
                   <div className="z-10 flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
                     <span className="font-manrope text-xs leading-none font-medium">
-                      {t("Start game")}
+                      {t("Buy farms and get tokens")}
                     </span>
                   </div>
                 ),
@@ -76,7 +76,7 @@ function RouteComponent() {
                 content: (
                   <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
                     <span className="font-manrope text-xs leading-none font-medium">
-                      Двойные бонусы за приглашение друзей
+                      {t("Invite bonuses")}
                     </span>
                   </div>
                 ),
@@ -85,7 +85,7 @@ function RouteComponent() {
                 content: (
                   <div className="flex h-[42px] shrink-0 items-center justify-center rounded-full bg-[#F7FFEB0F] px-[22px]">
                     <span className="font-manrope text-xs leading-none font-medium">
-                      Новые награды в заданиях
+                      {t("New rewards in quests")}
                     </span>
                   </div>
                 ),

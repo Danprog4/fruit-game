@@ -114,6 +114,8 @@ export const translations = {
     "Enter channel link @example": "Enter channel link @example",
     "Create alliance": "Create alliance",
     "Select photo": "Select photo",
+    "Invite bonuses": "Invite bonuses",
+    "New rewards in quests": "New rewards in quests",
     "Buy for TON": "Buy for TON",
   },
   ru: {
@@ -228,6 +230,8 @@ export const translations = {
     "Create alliance": "Создать альянс",
     "Select photo": "Выбрать фото",
     "Buy for TON": "Купить за TON",
+    "Invite bonuses": "Бонусы за приглашение друзей",
+    "New rewards in quests": "Новые награды в заданиях",
   },
 } as const;
 
