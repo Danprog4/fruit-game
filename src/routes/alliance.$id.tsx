@@ -320,7 +320,9 @@ function RouteComponent() {
             <div className="font-manrope flex items-center gap-1 text-xs leading-none font-medium">
               <div className="text-lg">{fruitIcon}</div>
               {t("Production")}:{" "}
-              <span className="text-[#85BF1A]">{fruitRussianName}</span>
+              <span className="text-[#85BF1A]">
+                {isRu ? fruitRussianName : seasonCurr}
+              </span>
             </div>
             <div className="font-manrope flex items-center gap-[7px] text-xs leading-none font-medium">
               <ClockIcon />
