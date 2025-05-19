@@ -304,7 +304,7 @@ function RouteComponent() {
       ) : (
         <div>
           <div className="mt-4 mb-[17px] flex h-[32px] w-full items-center justify-center rounded-full bg-[#222221]">
-            <div className="font-manrope text-sm font-medium text-[#85BF1A] opacity-50">
+            <div className="font-manrope text-sm font-medium text-[#85BF1A]">
               <div
                 onClick={(e) => {
                   e.stopPropagation();
