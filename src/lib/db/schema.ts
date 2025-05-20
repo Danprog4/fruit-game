@@ -45,7 +45,7 @@ export const alliancesTable = pgTable("alliances", {
 
 export const adminBotTable = pgTable("admin_bot", {
   id: serial("id").primaryKey(),
-  text: jsonb("text").default({}).$type<Record<string, string>>().notNull(),
+  text: jsonb("text").default({}).$type<Record<string, string>[]>().notNull(),
 });
 
 export const adminWithdrawalsTable = pgTable("admin_withdrawals", {

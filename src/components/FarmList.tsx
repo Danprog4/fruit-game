@@ -136,7 +136,7 @@ export const FarmList = () => {
                         buyFarmForTON.variables === farm.id ? (
                           <span>{t("Please wait...")}</span>
                         ) : (
-                          `${t("Buy for")} ${farm.priceInFRU} "FRU (TON))`
+                          `${t("Buy for")} ${farm.priceInFRU} FRU (TON)`
                         )}
                       </button>
 
