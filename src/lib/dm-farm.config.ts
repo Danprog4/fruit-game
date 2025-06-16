@@ -9,7 +9,7 @@ export interface FarmLevel {
 export const farmLevels: FarmLevel[] = [
   { level: 1, incomePerHour: 1, priceInStars: 0, priceInTgStars: 0 },
   { level: 2, incomePerHour: 2, priceInStars: 100, priceInTgStars: 10 },
-  { level: 3, incomePerHour: 4, priceInStars: 500, priceInTgStars: 3 },
+  { level: 3, incomePerHour: 4, priceInStars: 500, priceInTgStars: 30 },
   { level: 4, incomePerHour: 6, priceInStars: 1000, priceInTgStars: 50 },
   { level: 5, incomePerHour: 8, priceInStars: 1500, priceInTgStars: 70 },
   { level: 6, incomePerHour: 10, priceInStars: 2000, priceInTgStars: 90 },
